@@ -5,11 +5,8 @@
 .typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); margin: var(--sp04) 0 0; }
 
 .typing-page .typing-answer { margin: 0 0 var(--sp16); padding: var(--sp16); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); font-family: var(--font-main); font-size: var(--ft20); letter-spacing: 1px; line-height: 1.9; white-space: pre-wrap; word-break: break-all; min-height: 3.5rem; overflow-x: auto; }
-.typing-page .typing-char { color: var(--ink-dim); }
 .typing-page .typing-char.is-ok { color: var(--hp-green); }
-.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); border-radius: 2px; }
-.typing-page .typing-char.is-cursor { border-left: 2px solid var(--gold); margin-left: -2px; animation: typing-blink 1s steps(1) infinite; }
-@keyframes typing-blink { 50% { border-color: transparent; } }
+.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
 
 .typing-page .typing-row { display: flex; gap: var(--sp08); align-items: stretch; }
 .typing-page .typing-input { min-height: 0; flex: 1; font-size: var(--ft20); }

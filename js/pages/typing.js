@@ -9,10 +9,8 @@ function renderTarget(target, typed) {
     let html = '';
     for (let i = 0; i < target.length; i++) {
         const ch = target[i] === ' ' ? '&nbsp;' : escapeHtml(target[i]);
-        let cls = 'is-pending';
-        if (i < typed.length) cls = typed[i] === target[i] ? 'is-ok' : 'is-bad';
-        else if (i === typed.length) cls = 'is-cursor';
-        html += `<span class="typing-char ${cls}">${ch}</span>`;
+        const cls = i < typed.length ? (typed[i] === target[i] ? ' is-ok' : ' is-bad') : '';
+        html += `<span class="typing-char${cls}">${ch}</span>`;
     }
     if (typed.length > target.length) {
         html += `<span class="typing-char is-bad">${escapeHtml(typed.slice(target.length))}</span>`;
