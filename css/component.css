@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+    --bg: #150C22;
+    --panel: #1E1230;
+    --panel-light: #2A1B42;
+    --p1: #00E5FF;
+    --p2: #FF2E63;
+    --gold: #FFD23F;
+    --hp-green: #4ADE80;
+    --hp-red: #FF4757;
+    --ink: #F1EEFA;
+    --ink-dim: #9084AE;
+
+    --font-main: 'Pretendard', sans-serif;
+    --font-point: 'Press Start 2P', cursive;
+
+    --ft12: 12px;
+    --ft14: 14px;
+    --ft16: 16px;
+    --ft20: 20px;
+    --ft24: 24px;
+    --ft32: 32px;
+    --ft40: 40px;
+    --ft60: 60px;
+    --ft80: 80px;
+    --radius: 10px;
+    --sp04: 4px;
+    --sp08: 8px;
+    --sp16: 16px;
+    --sp24: 24px;
+    --sp40: 40px;
+    --sp60: 60px;
+    --sp80: 80px;
+    --sp120: 120px;
+}
+
+.btn { display: inline-block; font-family: var(--font-main); font-weight: 600; font-size: var(--ft14); color: var(--bg); background: var(--gold); border: 0; border-radius: var(--radius); padding: var(--sp16) var(--sp24); cursor: pointer; letter-spacing: 0.5px; }
+.btn:hover { filter: brightness(1.1); }
+.btn-ghost { background: transparent; color: var(--ink); border: 2px solid var(--panel-light); }
+.btn-point { font-family: var(--font-point); font-size: var(--ft12); }
+
+.card { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); }
+.card .card-title { font-family: var(--font-main); color: var(--p1); margin-bottom: var(--sp08); }
+
+/* 난이도 / 모드 탭 */
+.tabs { display: flex; gap: var(--sp08); }
+.tabs .tabs-btn { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink-dim); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); cursor: pointer; }
+.tabs .tabs-btn.is-active { color: var(--bg); background: var(--p1); border-color: var(--p1); }
+.battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
+.battle-page .battle-layout .battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp08); text-transform: uppercase; letter-spacing: 1px; }
+.dom-tree { font-family: var(--font-main); font-size: var(--ft14); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); white-space: pre; overflow-x: auto; }
+.preview-frame { width: 100%; height: 220px; border: 1px solid var(--panel-light); border-radius: var(--radius); background: #fff; }
+
+/* CSS 입력창 */
+.css-editor { width: 100%; min-height: 160px; font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); resize: vertical; }
+.css-editor:focus { outline: 2px solid var(--p1); }
+
+/* 체력바 */
+.health-bar { width: 100%; height: 18px; background: var(--panel-light); border-radius: 999px; overflow: hidden; border: 1px solid var(--bg); }
+.health-bar .health-bar-fill { height: 100%; background: var(--hp-green); transition: width 0.4s ease; }
+.health-bar .health-bar-fill.is-low { background: var(--hp-red); }
+
+/* 특이도 breakdown 표 (좁은 화면에서 표가 넘치면 가로 스크롤) */
+.table-scroll { overflow-x: auto; margin-top: var(--sp08); }
+.table-scroll .specificity-table { width: 100%; min-width: 420px; border-collapse: collapse; font-family: var(--font-main); font-size: var(--ft14); }
+.table-scroll .specificity-table th, .table-scroll .specificity-table td { border: 1px solid var(--panel-light); padding: var(--sp08); text-align: center; }
+.table-scroll .specificity-table th { color: var(--ink-dim); font-weight: normal; }
+
+/* 결과 배지 */
+.result-badge { display: inline-block; font-family: var(--font-main); font-weight: 600; font-size: var(--ft14); padding: var(--sp08) var(--sp16); border-radius: var(--radius); }
+.result-badge.result-badge-win { background: var(--hp-green); color: var(--bg); }
+.result-badge.result-badge-lose { background: var(--hp-red); color: var(--bg); }
+
+/* KO 스탬프 */
+.ko-stamp { font-family: var(--font-point); font-size: var(--ft24); color: var(--gold); letter-spacing: 2px; }
+
+/* 페이지 공통 */
+.page-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft24); color: var(--gold); margin-bottom: var(--sp08); }
+.page-desc { color: var(--ink-dim); }
+.hint-text { color: var(--ink-dim); font-size: var(--ft14); margin-top: var(--sp08); }
+
+/* 랜딩 */
+.landing-hero { text-align: center; padding: var(--sp40) 0; }
+.landing-hero .landing-hero-headline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft24); color: var(--gold); line-height: 1.6; margin-bottom: var(--sp16); }
+.landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp24); }
+.landing-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin-bottom: var(--sp40); }
+.landing-benefits { margin-bottom: var(--sp40); }
+.landing-benefits ul { margin-top: var(--sp08); padding-left: var(--sp24); }
+.landing-benefits li { margin-bottom: var(--sp04); }
+
+
+/* 배틀 컨트롤 */
+.battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
+.battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp16) 0 var(--sp08); text-transform: uppercase; letter-spacing: 1px; }
+.battle-page .battle-col { min-width: 0; }
+.battle-page .battle-status { margin-top: var(--sp16); }
+.battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); }
+.battle-page .battle-timer.is-low { color: var(--hp-red); }
+.battle-page .battle-actions { display: flex; gap: var(--sp08); margin-top: var(--sp16); }
+.battle-page .battle-feedback { list-style: none; margin: var(--sp08) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
+.battle-page .battle-feedback li { margin: var(--sp04) 0; }
+
+/* 체력바 블록 */
+.health-bar-block { margin-bottom: var(--sp08); }
+.health-bar-block .health-bar-label { display: block; font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
+
+/* KO 스탬프 애니메이션 */
+.ko-stamp { display: inline-block; animation: ko-pop 0.4s ease; }
+@keyframes ko-pop { 0% { transform: scale(2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* 타자연습 */
+.typing-page .typing-adapt { font-size: var(--ft14); color: var(--ink-dim); display: flex; align-items: center; gap: var(--sp04); }
+.typing-page .typing-stats { display: flex; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
+.typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 90px; }
+.typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
+.typing-page .typing-stats span { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-mission { color: var(--gold); margin-top: var(--sp16); }
+.typing-page .typing-answer { font-size: var(--ft20); letter-spacing: 1px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); margin: var(--sp08) 0; min-height: 3rem; overflow-x: auto; white-space: nowrap; }
+.typing-page .typing-char.is-ok { color: var(--hp-green); }
+.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
+.typing-page .typing-input { min-height: 0; }
+
+/* 진단 */
+.diagnose-page .diagnose-target { display: flex; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.diagnose-page .diagnose-target label { display: flex; flex-direction: column; gap: var(--sp04); font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .diagnose-target input { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08); }
+.diagnose-page .diagnose-table td { text-align: left; }
+.diagnose-page .diagnose-table .is-winner { background: rgba(74, 222, 128, 0.15); }
+
+/* 퀘스트 */
+.quest-page .quest-streak { display: flex; align-items: center; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.quest-page .quest-streak-badge { font-family: var(--font-point); font-size: var(--ft14); color: var(--gold); }
+.quest-page .quest-list { list-style: none; display: grid; gap: var(--sp08); }
+.quest-page .quest-item { display: flex; align-items: center; gap: var(--sp08); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); }
+.quest-page .quest-item.is-done { border-color: var(--hp-green); color: var(--hp-green); }
+.quest-page .quest-item-check { width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border: 1px solid currentColor; border-radius: var(--sp04); }
+.quest-page .quest-reward { color: var(--gold); }
+.quest-page .quest-reward-list { list-style: none; margin-top: var(--sp08); display: grid; gap: var(--sp04); color: var(--ink-dim); }
+.quest-page .quest-reward-list .is-unlocked { color: var(--hp-green); }
+
+/* 스탬프 달력 */
+.stamp-calendar { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); max-width: 360px; }
+.stamp-calendar .stamp-calendar-head, .stamp-calendar .stamp-calendar-grid { list-style: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp04); }
+.stamp-calendar .stamp-calendar-head { margin-bottom: var(--sp04); }
+.stamp-calendar .stamp-calendar-day-label { text-align: center; font-size: var(--ft12); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--ft12); background: var(--bg); border-radius: var(--sp04); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell.is-done { background: var(--hp-green); color: var(--bg); }
+.stamp-calendar .stamp-calendar-cell.is-today { outline: 2px solid var(--p1); }
+.stamp-calendar .stamp-calendar-cell.is-future { opacity: 0.35; }
+
+/* 리포트 */
+.report-page .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin: var(--sp16) 0; }
+.report-page .report-cards dt { font-size: var(--ft12); color: var(--ink-dim); }
+.report-page .report-cards dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin-top: var(--sp08); }
+.report-page .report-chart { width: 100%; height: 240px; display: block; }
+.report-page .report-beforeafter { color: var(--p1); margin-top: var(--sp08); }
+.report-page .dex-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp16); margin-top: var(--sp16); }
+.report-page .dex-spec { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp08) 0; }
+.report-page .report-insight { margin-top: var(--sp16); color: var(--ink); }
+.report-page .report-panel .tabs { margin-bottom: var(--sp16); }
+
+@media (max-width: 1024px) {
+    .landing-features,
+    .battle-page .battle-layout,
+    .report-page .report-cards,
+    .report-page .dex-list { grid-template-columns: 1fr; }
+}
