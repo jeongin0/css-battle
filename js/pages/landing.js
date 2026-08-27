@@ -112,7 +112,7 @@ export function render(container) {
 
         <section class="landing-howto">
             <h2 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h2>
-            <p class="landing-howto-lead">CSS는 화면의 첫인상을 결정하는 언어인데, 정작 "왜 안 먹히는지"는 눈에 잘 안 보입니다. 이 사이트는 그 우선순위(specificity) 감각을 대결·타이핑·진단으로 눈과 손에 익히려고 만들었습니다.</p>
+            <p class="landing-howto-lead">CSS는 화면의 첫인상을 결정하는 언어입니다.<br>정작 "왜 안 먹히는지"는 눈에 잘 안 보입니다.<br>이 사이트는 그 우선순위(specificity) 감각을 대결·타이핑·진단으로 눈과 손에 익히기 위해 만들었습니다.</p>
             <ol class="landing-howto-list">
                 ${HOWTO.map((h) => `
                     <li class="landing-howto-step">
