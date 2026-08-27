@@ -25,7 +25,7 @@ export function render(container) {
     let startedAt = 0;
     let keystrokes = 0;
     let correctKeystrokes = 0;
-    let correctChars = 0;      // 완료한 드릴의 글자 수 누적
+    let correctChars = 0;
     let combo = 0;
     let bestCombo = 0;
     let completed = 0;
@@ -34,16 +34,20 @@ export function render(container) {
     container.innerHTML = `
         <section class="container typing-page">
             <h2 class="page-title">타자연습 모드</h2>
-            <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하세요. 정확히 일치해야 다음으로 넘어갑니다.</p>
+            <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하고 Enter로 넘기세요.</p>
 
-            <ul class="typing-stats">
-                <li><span class="typing-stats-value" data-role="wpm">0</span><span class="typing-stats-label">타 / 분</span></li>
-                <li><span class="typing-stats-value" data-role="acc">100</span><span class="typing-stats-label">정확도 %</span></li>
-                <li><span class="typing-stats-value" data-role="combo">0</span><span class="typing-stats-label">콤보</span></li>
-            </ul>
+            <dl class="typing-stats">
+                <div><dt>타 / 분</dt><dd data-role="wpm">0</dd></div>
+                <div><dt>정확도 %</dt><dd data-role="acc">100</dd></div>
+                <div><dt>콤보</dt><dd data-role="combo">0</dd></div>
+            </dl>
 
-            <pre class="typing-target" data-role="target"></pre>
-            <input type="text" class="css-editor typing-input" data-role="input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="여기에 그대로 입력">
+            <pre class="typing-answer" data-role="target"></pre>
+
+            <div class="typing-row">
+                <input type="text" class="css-editor typing-input" data-role="input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="여기에 그대로 입력">
+                <button type="button" class="btn typing-enter" data-role="enter">Enter ↵</button>
+            </div>
 
             <div class="typing-actions">
                 <button type="button" class="btn btn-ghost" data-role="skip">다음 (건너뛰기)</button>
@@ -59,6 +63,7 @@ export function render(container) {
         wpm: container.querySelector('[data-role="wpm"]'),
         acc: container.querySelector('[data-role="acc"]'),
         combo: container.querySelector('[data-role="combo"]'),
+        enter: container.querySelector('[data-role="enter"]'),
         skip: container.querySelector('[data-role="skip"]')
     };
 
@@ -71,7 +76,7 @@ export function render(container) {
     }
 
     function loadDrill(resetCombo) {
-        if (resetCombo) { combo = 0; }
+        if (resetCombo) combo = 0;
         hadErrorThisDrill = false;
         target = nextDrill();
         el.input.value = '';
@@ -81,7 +86,14 @@ export function render(container) {
         renderStats();
     }
 
-    function completeDrill() {
+    function submit() {
+        if (el.input.value !== target) {
+            el.feedback.textContent = '아직 정확히 일치하지 않습니다.';
+            combo = 0;
+            el.combo.textContent = 0;
+            hadErrorThisDrill = true;
+            return;
+        }
         completed += 1;
         correctChars += target.length;
         if (!hadErrorThisDrill) {
@@ -90,9 +102,8 @@ export function render(container) {
         } else {
             combo = 0;
         }
-        el.combo.textContent = combo;
+        renderStats();
         if (completed % 5 === 0) {
-            renderStats();
             addTypingRecord({
                 wpm: Number(el.wpm.textContent),
                 accuracy: Number(el.acc.textContent),
@@ -100,8 +111,8 @@ export function render(container) {
                 difficulty: 'all'
             });
         }
-        el.feedback.textContent = '정확해요! 다음 문제로 넘어갑니다.';
-        setTimeout(() => loadDrill(false), 350);
+        el.feedback.textContent = '정확해요!';
+        loadDrill(false);
     }
 
     function onInput() {
@@ -111,28 +122,15 @@ export function render(container) {
         const pos = typed.length - 1;
         if (pos >= 0 && typed[pos] === target[pos]) correctKeystrokes += 1;
         else if (pos >= 0) hadErrorThisDrill = true;
-
         el.target.innerHTML = renderTarget(target, typed);
         renderStats();
-
-        if (typed === target) completeDrill();
-    }
-
-    function onKeyDown(e) {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-        if (el.input.value === target) { completeDrill(); return; }
-        el.feedback.textContent = '아직 시안과 정확히 일치하지 않습니다.';
-        el.input.classList.remove('is-shake');
-        void el.input.offsetWidth;
-        el.input.classList.add('is-shake');
-        hadErrorThisDrill = true;
-        combo = 0;
-        el.combo.textContent = 0;
     }
 
     el.input.addEventListener('input', onInput);
-    el.input.addEventListener('keydown', onKeyDown);
+    el.input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+    el.enter.addEventListener('click', submit);
     el.skip.addEventListener('click', () => loadDrill(true));
 
     loadDrill(false);
