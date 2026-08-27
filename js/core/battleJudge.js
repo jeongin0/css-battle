@@ -92,26 +92,50 @@ export function judgeDesignMatch(doc, targetSelector, expected) {
     return { matched: mismatches.length === 0, mismatches };
 }
 
-// 종합 판정: ① 특이도로 상대를 이김 AND ② 시안 일치
-export function judgeBattle({ doc, userCssText, problem }) {
-    const spec = judgeSpecificity(userCssText, problem.opponentRule);
-    if (!spec.valid) return { valid: false, reason: spec.reason };
+function opponentRuleList(problem) {
+    const raw = problem.opponentRules || (problem.opponentRule ? [problem.opponentRule] : []);
+    return raw.map(parseRule).filter(Boolean);
+}
 
-    const selectorMatches = selectorMatchesTarget(doc, spec.userRule.selector, problem.targetSelector);
+// 대상 요소에 실제로 매칭되는 상대 규칙 중 특이도가 가장 센 것 (breakdown 표시용)
+function dominantOpponentRule(problem, doc) {
+    const parsed = opponentRuleList(problem);
+    if (!parsed.length) return null;
+    const targets = (() => {
+        try { return [...doc.querySelectorAll(problem.targetSelector)]; } catch { return []; }
+    })();
+    const matching = parsed.filter((r) => {
+        try { return targets.length > 0 && targets.every((el) => el.matches(r.selector)); }
+        catch { return false; }
+    });
+    const pool = matching.length ? matching : parsed;
+    return [...pool].sort((a, b) => compareSpecificity(a.spec, b.spec)).pop();
+}
+
+// 종합 판정: ① 내 규칙이 상대 규칙을 특이도로 이기고 대상에 매칭 AND ② 시안 일치
+export function judgeBattle({ doc, userCssText, problem }) {
+    const userRule = parseRule(userCssText);
+    if (!userRule) {
+        return { valid: false, reason: '"선택자 { 속성: 값; }" 형태로 CSS 규칙 하나를 작성해주세요.' };
+    }
+
+    const opponentRule = dominantOpponentRule(problem, doc) || { selector: '(없음)', spec: { inline: 0, id: 0, class: 0, tag: 0, important: false } };
+    const cmp = compareSpecificity(userRule.spec, opponentRule.spec);
+    const selectorMatches = selectorMatchesTarget(doc, userRule.selector, problem.targetSelector);
     const design = judgeDesignMatch(doc, problem.targetSelector, problem.expectedStyles);
 
-    const wonSpecificity = spec.wonSpecificity && selectorMatches;
-    const result = wonSpecificity && design.matched ? 'win' : 'lose';
+    const wonSpecificity = cmp > 0 && selectorMatches;
+    const result = selectorMatches && cmp >= 0 && design.matched ? 'win' : 'lose';
 
     return {
         valid: true,
         result,
         wonSpecificity,
         selectorMatches,
-        tie: spec.tie,
+        tie: cmp === 0,
         matchedDesign: design.matched,
         mismatches: design.mismatches,
-        userRule: spec.userRule,
-        opponentRule: spec.opponentRule
+        userRule,
+        opponentRule
     };
 }
