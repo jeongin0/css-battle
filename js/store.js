@@ -2,7 +2,6 @@ const STORAGE_KEY = 'cssBattleData';
 
 const DEFAULT_STATE = {
     battleRecords: [],
-    battleBest: {},
     typingRecords: [],
     questLog: {},
     streak: { current: 0, longest: 0 },
@@ -48,21 +47,6 @@ export function addBattleRecord(record) {
     const full = { date: todayKey(), ...record };
     setState({ battleRecords: [...state.battleRecords, full] });
     return full;
-}
-
-export function getBattleBest(problemId) {
-    return state.battleBest[problemId] || null;
-}
-
-// 더 나으면(클리어 + 정밀도↑ 또는 동점이면 시간↓) 갱신하고 true 반환
-export function updateBattleBest(problemId, entry) {
-    const prev = state.battleBest[problemId];
-    const better = !prev
-        || entry.precision > prev.precision
-        || (entry.precision === prev.precision && entry.timeSec < prev.timeSec);
-    if (!better) return false;
-    setState({ battleBest: { ...state.battleBest, [problemId]: entry } });
-    return true;
 }
 
 export function addTypingRecord(record) {

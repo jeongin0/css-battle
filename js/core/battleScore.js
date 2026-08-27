@@ -6,7 +6,6 @@ import { parseStylesheet } from './cascade.js';
 import { calculateSpecificity } from './specificity.js';
 
 const CLEAR_THRESHOLD = 90;
-const BOX_TOL = 4;
 
 const PAINT_PROPS = [
     'background-color', 'color',
@@ -51,11 +50,6 @@ function elLabel(el) {
     return cls ? `.${cls.trim().split(/\s+/)[0]}` : el.tagName.toLowerCase();
 }
 
-function relRect(el, originRect) {
-    const r = el.getBoundingClientRect();
-    return { x: r.left - originRect.left, y: r.top - originRect.top, w: r.width, h: r.height };
-}
-
 // 같은 html을 렌더한 3개 문서 → 요소 트리 인덱스 정렬됨
 export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
     const aEls = [...answerDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
@@ -65,12 +59,11 @@ export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
     const aWin = answerDoc.defaultView;
     const uWin = userDoc.defaultView;
     const bWin = baseDoc.defaultView;
-    const aOrigin = answerDoc.body.getBoundingClientRect();
-    const uOrigin = userDoc.body.getBoundingClientRect();
 
     let total = 0;
     let passed = 0;
     const mismatches = [];
+    const brokenParents = new Set(); // 레이아웃이 틀린 요소 → 자식은 파급이므로 건너뜀
 
     aEls.forEach((aEl, i) => {
         const uEl = uEls[i];
@@ -78,13 +71,28 @@ export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
         if (!uEl) return;
         const label = elLabel(aEl);
 
-        const ar = relRect(aEl, aOrigin);
-        const ur = relRect(uEl, uOrigin);
-        [['x', ar.x, ur.x], ['y', ar.y, ur.y], ['너비', ar.w, ur.w], ['높이', ar.h, ur.h]].forEach(([k, av, uv]) => {
-            total += 1;
-            if (Math.abs(av - uv) <= BOX_TOL) passed += 1;
-            else mismatches.push({ label, prop: `위치·크기(${k})`, expected: `${Math.round(av)}px`, actual: `${Math.round(uv)}px` });
-        });
+        // 레이아웃: 부모 기준 상대 위치 + 크기 (px 근사, 부모가 이미 깨졌으면 스킵)
+        if (aEl.parentElement && brokenParents.has(aEl.parentElement)) {
+            brokenParents.add(aEl);
+        } else {
+            const ap = (aEl.parentElement || answerDoc.body).getBoundingClientRect();
+            const up = (uEl.parentElement || userDoc.body).getBoundingClientRect();
+            const ar = aEl.getBoundingClientRect();
+            const ur = uEl.getBoundingClientRect();
+            const checks = [
+                ['가로 위치', ar.left - ap.left, ur.left - up.left, 10],
+                ['세로 위치', ar.top - ap.top, ur.top - up.top, 10],
+                ['너비', ar.width, ur.width, Math.max(12, ar.width * 0.25)],
+                ['높이', ar.height, ur.height, Math.max(12, ar.height * 0.25)]
+            ];
+            let broke = false;
+            for (const [k, av, uv, tol] of checks) {
+                total += 1;
+                if (Math.abs(av - uv) <= tol) passed += 1;
+                else { mismatches.push({ label, prop: `레이아웃(${k})`, expected: `${Math.round(av)}px`, actual: `${Math.round(uv)}px` }); broke = true; }
+            }
+            if (broke) brokenParents.add(aEl);
+        }
 
         if (!bEl) return;
         const acs = aWin.getComputedStyle(aEl);

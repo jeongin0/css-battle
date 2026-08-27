@@ -2,7 +2,7 @@ import { previewDoc, nextBattleProblem, obfuscatedShown } from '../core/battlePr
 import { scoreAccuracy, scorePrecision } from '../core/battleScore.js';
 import { calculateSpecificity } from '../core/specificity.js';
 import { attachCodeEditor } from '../components/cssEditor.js';
-import { addBattleRecord, getBattleBest, updateBattleBest } from '../store.js';
+import { addBattleRecord } from '../store.js';
 
 export function render(container) {
     let difficulty = 'low';
@@ -107,9 +107,7 @@ export function render(container) {
     }
 
     function renderStatus() {
-        const best = getBattleBest(problem.id);
-        el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`
-            + (best ? `<span class="battle-best">최고 · 정밀도 ${best.precision} · ${formatTime(best.timeSec)}</span>` : '');
+        el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`;
     }
 
     let toastId = null;
@@ -217,11 +215,6 @@ export function render(container) {
         const prec = scorePrecision(el.cssInput.value, userDoc, problem.root);
         const won = acc.cleared;
 
-        let newBest = false;
-        if (won) {
-            newBest = updateBattleBest(problem.id, { accuracy: acc.percent, precision: prec.score, timeSec: elapsed });
-        }
-
         lastResult = {
             difficulty,
             problemId: problem.id,
@@ -232,14 +225,14 @@ export function render(container) {
         };
 
         setPhase('result');
-        renderResult(acc, prec, won, newBest);
+        renderResult(acc, prec, won);
     }
 
-    function renderResult(acc, prec, won, newBest) {
+    function renderResult(acc, prec, won) {
         const parts = [];
 
         parts.push(won
-            ? `<p class="result-badge result-badge-win">클리어</p> <span class="battle-clear-time">${formatTime(elapsed)}</span>${newBest ? ' <span class="ko-stamp">BEST!</span>' : ''}`
+            ? `<p class="result-badge result-badge-win">클리어</p> <span class="battle-clear-time">${formatTime(elapsed)}</span>`
             : `<p class="result-badge result-badge-lose">아직이에요</p>`);
 
         parts.push(`
@@ -279,7 +272,7 @@ export function render(container) {
                 <div class="battle-diff-col"><h4>내 CSS</h4><pre>${escapeHtml(el.cssInput.value || '(작성 안 함)')}</pre></div>
                 <div class="battle-diff-col"><h4>예시 정답</h4><pre>${escapeHtml(problem.answerCss)}</pre></div>
             </div>
-            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. flex든 inline-block든 <b>결과가 같으면 정답</b>이에요. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
+            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
         `);
 
         el.result.innerHTML = parts.join('');

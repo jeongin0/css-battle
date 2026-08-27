@@ -11,7 +11,6 @@
 
 .battle-page .battle-status { margin-top: var(--sp16); min-height: 20px; display: flex; align-items: baseline; gap: var(--sp16); flex-wrap: wrap; }
 .battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); }
-.battle-page .battle-best { font-size: var(--ft12); color: var(--ink-dim); }
 .battle-page .battle-clear-time { font-family: var(--font-point); font-size: var(--ft12); color: var(--hp-green); margin-left: var(--sp08); }
 
 .battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
@@ -52,7 +51,7 @@
 .battle-page .battle-feedback { list-style: none; margin: var(--sp04) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
 .battle-page .battle-feedback li { margin: var(--sp04) 0; }
 .battle-page .battle-mismatch.is-collapsed li:nth-child(n+15) { display: none; }
-.battle-page .battle-expand { margin-top: var(--sp08); font-size: var(--ft12); padding: var(--sp04) var(--sp12); border-radius: var(--sp08); }
+.battle-page .battle-expand { margin-top: var(--sp08); font-size: var(--ft14); padding: var(--sp04) var(--sp12); border-radius: var(--sp08); }
 
 .battle-page .battle-diff { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp16); }
 .battle-page .battle-diff-col h4 { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
