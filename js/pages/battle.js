@@ -108,15 +108,13 @@ export function render(container) {
 
     function renderStatus() {
         const best = getBattleBest(problem.id);
-        const bestText = best
-            ? `이 시안 최고 기록 · 정밀도 ${best.precision} · ${formatTime(best.timeSec)}`
-            : '이 시안 첫 도전';
         el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`
-            + `<span class="battle-best">${bestText}</span>`;
+            + (best ? `<span class="battle-best">최고 · 정밀도 ${best.precision} · ${formatTime(best.timeSec)}</span>` : '');
     }
 
     let toastId = null;
     function toast(msg) {
+        if (!el.toast) return;
         el.toast.textContent = msg;
         el.toast.hidden = false;
         clearTimeout(toastId);
@@ -252,10 +250,12 @@ export function render(container) {
         `);
 
         if (acc.mismatches.length) {
+            const lis = acc.mismatches.map((m) =>
+                `<li><code>${escapeHtml(m.label)}</code> ${m.prop}: 시안 <b>${escapeHtml(m.expected)}</b> / 내 결과 <b>${escapeHtml(m.actual)}</b></li>`).join('');
+            const collapsed = acc.mismatches.length > 14;
             parts.push(`<h3 class="battle-result-head">시안과 다른 부분 (${acc.mismatches.length})</h3>
-                <ul class="battle-feedback">${acc.mismatches.slice(0, 14).map((m) =>
-                    `<li><code>${escapeHtml(m.label)}</code> ${m.prop}: 시안 <b>${escapeHtml(m.expected)}</b> / 내 결과 <b>${escapeHtml(m.actual)}</b></li>`).join('')}
-                ${acc.mismatches.length > 14 ? `<li>…외 ${acc.mismatches.length - 14}개</li>` : ''}</ul>`);
+                <ul class="battle-feedback battle-mismatch${collapsed ? ' is-collapsed' : ''}">${lis}</ul>
+                ${collapsed ? `<button type="button" class="btn btn-ghost battle-expand" data-role="expand-mismatch">전체 ${acc.mismatches.length}개 보기</button>` : ''}`);
         }
         if (prec.deductions.length) {
             parts.push(`<h3 class="battle-result-head">정밀도 감점 (-${100 - prec.score})</h3>
@@ -319,6 +319,12 @@ export function render(container) {
         }
     });
     el.shield.addEventListener('contextmenu', (e) => e.preventDefault());
+    el.result.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-role="expand-mismatch"]');
+        if (!b) return;
+        b.previousElementSibling.classList.remove('is-collapsed');
+        b.remove();
+    });
     el.cssInput.addEventListener('input', updateLivePreview);
     btn.fight.addEventListener('click', startBattle);
     btn.stop.addEventListener('click', () => loadProblem(false));

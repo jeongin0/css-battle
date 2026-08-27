@@ -86,10 +86,18 @@ export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
             else mismatches.push({ label, prop: `위치·크기(${k})`, expected: `${Math.round(av)}px`, actual: `${Math.round(uv)}px` });
         });
 
+        if (!bEl) return;
         const acs = aWin.getComputedStyle(aEl);
         const ucs = uWin.getComputedStyle(uEl);
-        const bcs = bWin.getComputedStyle(bEl || aEl);
+        const bcs = bWin.getComputedStyle(bEl);
         for (const p of PAINT_PROPS) {
+            // border 색/두께는 그 변에 실제 테두리가 있을 때만 채점 (color 기본값=currentColor 오탐 방지)
+            const bd = p.match(/^border-(top|right|bottom|left)-(color|width)$/);
+            if (bd) {
+                const style = acs.getPropertyValue(`border-${bd[1]}-style`).trim();
+                const w = parseFloat(acs.getPropertyValue(`border-${bd[1]}-width`));
+                if (style === 'none' || !(w > 0)) continue;
+            }
             const av = acs.getPropertyValue(p).trim();
             const bv = bcs.getPropertyValue(p).trim();
             if (av === bv) continue; // 시안이 기본값에서 바꾸지 않은 속성은 채점 안 함
