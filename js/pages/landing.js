@@ -79,7 +79,7 @@ export function render(container) {
         </section>
 
         <section class="landing-modes">
-            <h2 class="landing-heading"><span>SELECT</span> 3가지 모드</h2>
+            <h2 class="landing-heading"><span>MODE</span> STAGE SELECT</h2>
             <ol class="landing-modes-list">
                 ${MODES.map((m) => `
                     <li>
@@ -95,7 +95,7 @@ export function render(container) {
         </section>
 
         <section class="landing-players">
-            <h2 class="landing-heading"><span>PLAYER</span> 이런 분이라면</h2>
+            <h2 class="landing-heading"><span>YOU</span> PLAYER SELECT</h2>
             <ul class="landing-players-list">
                 ${PLAYERS.map((p) => `
                     <li class="landing-players-row">
