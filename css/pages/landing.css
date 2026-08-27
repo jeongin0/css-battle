@@ -21,19 +21,19 @@
 
 /* STAGE SELECT */
 .landing-modes { margin-bottom: var(--sp80); }
-.landing-modes .landing-modes-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); align-items: stretch; }
+.landing-modes .landing-modes-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); align-items: stretch; }
 .landing-modes .landing-modes-list > li { display: flex; }
 .landing-modes .landing-mode { flex: 1; display: flex; flex-direction: column; gap: var(--sp08); background: var(--panel); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--p1); padding: var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
 .landing-modes .landing-mode:hover { box-shadow: 8px 8px 0 var(--gold); }
 .landing-modes .landing-mode:active { transform: translate(8px, 8px); box-shadow: 0 0 0 var(--ink); }
 .landing-modes .landing-mode-stage { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); }
-.landing-modes .landing-mode-title { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0; }
-.landing-modes .landing-mode-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; }
+.landing-modes .landing-mode-title { font-family: var(--font-main); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0; }
+.landing-modes .landing-mode-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; word-break: keep-all; }
 .landing-modes .landing-mode-go { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink); }
 
 /* PLAYER SELECT: 가로 행 리스트 */
 .landing-players { margin-bottom: var(--sp80); }
-.landing-players .landing-players-list { list-style: none; display: grid; gap: var(--sp16); }
+.landing-players .landing-players-list { display: grid; gap: var(--sp16); }
 .landing-players .landing-players-row { display: flex; align-items: center; gap: var(--sp16); background: var(--panel-light); border-left: 8px solid var(--p2); padding: var(--sp16) var(--sp24); }
 .landing-players .landing-players-tag { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft16); color: var(--p2); width: 44px; }
 .landing-players .landing-players-badge { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--bg); border: 3px solid var(--ink); color: var(--p1); }
@@ -44,22 +44,22 @@
 
 /* HOW TO PLAY: 설명서 패널 */
 .landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp60) var(--sp24); margin-bottom: var(--sp60); }
-.landing-howto > * { max-width: 760px; margin-left: auto; margin-right: auto; }
+.landing-howto > * { margin-left: auto; margin-right: auto; }
 .landing-howto .landing-heading { flex-direction: column; align-items: center; }
-.landing-howto .landing-howto-tagline { text-align: center; font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); line-height: 1.8; margin-bottom: var(--sp40); }
+.landing-howto .landing-howto-tagline { text-align: center; font-family: var(--font-main); font-size: var(--ft20); font-weight: 700; color: var(--p1); line-height: 1.8; margin-bottom: var(--sp40); }
 
-.landing-howto .landing-howto-intro { display: grid; gap: var(--sp16); margin-bottom: var(--sp60); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; }
+.landing-howto .landing-howto-intro { display: grid; gap: var(--sp16); max-width: 760px; margin-bottom: var(--sp60); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; text-align: center; }
 
-.landing-howto .landing-howto-list { list-style: none; display: grid; gap: var(--sp24); margin-bottom: var(--sp60); }
+.landing-howto .landing-howto-list { grid-auto-flow: column; display: grid; gap: var(--sp24); margin-bottom: var(--sp60); border-bottom: 2px solid var(--panel-light); padding-bottom: var(--sp40); }
 .landing-howto .landing-howto-step { display: flex; gap: var(--sp16); }
 .landing-howto .landing-howto-no { flex-shrink: 0; width: 2.4rem; height: 2.4rem; display: flex; align-items: center; justify-content: center; font-family: var(--font-point); font-size: var(--ft16); color: var(--bg); background: var(--gold); }
 .landing-howto .landing-howto-body { display: flex; flex-direction: column; gap: var(--sp08); }
 .landing-howto .landing-howto-step-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--gold); }
 .landing-howto .landing-howto-text { color: var(--ink-dim); font-size: var(--ft14); line-height: 1.8; word-break: keep-all; }
 
-.landing-howto .landing-howto-outcome { border-top: 2px solid var(--panel-light); padding-top: var(--sp40); margin-bottom: var(--sp40); display: grid; gap: var(--sp16); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; }
-.landing-howto .landing-howto-outcome-title { font-family: var(--font-point); font-size: var(--ft14); color: var(--p2); }
-.landing-howto .landing-howto-flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp12); font-weight: 700; }
+.landing-howto .landing-howto-outcome { max-width: 760px; margin-bottom: var(--sp40); display: grid; gap: var(--sp16); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; text-align: center; }
+.landing-howto .landing-howto-outcome-title { font-family: var(--font-main); font-size: var(--ft20); font-weight: 700; color: var(--p2); }
+.landing-howto .landing-howto-flow { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--sp12); font-weight: 700; }
 .landing-howto .landing-howto-flow span:not(.landing-howto-arrow) { background: var(--panel-light); padding: var(--sp08) var(--sp12); }
 .landing-howto .landing-howto-arrow { color: var(--p1); }
 .landing-howto .landing-howto-closing { color: var(--gold); font-weight: 600; }
@@ -69,6 +69,7 @@
 
 @media (max-width: 1024px) {
     .landing-modes .landing-modes-list { grid-template-columns: 1fr; }
+    .landing-howto .landing-howto-list { grid-auto-flow: row; }
     .landing-hero .landing-hero-logo { font-size: var(--ft40); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); }
     .landing-hero { box-shadow: 6px 6px 0 var(--p2); }
     .landing-players .landing-players-row { flex-wrap: wrap; }

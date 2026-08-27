@@ -41,8 +41,7 @@ const PLAYERS = [
 ];
 
 const HOWTO_INTRO = [
-    'CSS는 화면의 모습을 결정하지만, 어떤 스타일이 최종적으로 적용될지는 코드만 보고 바로 알아채기 어렵습니다.',
-    '같은 화면을 만드는 방법도 사람마다 다르고, 여러 CSS 규칙이 겹치면 어떤 스타일이 우선 적용되는지 찾아내는 데 시간이 걸립니다. 그래서 원하는 스타일이 적용되지 않을 때 하나씩 코드를 꺼보거나, 결국 !important를 붙여 강제로 해결하게 되기도 합니다.',
+    '같은 화면을 만드는 방법도 사람마다 다르고, 여러 CSS 규칙이 겹치면 어떤 스타일이 우선 적용되는지 찾아내는 데 시간이 걸립니다.<br>그래서 원하는 스타일이 적용되지 않을 때 하나씩 코드를 확인해보거나, 결국 !important를 붙여 강제로 해결하게 되기도 합니다.',
     '이 사이트는 이런 CSS 충돌을 감으로 해결하는 대신, specificity의 우선순위를 직접 경험하며 익히도록 만들었습니다.'
 ];
 
@@ -50,7 +49,7 @@ const HOWTO_STEPS = [
     {
         no: '1',
         title: '눈으로 비교하고',
-        text: '두 CSS 규칙이 충돌했을 때 어떤 스타일이 적용되는지 직접 확인합니다. 결과를 눈으로 비교하면서 CSS 우선순위의 차이를 자연스럽게 이해합니다.'
+        text: 'CSS 규칙이 충돌했을 때 어떤 스타일이 적용되는지 직접 결과를 비교하면서 CSS 우선순위의 차이를 자연스럽게 이해합니다.'
     },
     {
         no: '2',
@@ -145,7 +144,8 @@ export function render(container) {
                     <span>어떤 규칙이 우선순위가 높지?</span>
                 </p>
                 <p>스스로 원인을 찾아낼 수 있게 됩니다.</p>
-                <p class="landing-howto-closing">눈으로 보고 → 직접 입력하고 → 문제를 진단하는 과정을 반복하며, CSS specificity와 Cascade를 머리가 아니라 손에 익히는 것. 이것이 이 사이트가 만들어진 이유입니다.</p>
+                <p class="landing-howto-closing">눈으로 보고 → 직접 입력하고 → 문제를 진단하는 과정을 반복하며, CSS specificity와 Cascade를 머리가 아니라 손에 익히는 것.</p>
+                <p class="landing-howto-closing">이것이 이 사이트가 만들어진 이유입니다.</p>
             </div>
 
             <a href="#battle" class="landing-hero-start landing-howto-start">▶ PRESS START</a>
