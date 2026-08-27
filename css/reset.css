@@ -30,6 +30,10 @@ footer,header,hgroup,menu,nav,section {
     display:block;
 }
 
+p { 
+    word-break: keep-all;
+}
+
 ul,
 ol,
 dl {
