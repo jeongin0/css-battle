@@ -116,6 +116,10 @@ export function render(container) {
         return `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
     }
 
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+    }
+
     function renderStatus() {
         if (mode === 'solo') {
             el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`;
@@ -214,7 +218,7 @@ export function render(container) {
     }
 
     function ruleRows(cssText, doc) {
-        const { rules } = scorePrecision(cssText, doc);
+        const { rules } = scorePrecision(cssText, doc, problem.root);
         return rules.map((r) => {
             const s = calculateSpecificity(r.selector);
             return `<tr><td><code>${r.selector}</code></td><td>${s.inline}</td><td>${s.id}</td><td>${s.class}</td><td>${s.tag}</td></tr>`;
@@ -231,8 +235,8 @@ export function render(container) {
         }
         stopTimer();
 
-        const acc = scoreAccuracy({ userDoc, answerDoc, baseDoc, problem });
-        const prec = scorePrecision(el.cssInput.value, userDoc);
+        const acc = scoreAccuracy({ userDoc, answerDoc, baseDoc });
+        const prec = scorePrecision(el.cssInput.value, userDoc, problem.root);
         const ghostTarget = Math.max(50, par - GHOST_TOLERANCE);
         const won = mode === 'ghost'
             ? acc.cleared && prec.score >= ghostTarget
@@ -273,14 +277,9 @@ export function render(container) {
 
         if (acc.mismatches.length) {
             parts.push(`<h3 class="battle-result-head">시안과 다른 부분 (${acc.mismatches.length})</h3>
-                <ul class="battle-feedback">${acc.mismatches.slice(0, 12).map((m) =>
-                    `<li><code>${m.sel}</code> ${m.prop}: 기대 <b>${m.expected}</b> / 현재 <b>${m.actual}</b></li>`).join('')}
-                ${acc.mismatches.length > 12 ? `<li>…외 ${acc.mismatches.length - 12}개</li>` : ''}</ul>`);
-        }
-        if (acc.leaks.length) {
-            parts.push(`<h3 class="battle-result-head">스타일 누수</h3>
-                <ul class="battle-feedback">${acc.leaks.map((l) =>
-                    `<li><code>${l.sel}</code> ${l.prop} 이(가) 의도치 않게 바뀜 (${l.actual})</li>`).join('')}</ul>`);
+                <ul class="battle-feedback">${acc.mismatches.slice(0, 14).map((m) =>
+                    `<li><code>${m.label}</code> ${m.prop}: 시안 <b>${m.expected}</b> / 내 결과 <b>${m.actual}</b></li>`).join('')}
+                ${acc.mismatches.length > 14 ? `<li>…외 ${acc.mismatches.length - 14}개</li>` : ''}</ul>`);
         }
         if (prec.deductions.length) {
             parts.push(`<h3 class="battle-result-head">정밀도 감점 (-${100 - prec.score})</h3>
@@ -296,7 +295,15 @@ export function render(container) {
                     <tbody>${ruleRows(el.cssInput.value, el.liveFrame.contentDocument) || '<tr><td colspan="5">규칙 없음</td></tr>'}</tbody>
                 </table>
             </div>
-            <p class="hint-text">정확도는 렌더링 결과(computed style) 근사 비교입니다. 정답은 하나가 아니며, 시안과 같게만 보이면 통과합니다.</p>
+        `);
+
+        parts.push(`
+            <h3 class="battle-result-head">예시 정답 (이대로일 필요는 없어요)</h3>
+            <div class="battle-diff">
+                <div class="battle-diff-col"><h4>내 CSS</h4><pre>${escapeHtml(el.cssInput.value || '(작성 안 함)')}</pre></div>
+                <div class="battle-diff-col"><h4>예시 정답</h4><pre>${escapeHtml(problem.answerCss)}</pre></div>
+            </div>
+            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. flex든 inline-block든 <b>결과가 같으면 정답</b>이에요. 예시 정답은 컴포넌트 루트(<code>.${problem.root}</code>)부터 셀렉터를 잡는 권장 패턴을 보여줍니다.</p>
         `);
 
         el.result.innerHTML = parts.join('');

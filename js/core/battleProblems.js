@@ -968,6 +968,35 @@ export const BATTLE_POOLS = {
     ]
 };
 
+// 정답 CSS를 "컴포넌트 루트부터 잡는" 형태로 자동 변환 (권장 패턴 시연 + par 채점)
+function rootOf(html) {
+    const m = html.match(/class="([^"\s]+)/);
+    return m ? m[1] : '';
+}
+function anchorCss(css, root) {
+    if (!root) return css;
+    return css.split('\n').map((line) => {
+        const m = line.match(/^(\s*)([^{}]+)\{(.*)$/);
+        if (!m) return line;
+        const [, ws, selGroup, rest] = m;
+        const sels = selGroup.split(',').map((s) => s.trim()).filter(Boolean).map((sel) => {
+            if (sel === `.${root}`
+                || sel.startsWith(`.${root}.`)
+                || sel.startsWith(`.${root} `)
+                || sel.startsWith(`.${root}:`)
+                || sel.startsWith(`.${root}[`)) return sel;
+            return `.${root} ${sel}`;
+        });
+        return `${ws}${sels.join(', ')} {${rest}`;
+    }).join('\n');
+}
+for (const diff of Object.keys(BATTLE_POOLS)) {
+    for (const p of BATTLE_POOLS[diff]) {
+        p.root = rootOf(p.html);
+        p.answerCss = anchorCss(p.answerCss, p.root);
+    }
+}
+
 const lastShownId = { low: null, mid: null, high: null };
 
 export function nextBattleProblem(difficulty) {

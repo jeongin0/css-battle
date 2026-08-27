@@ -1,106 +1,127 @@
-// 배틀 채점: 정확도(computed style 비교) + 정밀도(셀렉터 위생)
+// 배틀 채점
+//  정확도 = "같아 보이나" : 요소별 위치·크기(getBoundingClientRect) + 칠(색/테두리/라운드/굵기)
+//  정밀도 = 셀렉터 위생 : 컴포넌트 루트부터 잡았는지 + !important/*/죽은 규칙
 
 import { parseStylesheet } from './cascade.js';
 import { calculateSpecificity } from './specificity.js';
 
 const CLEAR_THRESHOLD = 90;
+const BOX_TOL = 4;
 
-const LEAK_PROPS = [
-    'color', 'background-color', 'font-size', 'font-weight',
-    'padding-left', 'padding-top', 'margin-left', 'margin-top',
-    'border-top-width', 'border-radius', 'display', 'text-decoration-line'
+const PAINT_PROPS = [
+    'background-color', 'color',
+    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+    'border-top-left-radius', 'border-bottom-right-radius',
+    'font-weight', 'font-style', 'text-decoration-line', 'text-align', 'opacity', 'box-shadow'
 ];
 
 function rgb(value) {
+    if (/transparent|^none$/.test(value)) return [0, 0, 0, 0];
     const m = String(value).match(/-?\d+(\.\d+)?/g);
     return m ? m.slice(0, 3).map(Number) : null;
 }
 
-function propMatches(prop, expected, actual) {
+function weightBucket(v) {
+    const n = parseInt(v, 10) || 400;
+    return n >= 600 ? 'bold' : n >= 500 ? 'medium' : 'normal';
+}
+
+function paintMatches(prop, expected, actual) {
     if (expected === actual) return true;
+    if (prop === 'font-weight') return weightBucket(expected) === weightBucket(actual);
+    if (prop === 'box-shadow') return (expected === 'none') === (actual === 'none');
     if (/color/.test(prop)) {
         const e = rgb(expected);
         const a = rgb(actual);
-        return !!e && !!a && e.every((c, i) => Math.abs(c - a[i]) <= 12);
+        if (!e || !a) return false;
+        return e.every((c, i) => Math.abs(c - a[i]) <= 16);
     }
-    // 완전한 라운드(원/알약)는 999px, 50%, 큰 px 등 표현이 달라도 같은 결과로 본다
     if (/radius/.test(prop)) {
         const round = (v) => v.includes('%') ? parseFloat(v) >= 40 : parseFloat(v) >= 100;
         if (round(expected) && round(actual)) return true;
-        const e = parseFloat(expected);
-        const a = parseFloat(actual);
-        return !Number.isNaN(e) && !Number.isNaN(a) && Math.abs(e - a) <= 1.5;
+        return Math.abs(parseFloat(expected) - parseFloat(actual)) <= 2;
     }
-    if (/width|height|size|gap|top$|left$|right$|bottom$|margin|padding|spacing/.test(prop)) {
-        const e = parseFloat(expected);
-        const a = parseFloat(actual);
-        if (!Number.isNaN(e) && !Number.isNaN(a)) return Math.abs(e - a) <= 1.5;
-    }
+    if (/width/.test(prop)) return Math.abs(parseFloat(expected) - parseFloat(actual)) <= 1.5;
     return String(expected).trim() === String(actual).trim();
 }
 
-function read(doc, sel, prop) {
-    const elArr = safeQueryAll(doc, sel);
-    if (!elArr.length) return null;
-    return doc.defaultView.getComputedStyle(elArr[0]).getPropertyValue(prop).trim();
+function elLabel(el) {
+    const cls = el.getAttribute('class');
+    return cls ? `.${cls.trim().split(/\s+/)[0]}` : el.tagName.toLowerCase();
+}
+
+function relRect(el, originRect) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - originRect.left, y: r.top - originRect.top, w: r.width, h: r.height };
+}
+
+// 같은 html을 렌더한 3개 문서 → 요소 트리 인덱스 정렬됨
+export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
+    const aEls = [...answerDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
+    const uEls = [...userDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
+    const bEls = [...baseDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
+
+    const aWin = answerDoc.defaultView;
+    const uWin = userDoc.defaultView;
+    const bWin = baseDoc.defaultView;
+    const aOrigin = answerDoc.body.getBoundingClientRect();
+    const uOrigin = userDoc.body.getBoundingClientRect();
+
+    let total = 0;
+    let passed = 0;
+    const mismatches = [];
+
+    aEls.forEach((aEl, i) => {
+        const uEl = uEls[i];
+        const bEl = bEls[i];
+        if (!uEl) return;
+        const label = elLabel(aEl);
+
+        const ar = relRect(aEl, aOrigin);
+        const ur = relRect(uEl, uOrigin);
+        [['x', ar.x, ur.x], ['y', ar.y, ur.y], ['너비', ar.w, ur.w], ['높이', ar.h, ur.h]].forEach(([k, av, uv]) => {
+            total += 1;
+            if (Math.abs(av - uv) <= BOX_TOL) passed += 1;
+            else mismatches.push({ label, prop: `위치·크기(${k})`, expected: `${Math.round(av)}px`, actual: `${Math.round(uv)}px` });
+        });
+
+        const acs = aWin.getComputedStyle(aEl);
+        const ucs = uWin.getComputedStyle(uEl);
+        const bcs = bWin.getComputedStyle(bEl || aEl);
+        for (const p of PAINT_PROPS) {
+            const av = acs.getPropertyValue(p).trim();
+            const bv = bcs.getPropertyValue(p).trim();
+            if (av === bv) continue; // 시안이 기본값에서 바꾸지 않은 속성은 채점 안 함
+            total += 1;
+            const uv = ucs.getPropertyValue(p).trim();
+            if (paintMatches(p, av, uv)) passed += 1;
+            else mismatches.push({ label, prop: p, expected: av, actual: uv });
+        }
+    });
+
+    const percent = total === 0 ? 100 : Math.round((passed / total) * 100);
+    return { percent, cleared: percent >= CLEAR_THRESHOLD, mismatches, threshold: CLEAR_THRESHOLD };
 }
 
 function safeQueryAll(doc, sel) {
     try { return [...doc.querySelectorAll(sel)]; } catch { return []; }
 }
 
-// userDoc: 사용자 CSS 적용 / answerDoc: 정답 CSS 적용 / baseDoc: CSS 없음
-export function scoreAccuracy({ userDoc, answerDoc, baseDoc, problem }) {
-    let total = 0;
-    let passed = 0;
-    const mismatches = [];
-
-    for (const { sel, props } of problem.check) {
-        for (const prop of props) {
-            const expected = read(answerDoc, sel, prop);
-            const actual = read(userDoc, sel, prop);
-            if (expected === null) continue;
-            total += 1;
-            if (actual !== null && propMatches(prop, expected, actual)) {
-                passed += 1;
-            } else {
-                mismatches.push({ sel, prop, expected, actual: actual ?? '(요소 없음)' });
-            }
-        }
-    }
-
-    const leaks = [];
-    for (const sel of problem.keepDefault || []) {
-        for (const prop of LEAK_PROPS) {
-            const baseVal = read(baseDoc, sel, prop);
-            const userVal = read(userDoc, sel, prop);
-            if (baseVal !== null && userVal !== null && !propMatches(prop, baseVal, userVal)) {
-                leaks.push({ sel, prop, base: baseVal, actual: userVal });
-                total += 1;
-            }
-        }
-    }
-
-    const percent = total === 0 ? 100 : Math.round((passed / total) * 100);
-    return { percent, cleared: percent >= CLEAR_THRESHOLD, mismatches, leaks, threshold: CLEAR_THRESHOLD };
-}
-
-function compoundCount(selector) {
-    return selector.trim().split(/\s*[>+~]\s*|\s+/).filter(Boolean).length;
-}
-
-// cssText: 사용자 CSS / doc: 사용자 CSS 적용 문서(죽은 규칙 판정용)
-export function scorePrecision(cssText, doc) {
+// cssText: 사용자 CSS / doc: 사용자 CSS 적용 문서 / rootClass: 컴포넌트 루트 클래스명
+export function scorePrecision(cssText, doc, rootClass) {
     const rules = parseStylesheet(cssText);
     const deductions = [];
-    const declSeen = new Map();
 
     if (!rules.length) {
-        return { score: 0, par: 100, deductions: [{ reason: 'CSS 없음', points: 100 }], rules: [] };
+        return { score: 0, deductions: [{ reason: 'CSS 없음', points: 100 }], rules: [] };
     }
+
+    const rootRe = rootClass ? new RegExp(`\\.${rootClass.replace(/-/g, '\\-')}(?![\\w-])`) : null;
 
     for (const rule of rules) {
         const sel = rule.selector;
+        const matched = safeQueryAll(doc, sel);
 
         const importants = (rule.body.match(/!\s*important/gi) || []).length;
         if (importants) deductions.push({ reason: '!important 사용', detail: sel, points: 8 * importants });
@@ -110,39 +131,31 @@ export function scorePrecision(cssText, doc) {
         }
 
         const ids = (sel.match(/#[\w-]+/g) || []).length;
-        if (ids) deductions.push({ reason: '스타일에 ID 선택자 사용', detail: sel, points: 5 * ids });
+        if (ids) deductions.push({ reason: '스타일에 ID 선택자 사용', detail: sel, points: 4 * ids });
 
-        if (compoundCount(sel) > 3) {
-            deductions.push({ reason: '3단계 초과 깊은 체이닝', detail: sel, points: 4 });
-        }
-
-        const spec = calculateSpecificity(sel);
-        if (spec.class + spec.id * 3 >= 4) {
-            deductions.push({ reason: '과잉 특이도', detail: `${sel} (0,${spec.id},${spec.class},${spec.tag})`, points: 3 });
-        }
-
-        if (safeQueryAll(doc, sel).length === 0) {
+        if (matched.length === 0) {
             deductions.push({ reason: '아무 요소도 선택하지 않는 규칙', detail: sel, points: 6 });
+        } else if (rootRe && !rootRe.test(sel)) {
+            // 루트를 앵커로 쓰지 않음 → 다른 곳의 같은 클래스에도 적용될 수 있음
+            deductions.push({
+                reason: `컴포넌트 루트(.${rootClass})부터 시작하지 않음`,
+                detail: `${sel} → .${rootClass} ${sel} 처럼`,
+                points: 5
+            });
         }
-
-        for (const decl of rule.body.split(';')) {
-            const [p, v] = decl.split(':');
-            if (!p || !v) continue;
-            const key = `${p.trim()}:${v.trim().replace(/!\s*important/i, '').trim()}`;
-            declSeen.set(key, (declSeen.get(key) || 0) + 1);
-        }
-    }
-
-    for (const [key, count] of declSeen) {
-        if (count > 1) deductions.push({ reason: '동일 선언 중복', detail: key, points: 3 * (count - 1) });
     }
 
     const lost = deductions.reduce((s, d) => s + d.points, 0);
     return { score: Math.max(0, 100 - lost), deductions, rules };
 }
 
+export function rootClassOf(problem) {
+    if (problem.root) return problem.root;
+    const m = problem.html.match(/class="([^"\s]+)/);
+    return m ? m[1] : null;
+}
+
 export function precisionPar(problem) {
-    // 정답 CSS의 정밀도 = par. 정답 문서 없이도 셀렉터가 유효하다고 보고 죽은 규칙 검사는 생략.
-    const fake = { querySelectorAll: () => [{}] };
-    return scorePrecision(problem.answerCss, fake).score;
+    const fake = { querySelectorAll: () => [{ matches: () => true }] };
+    return scorePrecision(problem.answerCss, fake, rootClassOf(problem)).score;
 }

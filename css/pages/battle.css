@@ -54,7 +54,12 @@
 .battle-page .battle-feedback { list-style: none; margin: var(--sp04) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
 .battle-page .battle-feedback li { margin: var(--sp04) 0; }
 
-.battle-offscreen { position: absolute; left: -9999px; top: 0; width: 480px; height: 320px; border: 0; }
+.battle-page .battle-diff { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp16); }
+.battle-page .battle-diff-col h4 { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
+.battle-page .battle-diff-col pre { margin: 0; padding: var(--sp16); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp08); font-family: var(--font-main); font-size: var(--ft12); line-height: 1.7; color: var(--ink); white-space: pre-wrap; word-break: break-all; overflow-x: auto; }
+@media (max-width: 1024px) { .battle-page .battle-diff { grid-template-columns: 1fr; } }
+
+.battle-offscreen { position: absolute; left: -9999px; top: 0; width: 560px; height: 440px; border: 0; }
 
 /* 체력바 블록 */
 .health-bar-block { margin-bottom: var(--sp08); }
