@@ -160,6 +160,7 @@ export function render(container) {
         el.cssInput.disabled = !running;
         el.difficultyTabs.classList.toggle('is-locked', !idle);
         el.resultActions.hidden = !(result && lastResult);
+        if (result) { btn.save.disabled = false; btn.save.textContent = '전적에 저장'; }
         renderStatus();
     }
 
@@ -272,7 +273,8 @@ export function render(container) {
                 <div class="battle-diff-col"><h4>내 CSS</h4><pre>${escapeHtml(el.cssInput.value || '(작성 안 함)')}</pre></div>
                 <div class="battle-diff-col"><h4>예시 정답</h4><pre>${escapeHtml(problem.answerCss)}</pre></div>
             </div>
-            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
+            <p class="hint-text">정확도는 요소의 색·테두리·스타일이 시안과 같은지만 봅니다. 크기·위치는 시안에 맞게 구현했다면 정답이에요. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
+            <p class="hint-text">"전적에 저장"을 누르면 이 결과가 <a href="#report">리포트</a> 페이지에 통계로 쌓입니다.</p>
         `);
 
         el.result.innerHTML = parts.join('');
@@ -292,8 +294,7 @@ export function render(container) {
             result: lastResult.result
         });
         btn.save.disabled = true;
-        btn.save.textContent = '저장됨';
-        setTimeout(() => { btn.save.disabled = false; btn.save.textContent = '전적에 저장'; }, 1500);
+        btn.save.textContent = '저장됨 · 리포트에서 확인';
     }
 
     el.difficultyTabs.addEventListener('click', (e) => {

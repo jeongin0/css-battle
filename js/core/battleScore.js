@@ -63,38 +63,22 @@ export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
     let total = 0;
     let passed = 0;
     const mismatches = [];
-    const brokenParents = new Set(); // 레이아웃이 틀린 요소 → 자식은 파급이므로 건너뜀
 
     aEls.forEach((aEl, i) => {
         const uEl = uEls[i];
         const bEl = bEls[i];
-        if (!uEl) return;
+        if (!uEl || !bEl) return;
         const label = elLabel(aEl);
 
-        // 레이아웃: 부모 기준 상대 위치 + 크기 (px 근사, 부모가 이미 깨졌으면 스킵)
-        if (aEl.parentElement && brokenParents.has(aEl.parentElement)) {
-            brokenParents.add(aEl);
-        } else {
-            const ap = (aEl.parentElement || answerDoc.body).getBoundingClientRect();
-            const up = (uEl.parentElement || userDoc.body).getBoundingClientRect();
-            const ar = aEl.getBoundingClientRect();
+        // 크기·위치는 채점하지 않는다. 시안에 보이는 요소가 내 결과에서도 "렌더되어 보이나"만 확인.
+        const ar = aEl.getBoundingClientRect();
+        if (ar.width > 2 && ar.height > 2) {
             const ur = uEl.getBoundingClientRect();
-            const checks = [
-                ['가로 위치', ar.left - ap.left, ur.left - up.left, 10],
-                ['세로 위치', ar.top - ap.top, ur.top - up.top, 10],
-                ['너비', ar.width, ur.width, Math.max(12, ar.width * 0.25)],
-                ['높이', ar.height, ur.height, Math.max(12, ar.height * 0.25)]
-            ];
-            let broke = false;
-            for (const [k, av, uv, tol] of checks) {
-                total += 1;
-                if (Math.abs(av - uv) <= tol) passed += 1;
-                else { mismatches.push({ label, prop: `레이아웃(${k})`, expected: `${Math.round(av)}px`, actual: `${Math.round(uv)}px` }); broke = true; }
-            }
-            if (broke) brokenParents.add(aEl);
+            total += 1;
+            if (ur.width > 2 && ur.height > 2) passed += 1;
+            else mismatches.push({ label, prop: '렌더', expected: '보임', actual: '보이지 않음 (크기 0)' });
         }
 
-        if (!bEl) return;
         const acs = aWin.getComputedStyle(aEl);
         const ucs = uWin.getComputedStyle(uEl);
         const bcs = bWin.getComputedStyle(bEl);
