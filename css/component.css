@@ -38,11 +38,13 @@
     --sp120: 120px;
 }
 
+/* 버튼 */
 .btn { display: inline-block; font-family: var(--font-main); font-weight: 600; font-size: var(--ft14); color: var(--bg); background: var(--gold); border: 0; border-radius: var(--radius); padding: var(--sp16) var(--sp24); cursor: pointer; letter-spacing: 0.5px; }
 .btn:hover { filter: brightness(1.1); }
 .btn-ghost { background: transparent; color: var(--ink); border: 2px solid var(--panel-light); }
 .btn-point { font-family: var(--font-point); font-size: var(--ft12); }
 
+/* 카드 */
 .card { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); }
 .card .card-title { font-family: var(--font-main); color: var(--p1); margin-bottom: var(--sp08); }
 
@@ -50,177 +52,36 @@
 .tabs { display: flex; gap: var(--sp08); }
 .tabs .tabs-btn { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink-dim); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); cursor: pointer; }
 .tabs .tabs-btn.is-active { color: var(--bg); background: var(--p1); border-color: var(--p1); }
-.battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
-.battle-page .battle-layout .battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp08); text-transform: uppercase; letter-spacing: 1px; }
+
+/* DOM 트리 스니펫 (배틀 · 타자연습) */
 .dom-tree { font-family: var(--font-main); font-size: var(--ft14); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); white-space: pre; overflow-x: auto; }
+
+/* 미리보기 iframe (배틀) */
 .preview-frame { width: 100%; height: 220px; border: 1px solid var(--panel-light); border-radius: var(--radius); background: #fff; }
 
-/* CSS 입력창 */
+/* CSS 입력창 (배틀 · 타자연습 · 진단) */
 .css-editor { width: 100%; min-height: 160px; font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); resize: vertical; }
 .css-editor:focus { outline: 2px solid var(--p1); }
 
-/* 체력바 */
+/* 체력바 (배틀) */
 .health-bar { width: 100%; height: 18px; background: var(--panel-light); border-radius: 999px; overflow: hidden; border: 1px solid var(--bg); }
 .health-bar .health-bar-fill { height: 100%; background: var(--hp-green); transition: width 0.4s ease; }
 .health-bar .health-bar-fill.is-low { background: var(--hp-red); }
 
-/* 특이도 breakdown 표 (좁은 화면에서 표가 넘치면 가로 스크롤) */
+/* 가로로 넓은 표 스크롤 래퍼 + 특이도 breakdown 표 (배틀 · 진단) */
 .table-scroll { overflow-x: auto; margin-top: var(--sp08); }
 .table-scroll .specificity-table { width: 100%; min-width: 420px; border-collapse: collapse; font-family: var(--font-main); font-size: var(--ft14); }
 .table-scroll .specificity-table th, .table-scroll .specificity-table td { border: 1px solid var(--panel-light); padding: var(--sp08); text-align: center; }
 .table-scroll .specificity-table th { color: var(--ink-dim); font-weight: normal; }
 
-/* 결과 배지 */
+/* 결과 배지 (배틀 · 진단) */
 .result-badge { display: inline-block; font-family: var(--font-main); font-weight: 600; font-size: var(--ft14); padding: var(--sp08) var(--sp16); border-radius: var(--radius); }
 .result-badge.result-badge-win { background: var(--hp-green); color: var(--bg); }
 .result-badge.result-badge-lose { background: var(--hp-red); color: var(--bg); }
 
-/* KO 스탬프 */
-.ko-stamp { font-family: var(--font-point); font-size: var(--ft24); color: var(--gold); letter-spacing: 2px; }
-
-/* 페이지 공통 */
-.page-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft24); color: var(--gold); margin-bottom: var(--sp08); }
-.page-desc { color: var(--ink-dim); }
-.hint-text { color: var(--ink-dim); font-size: var(--ft14); margin-top: var(--sp08); }
-
-/* ===== 랜딩 (아케이드 게임 UI) ===== */
-.landing-heading { font-family: var(--font-point); font-size: var(--ft16); color: var(--ink); margin-bottom: var(--sp24); display: flex; align-items: center; gap: var(--sp12); flex-wrap: wrap; }
-.landing-heading span { font-size: var(--ft12); color: var(--bg); background: var(--gold); padding: var(--sp04) var(--sp08); }
-
-/* Hero: 타이틀 스크린 */
-.landing-hero { text-align: center; padding: var(--sp80) var(--sp16) var(--sp60); border: 4px solid var(--ink); box-shadow: 10px 10px 0 var(--p2); background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.25) 3px 4px), var(--panel); margin-bottom: var(--sp60); }
-.landing-hero .landing-hero-coin { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); letter-spacing: 2px; margin-bottom: var(--sp24); animation: landing-blink 1.2s steps(1) infinite; }
-.landing-hero .landing-hero-logo { font-family: var(--font-point); font-size: var(--ft60); line-height: 1.1; color: var(--gold); text-shadow: 4px 4px 0 var(--p2), 8px 8px 0 var(--bg); margin-bottom: var(--sp24); }
-.landing-hero .landing-hero-tagline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft24); color: var(--ink); margin-bottom: var(--sp08); }
-.landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp40); }
-.landing-hero-start { display: inline-block; font-family: var(--font-point); font-size: var(--ft14); color: var(--bg); background: var(--p1); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: var(--sp16) var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
-.landing-hero-start:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-
-/* Hero(상단) 버튼: hover 시 왼쪽→오른쪽 체력바 차오르듯 채워짐 */
-.landing-hero .landing-hero-start { color: var(--ink); background-color: var(--bg); background-image: linear-gradient(var(--hp-green), var(--hp-green)); background-repeat: no-repeat; background-position: left center; background-size: 0% 100%; transition: transform 0.1s ease, box-shadow 0.1s ease, background-size 0.5s linear, color 0.2s ease 0.15s; }
-.landing-hero .landing-hero-start:hover { color: var(--bg); background-size: 100% 100%; }
-
-/* 하단 버튼: hover할 때만 깜빡임 */
-.landing-howto-start:hover { animation: landing-blink 1s steps(1) infinite; }
-
-/* STAGE SELECT */
-.landing-modes { margin-bottom: var(--sp80); }
-.landing-modes .landing-modes-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); align-items: stretch; }
-.landing-modes .landing-modes-list > li { display: flex; }
-.landing-modes .landing-mode { flex: 1; display: flex; flex-direction: column; gap: var(--sp08); background: var(--panel); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--p1); padding: var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
-.landing-modes .landing-mode:hover { box-shadow: 8px 8px 0 var(--gold); }
-.landing-modes .landing-mode:active { transform: translate(8px, 8px); box-shadow: 0 0 0 var(--ink); }
-.landing-modes .landing-mode-stage { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); }
-.landing-modes .landing-mode-title { font-family: var(--font-main); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0; }
-.landing-modes .landing-mode-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; }
-.landing-modes .landing-mode-go { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink); }
-
-/* PLAYER SELECT: 가로 행 리스트 */
-.landing-players { margin-bottom: var(--sp80); }
-.landing-players .landing-players-list { list-style: none; display: grid; gap: var(--sp16); }
-.landing-players .landing-players-row { display: flex; align-items: center; gap: var(--sp16); background: var(--panel-light); border-left: 8px solid var(--p2); padding: var(--sp16) var(--sp24); }
-.landing-players .landing-players-tag { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft16); color: var(--p2); width: 44px; }
-.landing-players .landing-players-badge { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--bg); border: 3px solid var(--ink); color: var(--p1); }
-.landing-players .landing-players-icon { width: 26px; height: 26px; }
-.landing-players .landing-players-body { display: flex; flex-direction: column; gap: var(--sp04); }
-.landing-players .landing-players-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--ink); }
-.landing-players .landing-players-desc { color: var(--ink-dim); font-size: var(--ft14); }
-
-/* HOW TO PLAY: 설명서 패널 */
-.landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp40) var(--sp24); margin-bottom: var(--sp60); text-align: center; }
-.landing-howto .landing-heading { flex-direction: column; justify-content: center; }
-.landing-howto .landing-howto-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); margin-bottom: var(--sp40); text-align: left; }
-.landing-howto .landing-howto-step { display: flex; gap: var(--sp16); }
-.landing-howto .landing-howto-no { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft32); color: var(--gold); line-height: 1; }
-.landing-howto .landing-howto-body { display: flex; flex-direction: column; gap: var(--sp04); }
-.landing-howto .landing-howto-phase { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); }
-.landing-howto .landing-howto-text { color: var(--ink); font-size: var(--ft14); }
-
-@keyframes landing-blink { 50% { opacity: 0; } }
-
-
-/* 배틀 컨트롤 */
-.battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
-.battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp16) 0 var(--sp08); text-transform: uppercase; letter-spacing: 1px; }
-.battle-page .battle-col { min-width: 0; }
-.battle-page .battle-status { margin-top: var(--sp16); }
-.battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); }
-.battle-page .battle-timer.is-low { color: var(--hp-red); }
-.battle-page .battle-actions { display: flex; gap: var(--sp08); margin-top: var(--sp16); }
-.battle-page .battle-feedback { list-style: none; margin: var(--sp08) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
-.battle-page .battle-feedback li { margin: var(--sp04) 0; }
-
-/* 체력바 블록 */
-.health-bar-block { margin-bottom: var(--sp08); }
-.health-bar-block .health-bar-label { display: block; font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
-
-/* KO 스탬프 애니메이션 */
-.ko-stamp { display: inline-block; animation: ko-pop 0.4s ease; }
+/* KO 스탬프 (배틀) */
+.ko-stamp { display: inline-block; font-family: var(--font-point); font-size: var(--ft24); color: var(--gold); letter-spacing: 2px; animation: ko-pop 0.4s ease; }
 @keyframes ko-pop { 0% { transform: scale(2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-/* 타자연습 */
-.typing-page .typing-adapt { font-size: var(--ft14); color: var(--ink-dim); display: flex; align-items: center; gap: var(--sp04); }
-.typing-page .typing-stats { display: flex; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
-.typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 90px; }
-.typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
-.typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
-.typing-page .typing-stats span { font-size: var(--ft12); color: var(--ink-dim); }
-.typing-page .typing-mission { color: var(--gold); margin-top: var(--sp16); }
-.typing-page .typing-answer { font-size: var(--ft20); letter-spacing: 1px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); margin: var(--sp08) 0; min-height: 3rem; overflow-x: auto; white-space: nowrap; }
-.typing-page .typing-char.is-ok { color: var(--hp-green); }
-.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
-.typing-page .typing-input { min-height: 0; }
-
-/* 진단 */
-.diagnose-page .diagnose-target { display: flex; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
-.diagnose-page .diagnose-target label { display: flex; flex-direction: column; gap: var(--sp04); font-size: var(--ft12); color: var(--ink-dim); }
-.diagnose-page .diagnose-target input { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08); }
-.diagnose-page .diagnose-table td { text-align: left; }
-.diagnose-page .diagnose-table .is-winner { background: rgba(74, 222, 128, 0.15); }
-
-/* 퀘스트 */
-.quest-page .quest-streak { display: flex; align-items: center; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
-.quest-page .quest-streak-badge { font-family: var(--font-point); font-size: var(--ft14); color: var(--gold); }
-.quest-page .quest-list { list-style: none; display: grid; gap: var(--sp08); }
-.quest-page .quest-item { display: flex; align-items: center; gap: var(--sp08); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); }
-.quest-page .quest-item.is-done { border-color: var(--hp-green); color: var(--hp-green); }
-.quest-page .quest-item-check { width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border: 1px solid currentColor; border-radius: var(--sp04); }
-.quest-page .quest-reward { color: var(--gold); }
-.quest-page .quest-reward-list { list-style: none; margin-top: var(--sp08); display: grid; gap: var(--sp04); color: var(--ink-dim); }
-.quest-page .quest-reward-list .is-unlocked { color: var(--hp-green); }
-
-/* 스탬프 달력 */
-.stamp-calendar { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); max-width: 360px; }
-.stamp-calendar .stamp-calendar-head, .stamp-calendar .stamp-calendar-grid { list-style: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp04); }
-.stamp-calendar .stamp-calendar-head { margin-bottom: var(--sp04); }
-.stamp-calendar .stamp-calendar-day-label { text-align: center; font-size: var(--ft12); color: var(--ink-dim); }
-.stamp-calendar .stamp-calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--ft12); background: var(--bg); border-radius: var(--sp04); color: var(--ink-dim); }
-.stamp-calendar .stamp-calendar-cell.is-done { background: var(--hp-green); color: var(--bg); }
-.stamp-calendar .stamp-calendar-cell.is-today { outline: 2px solid var(--p1); }
-.stamp-calendar .stamp-calendar-cell.is-future { opacity: 0.35; }
-
-/* 리포트 */
-.report-page .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin: var(--sp16) 0; }
-.report-page .report-cards dt { font-size: var(--ft12); color: var(--ink-dim); }
-.report-page .report-cards dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin-top: var(--sp08); }
-.report-page .report-chart { width: 100%; height: 240px; display: block; }
-.report-page .report-beforeafter { color: var(--p1); margin-top: var(--sp08); }
-.report-page .dex-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp16); margin-top: var(--sp16); }
-.report-page .dex-spec { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp08) 0; }
-.report-page .report-insight { margin-top: var(--sp16); color: var(--ink); }
-.report-page .report-panel .tabs { margin-bottom: var(--sp16); }
-
-@media (max-width: 1024px) {
-    .landing-modes .landing-modes-list,
-    .landing-howto .landing-howto-list,
-    .battle-page .battle-layout,
-    .report-page .report-cards,
-    .report-page .dex-list { grid-template-columns: 1fr; }
-    .landing-hero .landing-hero-logo { font-size: var(--ft40); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); }
-    .landing-hero { box-shadow: 6px 6px 0 var(--p2); }
-    .landing-players .landing-players-row { flex-wrap: wrap; }
-}
-
-@media (max-width: 400px) {
-    .landing-hero .landing-hero-logo { font-size: var(--ft32); }
-}
+/* 배틀 · 타자연습 · 진단 패널 소제목 */
+.battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp16) 0 var(--sp08); text-transform: uppercase; letter-spacing: 1px; }

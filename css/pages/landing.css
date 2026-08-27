@@ -1,0 +1,67 @@
+/* ===== 랜딩 (아케이드 게임 UI) ===== */
+.landing-heading { font-family: var(--font-point); font-size: var(--ft16); color: var(--ink); margin-bottom: var(--sp24); display: flex; align-items: center; gap: var(--sp12); flex-wrap: wrap; }
+.landing-heading span { font-size: var(--ft12); color: var(--bg); background: var(--gold); padding: var(--sp04) var(--sp08); }
+
+/* Hero: 타이틀 스크린 */
+.landing-hero { text-align: center; padding: var(--sp80) var(--sp16) var(--sp60); border: 4px solid var(--ink); box-shadow: 10px 10px 0 var(--p2); background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.25) 3px 4px), var(--panel); margin-bottom: var(--sp60); }
+.landing-hero .landing-hero-coin { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); letter-spacing: 2px; margin-bottom: var(--sp24); animation: landing-blink 1.2s steps(1) infinite; }
+.landing-hero .landing-hero-logo { font-family: var(--font-point); font-size: var(--ft60); line-height: 1.1; color: var(--gold); text-shadow: 4px 4px 0 var(--p2), 8px 8px 0 var(--bg); margin-bottom: var(--sp24); }
+.landing-hero .landing-hero-tagline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft24); color: var(--ink); margin-bottom: var(--sp08); }
+.landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp40); }
+
+.landing-hero-start { display: inline-block; font-family: var(--font-point); font-size: var(--ft14); color: var(--bg); background: var(--p1); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: var(--sp16) var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
+.landing-hero-start:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+
+/* Hero(상단) 버튼: hover 시 왼쪽→오른쪽 체력바 차오르듯 채워짐 */
+.landing-hero .landing-hero-start { color: var(--ink); background-color: var(--bg); background-image: linear-gradient(var(--hp-green), var(--hp-green)); background-repeat: no-repeat; background-position: left center; background-size: 0% 100%; transition: transform 0.1s ease, box-shadow 0.1s ease, background-size 0.5s linear, color 0.2s ease 0.15s; }
+.landing-hero .landing-hero-start:hover { color: var(--bg); background-size: 100% 100%; }
+
+/* 하단 버튼: hover할 때만 깜빡임 */
+.landing-howto-start:hover { animation: landing-blink 1s steps(1) infinite; }
+
+/* STAGE SELECT */
+.landing-modes { margin-bottom: var(--sp80); }
+.landing-modes .landing-modes-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); align-items: stretch; }
+.landing-modes .landing-modes-list > li { display: flex; }
+.landing-modes .landing-mode { flex: 1; display: flex; flex-direction: column; gap: var(--sp08); background: var(--panel); border: 4px solid var(--ink); box-shadow: 8px 8px 0 var(--p1); padding: var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
+.landing-modes .landing-mode:hover { box-shadow: 8px 8px 0 var(--gold); }
+.landing-modes .landing-mode:active { transform: translate(8px, 8px); box-shadow: 0 0 0 var(--ink); }
+.landing-modes .landing-mode-stage { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); }
+.landing-modes .landing-mode-title { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0; }
+.landing-modes .landing-mode-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; }
+.landing-modes .landing-mode-go { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink); }
+
+/* PLAYER SELECT: 가로 행 리스트 */
+.landing-players { margin-bottom: var(--sp80); }
+.landing-players .landing-players-list { list-style: none; display: grid; gap: var(--sp16); }
+.landing-players .landing-players-row { display: flex; align-items: center; gap: var(--sp16); background: var(--panel-light); border-left: 8px solid var(--p2); padding: var(--sp16) var(--sp24); }
+.landing-players .landing-players-tag { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft16); color: var(--p2); width: 44px; }
+.landing-players .landing-players-badge { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--bg); border: 3px solid var(--ink); color: var(--p1); }
+.landing-players .landing-players-icon { width: 26px; height: 26px; }
+.landing-players .landing-players-body { display: flex; flex-direction: column; gap: var(--sp04); }
+.landing-players .landing-players-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--ink); }
+.landing-players .landing-players-desc { color: var(--ink-dim); font-size: var(--ft14); }
+
+/* HOW TO PLAY: 설명서 패널 */
+.landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp40) var(--sp24); margin-bottom: var(--sp60); text-align: center; }
+.landing-howto .landing-heading { flex-direction: column; justify-content: center; }
+.landing-howto .landing-howto-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); margin-bottom: var(--sp40); text-align: left; }
+.landing-howto .landing-howto-step { display: flex; gap: var(--sp16); }
+.landing-howto .landing-howto-no { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft32); color: var(--gold); line-height: 1; }
+.landing-howto .landing-howto-body { display: flex; flex-direction: column; gap: var(--sp04); }
+.landing-howto .landing-howto-phase { font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); }
+.landing-howto .landing-howto-text { color: var(--ink); font-size: var(--ft14); word-break: keep-all; }
+
+@keyframes landing-blink { 50% { opacity: 0; } }
+
+@media (max-width: 1024px) {
+    .landing-modes .landing-modes-list,
+    .landing-howto .landing-howto-list { grid-template-columns: 1fr; }
+    .landing-hero .landing-hero-logo { font-size: var(--ft40); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); }
+    .landing-hero { box-shadow: 6px 6px 0 var(--p2); }
+    .landing-players .landing-players-row { flex-wrap: wrap; }
+}
+
+@media (max-width: 400px) {
+    .landing-hero .landing-hero-logo { font-size: var(--ft32); }
+}

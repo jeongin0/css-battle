@@ -1,0 +1,6 @@
+/* ===== 실전 진단 모드 ===== */
+.diagnose-page .diagnose-target { display: flex; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.diagnose-page .diagnose-target label { display: flex; flex-direction: column; gap: var(--sp04); font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .diagnose-target input { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08); }
+.diagnose-page .diagnose-table td { text-align: left; }
+.diagnose-page .diagnose-table .is-winner { background: rgba(74, 222, 128, 0.15); }

@@ -1,0 +1,12 @@
+/* ===== 타자연습 모드 ===== */
+.typing-page .typing-adapt { font-size: var(--ft14); color: var(--ink-dim); display: flex; align-items: center; gap: var(--sp04); }
+.typing-page .typing-stats { display: flex; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
+.typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 90px; }
+.typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
+.typing-page .typing-stats span { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-mission { color: var(--gold); margin-top: var(--sp16); }
+.typing-page .typing-answer { font-size: var(--ft20); letter-spacing: 1px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); margin: var(--sp08) 0; min-height: 3rem; overflow-x: auto; white-space: nowrap; }
+.typing-page .typing-char.is-ok { color: var(--hp-green); }
+.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
+.typing-page .typing-input { min-height: 0; }

@@ -1,0 +1,20 @@
+/* ===== 오늘의 퀘스트 / 스탬프 ===== */
+.quest-page .quest-streak { display: flex; align-items: center; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.quest-page .quest-streak-badge { font-family: var(--font-point); font-size: var(--ft14); color: var(--gold); }
+.quest-page .quest-list { list-style: none; display: grid; gap: var(--sp08); }
+.quest-page .quest-item { display: flex; align-items: center; gap: var(--sp08); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); }
+.quest-page .quest-item.is-done { border-color: var(--hp-green); color: var(--hp-green); }
+.quest-page .quest-item-check { width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border: 1px solid currentColor; border-radius: var(--sp04); }
+.quest-page .quest-reward { color: var(--gold); }
+.quest-page .quest-reward-list { list-style: none; margin-top: var(--sp08); display: grid; gap: var(--sp04); color: var(--ink-dim); }
+.quest-page .quest-reward-list .is-unlocked { color: var(--hp-green); }
+
+/* 스탬프 달력 (stampCalendar 컴포넌트 — 퀘스트 전용) */
+.stamp-calendar { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); max-width: 360px; }
+.stamp-calendar .stamp-calendar-head, .stamp-calendar .stamp-calendar-grid { list-style: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp04); }
+.stamp-calendar .stamp-calendar-head { margin-bottom: var(--sp04); }
+.stamp-calendar .stamp-calendar-day-label { text-align: center; font-size: var(--ft12); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--ft12); background: var(--bg); border-radius: var(--sp04); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell.is-done { background: var(--hp-green); color: var(--bg); }
+.stamp-calendar .stamp-calendar-cell.is-today { outline: 2px solid var(--p1); }
+.stamp-calendar .stamp-calendar-cell.is-future { opacity: 0.35; }

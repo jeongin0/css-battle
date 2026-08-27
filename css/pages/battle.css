@@ -1,0 +1,18 @@
+/* ===== 배틀 모드 ===== */
+.battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
+.battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
+.battle-page .battle-col { min-width: 0; }
+.battle-page .battle-status { margin-top: var(--sp16); }
+.battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); }
+.battle-page .battle-timer.is-low { color: var(--hp-red); }
+.battle-page .battle-actions { display: flex; gap: var(--sp08); margin-top: var(--sp16); }
+.battle-page .battle-feedback { list-style: none; margin: var(--sp08) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
+.battle-page .battle-feedback li { margin: var(--sp04) 0; }
+
+/* 체력바 블록 */
+.health-bar-block { margin-bottom: var(--sp08); }
+.health-bar-block .health-bar-label { display: block; font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
+
+@media (max-width: 1024px) {
+    .battle-page .battle-layout { grid-template-columns: 1fr; }
+}

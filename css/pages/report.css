@@ -1,0 +1,15 @@
+/* ===== 성장 리포트 (+ 도감) ===== */
+.report-page .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin: var(--sp16) 0; }
+.report-page .report-cards dt { font-size: var(--ft12); color: var(--ink-dim); }
+.report-page .report-cards dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin-top: var(--sp08); }
+.report-page .report-chart { width: 100%; height: 240px; display: block; }
+.report-page .report-beforeafter { color: var(--p1); margin-top: var(--sp08); }
+.report-page .dex-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp16); margin-top: var(--sp16); }
+.report-page .dex-spec { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp08) 0; }
+.report-page .report-insight { margin-top: var(--sp16); color: var(--ink); }
+.report-page .report-panel .tabs { margin-bottom: var(--sp16); }
+
+@media (max-width: 1024px) {
+    .report-page .report-cards,
+    .report-page .dex-list { grid-template-columns: 1fr; }
+}
