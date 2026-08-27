@@ -92,10 +92,79 @@
 
 
 /* 배틀 컨트롤 */
-.battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; margin-top: var(--sp16); }
+.battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
+.battle-panel-title { font-family: var(--font-main); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp16) 0 var(--sp08); text-transform: uppercase; letter-spacing: 1px; }
+.battle-page .battle-col { min-width: 0; }
+.battle-page .battle-status { margin-top: var(--sp16); }
+.battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); }
+.battle-page .battle-timer.is-low { color: var(--hp-red); }
+.battle-page .battle-actions { display: flex; gap: var(--sp08); margin-top: var(--sp16); }
+.battle-page .battle-feedback { list-style: none; margin: var(--sp08) 0; padding: var(--sp08) var(--sp16); background: var(--panel); border-left: 3px solid var(--p2); border-radius: var(--sp04); font-size: var(--ft14); }
+.battle-page .battle-feedback li { margin: var(--sp04) 0; }
 
+/* 체력바 블록 */
+.health-bar-block { margin-bottom: var(--sp08); }
+.health-bar-block .health-bar-label { display: block; font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
+
+/* KO 스탬프 애니메이션 */
+.ko-stamp { display: inline-block; animation: ko-pop 0.4s ease; }
+@keyframes ko-pop { 0% { transform: scale(2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* 타자연습 */
+.typing-page .typing-adapt { font-size: var(--ft14); color: var(--ink-dim); display: flex; align-items: center; gap: var(--sp04); }
+.typing-page .typing-stats { display: flex; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
+.typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 90px; }
+.typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
+.typing-page .typing-stats span { font-size: var(--ft12); color: var(--ink-dim); }
+.typing-page .typing-mission { color: var(--gold); margin-top: var(--sp16); }
+.typing-page .typing-answer { font-size: var(--ft20); letter-spacing: 1px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); margin: var(--sp08) 0; min-height: 3rem; overflow-x: auto; white-space: nowrap; }
+.typing-page .typing-char.is-ok { color: var(--hp-green); }
+.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
+.typing-page .typing-input { min-height: 0; }
+
+/* 진단 */
+.diagnose-page .diagnose-target { display: flex; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.diagnose-page .diagnose-target label { display: flex; flex-direction: column; gap: var(--sp04); font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .diagnose-target input { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08); }
+.diagnose-page .diagnose-table td { text-align: left; }
+.diagnose-page .diagnose-table .is-winner { background: rgba(74, 222, 128, 0.15); }
+
+/* 퀘스트 */
+.quest-page .quest-streak { display: flex; align-items: center; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
+.quest-page .quest-streak-badge { font-family: var(--font-point); font-size: var(--ft14); color: var(--gold); }
+.quest-page .quest-list { list-style: none; display: grid; gap: var(--sp08); }
+.quest-page .quest-item { display: flex; align-items: center; gap: var(--sp08); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); }
+.quest-page .quest-item.is-done { border-color: var(--hp-green); color: var(--hp-green); }
+.quest-page .quest-item-check { width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border: 1px solid currentColor; border-radius: var(--sp04); }
+.quest-page .quest-reward { color: var(--gold); }
+.quest-page .quest-reward-list { list-style: none; margin-top: var(--sp08); display: grid; gap: var(--sp04); color: var(--ink-dim); }
+.quest-page .quest-reward-list .is-unlocked { color: var(--hp-green); }
+
+/* 스탬프 달력 */
+.stamp-calendar { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); max-width: 360px; }
+.stamp-calendar .stamp-calendar-head, .stamp-calendar .stamp-calendar-grid { list-style: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp04); }
+.stamp-calendar .stamp-calendar-head { margin-bottom: var(--sp04); }
+.stamp-calendar .stamp-calendar-day-label { text-align: center; font-size: var(--ft12); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--ft12); background: var(--bg); border-radius: var(--sp04); color: var(--ink-dim); }
+.stamp-calendar .stamp-calendar-cell.is-done { background: var(--hp-green); color: var(--bg); }
+.stamp-calendar .stamp-calendar-cell.is-today { outline: 2px solid var(--p1); }
+.stamp-calendar .stamp-calendar-cell.is-future { opacity: 0.35; }
+
+/* 리포트 */
+.report-page .report-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin: var(--sp16) 0; }
+.report-page .report-cards dt { font-size: var(--ft12); color: var(--ink-dim); }
+.report-page .report-cards dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin-top: var(--sp08); }
+.report-page .report-chart { width: 100%; height: 240px; display: block; }
+.report-page .report-beforeafter { color: var(--p1); margin-top: var(--sp08); }
+.report-page .dex-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp16); margin-top: var(--sp16); }
+.report-page .dex-spec { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); margin: var(--sp08) 0; }
+.report-page .report-insight { margin-top: var(--sp16); color: var(--ink); }
+.report-page .report-panel .tabs { margin-bottom: var(--sp16); }
 
 @media (max-width: 1024px) {
     .landing-features,
-    .battle-page .battle-layout { grid-template-columns: 1fr; }
+    .battle-page .battle-layout,
+    .report-page .report-cards,
+    .report-page .dex-list { grid-template-columns: 1fr; }
 }

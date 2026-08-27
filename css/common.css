@@ -3,15 +3,10 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-main); 
 .app { max-width: 1200px; margin: 0 auto; padding: var(--sp24); }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--sp24); }
 
-.site-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp08); padding: var(--sp16) var(--sp24); background: var(--panel); border-bottom: 1px solid var(--panel-light); }
-.site-header .site-header-logo { font-family: var(--font-point); font-weight: 700; font-size: var(--ft24); color: var(--gold); display: flex; gap: 8px; align-items: center; }
-.site-header .site-header-logo img { display: block; width: 100%; max-width: 60px; }
-.site-header .site-header-nav ul { display: flex; gap: var(--sp24); }
-.site-header .site-header-nav a { color: var(--ink-dim); font-size: var(--ft14); }
-.site-header .site-header-nav a:hover, .site-header .site-header-nav a.is-active { color: var(--p1); }
+a { color: inherit; }
+code { font-family: var(--font-main); background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); }
 
 @media (max-width: 1024px) {
     .app { padding: var(--sp16); }
     .container { padding: var(--sp16); }
-    .site-header .site-header-nav ul { gap: var(--sp08); }
 }
