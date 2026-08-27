@@ -90,8 +90,9 @@
 .landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp24); }
 
 .landing-features { margin-bottom: var(--sp60); }
-.landing-features .landing-features-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); }
-.landing-features .landing-feature-card { display: flex; flex-direction: column; gap: var(--sp08); height: 100%; background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); transition: border-color 0.15s ease, transform 0.15s ease; }
+.landing-features .landing-features-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); align-items: stretch; }
+.landing-features .landing-features-list > li { display: flex; }
+.landing-features .landing-feature-card { flex: 1; display: flex; flex-direction: column; gap: var(--sp08); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); transition: border-color 0.15s ease, transform 0.15s ease; }
 .landing-features .landing-feature-card:hover { border-color: var(--p1); transform: translateY(-2px); }
 .landing-features .landing-feature-step { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); }
 .landing-features .landing-feature-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft20); color: var(--p1); }
