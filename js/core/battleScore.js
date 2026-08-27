@@ -23,7 +23,15 @@ function propMatches(prop, expected, actual) {
         const a = rgb(actual);
         return !!e && !!a && e.every((c, i) => Math.abs(c - a[i]) <= 12);
     }
-    if (/width|height|size|gap|radius|top$|left$|right$|bottom$|margin|padding|spacing/.test(prop)) {
+    // 완전한 라운드(원/알약)는 999px, 50%, 큰 px 등 표현이 달라도 같은 결과로 본다
+    if (/radius/.test(prop)) {
+        const round = (v) => v.includes('%') ? parseFloat(v) >= 40 : parseFloat(v) >= 100;
+        if (round(expected) && round(actual)) return true;
+        const e = parseFloat(expected);
+        const a = parseFloat(actual);
+        return !Number.isNaN(e) && !Number.isNaN(a) && Math.abs(e - a) <= 1.5;
+    }
+    if (/width|height|size|gap|top$|left$|right$|bottom$|margin|padding|spacing/.test(prop)) {
         const e = parseFloat(expected);
         const a = parseFloat(actual);
         if (!Number.isNaN(e) && !Number.isNaN(a)) return Math.abs(e - a) <= 1.5;
