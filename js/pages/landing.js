@@ -1,8 +1,8 @@
 export function render(container) {
     container.innerHTML = `
         <section class="container landing-hero">
-            <h1 class="landing-hero-headline">분명 스타일 줬는데, 왜 안 먹히지?</h1>
-            <p class="landing-hero-sub">CSS 특이도(specificity)를 대결·타이핑·실전 진단으로 몸에 익히는 학습 도구</p>
+            <h1 class="landing-hero-headline">분명 스타일 줬는데, 왜 안 먹지?</h1>
+            <p class="landing-hero-sub">CSS를 대결·타이핑·실전 진단으로 몸에 익히는 학습 도구</p>
             <a href="#battle" class="btn">지금 배틀 시작</a>
         </section>
 
