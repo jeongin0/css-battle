@@ -1,5 +1,6 @@
 .site-header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp16); padding: var(--sp16) var(--sp24); background: var(--panel); border-bottom: 1px solid var(--panel-light); }
-.site-header .site-header-logo { font-family: var(--font-point); font-weight: 700; font-size: var(--ft14); color: var(--gold); display: flex; gap: var(--sp08); align-items: center; }
+.site-header .site-header-logo { margin: 0; font-family: var(--font-point); font-weight: 700; font-size: var(--ft14); }
+.site-header .site-header-logo a { display: flex; gap: var(--sp08); align-items: center; color: var(--gold); }
 .site-header .site-header-logo img { display: block; width: 100%; max-width: 40px; }
 .site-header .site-header-nav ul { display: flex; flex-wrap: wrap; gap: var(--sp16); }
 .site-header .site-header-nav ul li a { color: var(--ink-dim); font-size: var(--ft16); }

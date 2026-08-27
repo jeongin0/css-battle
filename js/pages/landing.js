@@ -77,14 +77,14 @@ export function render(container) {
     container.innerHTML = `
         <section class="landing-hero">
             <p class="landing-hero-coin">◆ INSERT COIN ◆</p>
-            <h1 class="landing-hero-logo">CSS<br>BATTLE</h1>
+            <h2 class="landing-hero-logo">CSS<br>BATTLE</h2>
             <p class="landing-hero-tagline">분명 스타일 줬는데, 왜 안 먹지?</p>
             <p class="landing-hero-sub">CSS 특이도를 대결·타이핑·실전 진단으로 몸에 익히는 학습 도구</p>
             <a href="#battle" class="landing-hero-start">▶ PRESS START</a>
         </section>
 
         <section class="landing-modes">
-            <h2 class="landing-heading"><span>MODE</span> STAGE SELECT</h2>
+            <h3 class="landing-heading"><span>MODE</span> STAGE SELECT</h3>
             <ol class="landing-modes-list">
                 ${MODES.map((m) => `
                     <li>
@@ -100,7 +100,7 @@ export function render(container) {
         </section>
 
         <section class="landing-players">
-            <h2 class="landing-heading"><span>YOU</span> PLAYER SELECT</h2>
+            <h3 class="landing-heading"><span>YOU</span> PLAYER SELECT</h3>
             <ul class="landing-players-list">
                 ${PLAYERS.map((p) => `
                     <li class="landing-players-row">
@@ -116,7 +116,7 @@ export function render(container) {
         </section>
 
         <section class="landing-howto">
-            <h2 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h2>
+            <h3 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h3>
             <p class="landing-howto-tagline">CSS가 왜 안 먹히는지, 직접 부딪혀보세요.</p>
 
             <div class="landing-howto-intro">
@@ -136,7 +136,7 @@ export function render(container) {
             </ol>
 
             <div class="landing-howto-outcome">
-                <h3 class="landing-howto-outcome-title">그래서 무엇이 달라질까요?</h3>
+                <h4 class="landing-howto-outcome-title">그래서 무엇이 달라질까요?</h4>
                 <p>CSS가 적용되지 않을 때 무작정 코드를 수정하거나 !important를 사용하는 대신,</p>
                 <p class="landing-howto-flow">
                     <span>왜 이 스타일이 적용되지 않았지?</span>

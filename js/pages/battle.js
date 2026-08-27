@@ -14,7 +14,7 @@ export function render(container) {
 
     container.innerHTML = `
         <section class="container battle-page">
-            <h1 class="page-title">배틀 모드</h1>
+            <h2 class="page-title">배틀 모드</h2>
             <p class="page-desc">HTML과 목표 시안만 보고 CSS를 직접 작성해, 시안과 똑같이 만드세요. 시안과의 배틀입니다.</p>
 
             <div class="battle-bar">
@@ -36,24 +36,24 @@ export function render(container) {
 
             <div class="battle-layout">
                 <div class="battle-col">
-                    <h2 class="battle-panel-title">HTML 구조 (수정 불가)</h2>
+                    <h3 class="battle-panel-title">HTML 구조 (수정 불가)</h3>
                     <pre class="dom-tree" data-role="html-src"></pre>
 
-                    <h2 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h2>
+                    <h3 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h3>
                     <div class="battle-shielded">
                         <iframe class="preview-frame preview-frame-lg" data-role="shown-frame" sandbox="allow-same-origin" scrolling="no" title="목표 시안"></iframe>
                         <div class="battle-shield" data-role="shield"></div>
                     </div>
 
-                    <h2 class="battle-panel-title">색상 팔레트 · 스포이드</h2>
+                    <h3 class="battle-panel-title">색상 팔레트 · 스포이드</h3>
                     <div class="battle-palette" data-role="palette"></div>
                 </div>
 
                 <div class="battle-col">
-                    <h2 class="battle-panel-title">현재 렌더링 (실시간)</h2>
+                    <h3 class="battle-panel-title">현재 렌더링 (실시간)</h3>
                     <iframe class="preview-frame preview-frame-lg" data-role="live-frame" sandbox="allow-same-origin" title="현재 렌더링"></iframe>
 
-                    <h2 class="battle-panel-title">CSS 작성</h2>
+                    <h3 class="battle-panel-title">CSS 작성</h3>
                     <textarea class="css-editor" data-role="css-input" spellcheck="false" placeholder="FIGHT를 누르면 입력할 수 있습니다"></textarea>
                 </div>
             </div>
@@ -63,8 +63,8 @@ export function render(container) {
                 <button type="button" class="btn btn-ghost" data-role="save-btn">전적에 저장</button>
             </div>
 
-            <iframe class="battle-offscreen" data-role="answer-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
-            <iframe class="battle-offscreen" data-role="base-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
+            <iframe class="battle-offscreen" data-role="answer-frame" sandbox="allow-same-origin" title="채점용 렌더" aria-hidden="true" tabindex="-1"></iframe>
+            <iframe class="battle-offscreen" data-role="base-frame" sandbox="allow-same-origin" title="채점용 렌더" aria-hidden="true" tabindex="-1"></iframe>
         </section>
     `;
 

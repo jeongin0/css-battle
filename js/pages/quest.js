@@ -34,7 +34,7 @@ export function render(container) {
 
     container.innerHTML = `
         <section class="container quest-page">
-            <h1 class="page-title">오늘의 퀘스트 / 스탬프</h1>
+            <h2 class="page-title">오늘의 퀘스트 / 스탬프</h2>
             <p class="page-desc">매일 3개의 퀘스트를 완료해 스트릭을 이어가고 스탬프를 모으세요.</p>
 
             <div class="quest-streak">
@@ -42,7 +42,7 @@ export function render(container) {
                 <span class="hint-text">최장 ${streak.longest}일 · 누적 스탬프 ${stamps}개</span>
             </div>
 
-            <h2 class="battle-panel-title">오늘의 퀘스트</h2>
+            <h3 class="battle-panel-title">오늘의 퀘스트</h3>
             <ul class="quest-list">
                 ${DAILY_QUESTS.map((q) => `
                     <li class="quest-item ${status[q.id] ? 'is-done' : ''}">
@@ -52,10 +52,10 @@ export function render(container) {
                 `).join('')}
             </ul>
 
-            <h2 class="battle-panel-title">스탬프 카드</h2>
+            <h3 class="battle-panel-title">스탬프 카드</h3>
             ${stampCalendarHtml(fresh.questLog, 4)}
 
-            <h2 class="battle-panel-title">다음 보상</h2>
+            <h3 class="battle-panel-title">다음 보상</h3>
             <p class="quest-reward">
                 ${reward
                     ? `<strong>${reward.title}</strong> 까지 스탬프 ${reward.remaining}개 남음`

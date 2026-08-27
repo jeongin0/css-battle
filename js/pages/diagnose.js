@@ -10,10 +10,10 @@ article p { color: blue; }`;
 export function render(container) {
     container.innerHTML = `
         <section class="container diagnose-page">
-            <h1 class="page-title">실전 진단 모드</h1>
+            <h2 class="page-title">실전 진단 모드</h2>
             <p class="page-desc">실제 CSS 코드를 붙여넣고, 대상 엘리먼트에 어떤 규칙이 이기는지 우선순위를 진단합니다.</p>
 
-            <h2 class="battle-panel-title">CSS 코드</h2>
+            <h3 class="battle-panel-title">CSS 코드</h3>
             <textarea class="css-editor" data-role="css" spellcheck="false"></textarea>
 
             <div class="diagnose-target">

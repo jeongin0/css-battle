@@ -60,7 +60,7 @@ export function render(container) {
 
     container.innerHTML = `
         <section class="container report-page">
-            <h1 class="page-title">성장 리포트</h1>
+            <h2 class="page-title">성장 리포트</h2>
 
             <div class="tabs" data-role="tabs">
                 <button type="button" class="tabs-btn is-active" data-value="report">성장 리포트</button>
@@ -76,17 +76,17 @@ export function render(container) {
 
                 ${battles.length ? '' : '<p class="hint-text">아직 배틀 기록이 없습니다. 배틀 모드에서 "전적에 저장"을 눌러보세요.</p>'}
 
-                <h2 class="battle-panel-title">주차별 승률</h2>
+                <h3 class="battle-panel-title">주차별 승률</h3>
                 <canvas class="report-chart" data-role="chart-winrate"></canvas>
 
                 ${firstWeek && lastWeek && weekly.length > 1
                     ? `<p class="report-beforeafter">${firstWeek.label}주 ${firstWeek.value}% → ${lastWeek.label}주 ${lastWeek.value}%</p>`
                     : ''}
 
-                <h2 class="battle-panel-title">타이핑 타수 추이</h2>
+                <h3 class="battle-panel-title">타이핑 타수 추이</h3>
                 <canvas class="report-chart" data-role="chart-wpm"></canvas>
 
-                <h2 class="battle-panel-title">타이핑 정확도 추이</h2>
+                <h3 class="battle-panel-title">타이핑 정확도 추이</h3>
                 <canvas class="report-chart" data-role="chart-acc"></canvas>
             </div>
 
@@ -94,7 +94,7 @@ export function render(container) {
                 <ul class="dex-list">
                     ${SELECTOR_GUIDE.map((g) => `
                         <li class="card">
-                            <h3 class="card-title">${g.type}</h3>
+                            <h4 class="card-title">${g.type}</h4>
                             <p class="dex-spec">특이도 ${g.spec}</p>
                             <p>${g.desc}</p>
                         </li>
