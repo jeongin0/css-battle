@@ -1,6 +1,9 @@
 /* ===== 배틀 모드 ===== */
 .battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
 .battle-page .battle-controls { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
+.battle-page .tabs.is-locked { opacity: 0.45; pointer-events: none; }
+.battle-page .css-editor:disabled { opacity: 0.6; cursor: not-allowed; }
+.battle-page .battle-actions { flex-wrap: wrap; }
 .battle-page .battle-col { min-width: 0; }
 .battle-page .battle-status { margin-top: var(--sp16); }
 .battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); }
