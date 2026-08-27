@@ -27,7 +27,7 @@
 .landing-modes .landing-mode:hover { box-shadow: 8px 8px 0 var(--gold); }
 .landing-modes .landing-mode:active { transform: translate(8px, 8px); box-shadow: 0 0 0 var(--ink); }
 .landing-modes .landing-mode-stage { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); }
-.landing-modes .landing-mode-title { font-family: var(--font-main); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0; }
+.landing-modes .landing-mode-title { font-family: var(--font-main); font-size: var(--ft20); font-weight: 700; color: var(--gold); margin: var(--sp08) 0; }
 .landing-modes .landing-mode-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; word-break: keep-all; }
 .landing-modes .landing-mode-go { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink); }
 

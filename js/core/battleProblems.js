@@ -1,151 +1,348 @@
-// 배틀 모드 문제 풀 — 난이도별 실제 UI 컴포넌트.
-// 각 문제: 상대 규칙(opponentRules)이 DOM에 이미 적용돼 시안과 다르게 보인다.
-// 사용자는 상대 규칙을 특이도로 이기는 규칙을 써서 targetSelector의 렌더 결과를
-// expectedStyles(정답 CSS = targetCss의 결과)와 맞춰야 한다.
+// 배틀 모드 시안 풀 — 난이도별 큐레이션.
+// html: 스타일 없는 구조 / answerCss: 정답(시안 렌더 + 채점 기준) / check: 검증 대상
+// palette: 색상 스와치 / keepDefault: 스타일이 새면 안 되는 요소
+
+const COMMON_HEAD = `@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 20px; font-family: 'Pretendard', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #f4f4f6; }`;
+
+export function previewDoc(html, css) {
+    return `<!doctype html><html><head><style>${COMMON_HEAD}\n${css || ''}</style></head><body>${html}</body></html>`;
+}
+
+const BOX = ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'];
+const TEXT = ['color', 'font-size', 'font-weight'];
 
 export const BATTLE_POOLS = {
     low: [
         {
-            id: 'low-btn',
-            name: '주요 버튼 색',
-            domHtml: '<div class="toolbar">\n  <button class="btn primary">저장</button>\n  <button class="btn">취소</button>\n</div>',
-            opponentRules: ['.toolbar .btn { background: #6B7280; color: #fff; }'],
-            targetCss: '.toolbar .btn.primary { background: #00E5FF; color: #150C22; }',
-            targetSelector: '.primary',
-            expectedStyles: { 'background-color': '#00E5FF', color: '#150C22' },
-            hint: '.toolbar .btn (0,0,2,0)보다 세려면 클래스를 하나 더 붙이세요. .primary는 이미 버튼에 있습니다.'
+            id: 'low-profile',
+            name: '프로필 뱃지',
+            html:
+`<div class="profile">
+  <span class="profile-avatar">A</span>
+  <span class="profile-name">Ada Lovelace</span>
+  <span class="profile-role">Engineer</span>
+</div>`,
+            answerCss:
+`.profile { display: flex; align-items: center; gap: 12px; padding: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; width: 320px; }
+.profile-avatar { width: 40px; height: 40px; border-radius: 999px; background: #4f46e5; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.profile-name { font-size: 15px; font-weight: 700; color: #111827; }
+.profile-role { font-size: 13px; color: #6b7280; margin-left: auto; }`,
+            palette: ['#4F46E5', '#111827', '#6B7280', '#E5E7EB', '#FFFFFF'],
+            check: [
+                { sel: '.profile', props: ['display', 'align-items', 'gap', ...BOX, 'background-color', 'border-radius'] },
+                { sel: '.profile-avatar', props: ['width', 'height', 'border-radius', 'background-color', 'color', 'font-weight'] },
+                { sel: '.profile-name', props: TEXT },
+                { sel: '.profile-role', props: ['color', 'font-size'] }
+            ],
+            keepDefault: []
         },
         {
-            id: 'low-badge',
-            name: 'NEW 뱃지',
-            domHtml: '<p class="row">업데이트 <span class="badge new">NEW</span></p>',
-            opponentRules: ['.row .badge { background: #6B7280; color: #fff; }'],
-            targetCss: '.row .badge.new { background: #FFD23F; color: #150C22; }',
-            targetSelector: '.new',
-            expectedStyles: { 'background-color': '#FFD23F', color: '#150C22' },
-            hint: '뱃지에는 badge와 new 두 클래스가 있습니다. 둘 다 쓰면 상대보다 셉니다.'
+            id: 'low-stat',
+            name: '지표 카드',
+            html:
+`<div class="stat">
+  <p class="stat-value">2,847</p>
+  <p class="stat-label">이번 주 방문자</p>
+  <p class="stat-delta">+12.5%</p>
+</div>`,
+            answerCss:
+`.stat { padding: 20px; background: #0f172a; border-radius: 14px; width: 240px; }
+.stat-value { margin: 0; font-size: 32px; font-weight: 800; color: #f8fafc; }
+.stat-label { margin: 4px 0 0; font-size: 13px; color: #94a3b8; }
+.stat-delta { margin: 12px 0 0; font-size: 13px; font-weight: 700; color: #4ade80; }`,
+            palette: ['#0F172A', '#F8FAFC', '#94A3B8', '#4ADE80'],
+            check: [
+                { sel: '.stat', props: [...BOX, 'background-color', 'border-radius'] },
+                { sel: '.stat-value', props: ['font-size', 'font-weight', 'color', 'margin-top', 'margin-bottom'] },
+                { sel: '.stat-label', props: ['font-size', 'color'] },
+                { sel: '.stat-delta', props: ['font-size', 'font-weight', 'color', 'margin-top'] }
+            ],
+            keepDefault: []
         },
         {
-            id: 'low-title',
-            name: '카드 제목 색',
-            domHtml: '<article class="card">\n  <h3 class="card-title">주간 리포트</h3>\n  <p>이번 주 요약</p>\n</article>',
-            opponentRules: ['.card h3 { color: #6B7280; }'],
-            targetCss: '.card .card-title { color: #00E5FF; }',
-            targetSelector: '.card-title',
-            expectedStyles: { color: '#00E5FF' },
-            hint: '태그(h3)보다 클래스가 셉니다. .card .card-title로 이겨보세요.'
+            id: 'low-notice',
+            name: '안내 배너',
+            html:
+`<p class="notice">
+  <span class="notice-icon">i</span>
+  변경 사항은 자동으로 저장됩니다.
+</p>`,
+            answerCss:
+`.notice { display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 16px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; font-size: 14px; color: #1e3a8a; width: 360px; }
+.notice-icon { width: 20px; height: 20px; border-radius: 999px; background: #3b82f6; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-style: normal; }`,
+            palette: ['#EFF6FF', '#3B82F6', '#1E3A8A', '#FFFFFF'],
+            check: [
+                { sel: '.notice', props: ['display', 'align-items', 'gap', ...BOX, 'background-color', 'border-left-width', 'border-left-color', 'border-radius', 'font-size', 'color'] },
+                { sel: '.notice-icon', props: ['width', 'height', 'border-radius', 'background-color', 'color', 'font-weight'] }
+            ],
+            keepDefault: []
         },
         {
             id: 'low-price',
-            name: '가격 강조',
-            domHtml: '<p class="plan">월 <span class="price">9,900</span>원</p>',
-            opponentRules: ['.plan .price { font-size: 16px; color: #6B7280; }'],
-            targetCss: '.plan span.price { font-size: 28px; color: #FFD23F; }',
-            targetSelector: '.price',
-            expectedStyles: { 'font-size': '28px', color: '#FFD23F' },
-            hint: '태그 선택자(span)를 클래스 앞에 붙이면 (0,0,2,1)로 상대를 이깁니다.'
+            name: '가격 표시',
+            html:
+`<p class="price">
+  <span class="price-currency">₩</span>
+  <span class="price-amount">12,000</span>
+  <span class="price-period">/ 월</span>
+</p>`,
+            answerCss:
+`.price { margin: 0; display: flex; align-items: baseline; gap: 4px; color: #111827; }
+.price-currency { font-size: 18px; font-weight: 600; }
+.price-amount { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; }
+.price-period { font-size: 14px; font-weight: 500; color: #9ca3af; }`,
+            palette: ['#111827', '#9CA3AF'],
+            check: [
+                { sel: '.price', props: ['display', 'align-items', 'gap', 'color'] },
+                { sel: '.price-currency', props: ['font-size', 'font-weight'] },
+                { sel: '.price-amount', props: ['font-size', 'font-weight'] },
+                { sel: '.price-period', props: ['font-size', 'font-weight', 'color'] }
+            ],
+            keepDefault: []
         }
     ],
     mid: [
         {
-            id: 'mid-nav',
-            name: '내비 활성 항목',
-            domHtml: '<nav class="gnb">\n  <a class="gnb-link">홈</a>\n  <a class="gnb-link is-active">대시보드</a>\n  <a class="gnb-link">설정</a>\n</nav>',
-            opponentRules: [
-                '.gnb .gnb-link { color: #9CA3AF; font-weight: 400; }',
-                '.gnb a.gnb-link { color: #9CA3AF; }'
+            id: 'mid-segmented',
+            name: '세그먼트 컨트롤',
+            html:
+`<div class="seg">
+  <button class="seg-item">일간</button>
+  <button class="seg-item is-active">주간</button>
+  <button class="seg-item">월간</button>
+</div>`,
+            answerCss:
+`.seg { display: inline-flex; gap: 4px; padding: 4px; background: #f1f5f9; border-radius: 10px; }
+.seg-item { border: 0; padding: 8px 16px; border-radius: 7px; background: transparent; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; }
+.seg-item.is-active { background: #ffffff; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }`,
+            palette: ['#F1F5F9', '#64748B', '#0F172A', '#FFFFFF'],
+            check: [
+                { sel: '.seg', props: ['display', 'gap', ...BOX, 'background-color', 'border-radius'] },
+                { sel: '.seg-item', props: ['padding-top', 'padding-left', 'border-radius', 'font-size', 'font-weight', 'color'] },
+                { sel: '.seg-item.is-active', props: ['background-color', 'color'] }
             ],
-            targetCss: '.gnb .gnb-link.is-active { color: #00E5FF; font-weight: 700; }',
-            targetSelector: '.is-active',
-            expectedStyles: { color: '#00E5FF', 'font-weight': '700' },
-            hint: '상대 규칙 중 가장 센 것이 .gnb a.gnb-link (0,0,2,1). 여기에 .is-active를 더하면 이깁니다.'
+            keepDefault: []
         },
         {
-            id: 'mid-alert',
-            name: '성공 알림 배너',
-            domHtml: '<div class="alert success">\n  <strong>저장됨</strong> 변경 사항이 반영되었습니다.\n</div>',
-            opponentRules: [
-                '.alert { background: #374151; color: #E5E7EB; }',
-                '.alert.success { background: #4B5563; }'
+            id: 'mid-todo',
+            name: '할 일 항목',
+            html:
+`<ul class="todo">
+  <li class="todo-item">보고서 초안 작성</li>
+  <li class="todo-item is-done">회의실 예약</li>
+</ul>`,
+            answerCss:
+`.todo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; width: 320px; }
+.todo-item { padding: 12px 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; color: #111827; }
+.todo-item.is-done { color: #9ca3af; text-decoration: line-through; background: #f9fafb; }`,
+            palette: ['#FFFFFF', '#E5E7EB', '#111827', '#9CA3AF', '#F9FAFB'],
+            check: [
+                { sel: '.todo', props: ['display', 'flex-direction', 'gap', ...BOX] },
+                { sel: '.todo-item', props: [...BOX, 'background-color', 'border-top-width', 'border-radius', 'font-size', 'color'] },
+                { sel: '.todo-item.is-done', props: ['color', 'text-decoration-line', 'background-color'] }
             ],
-            targetCss: '.alert.success { background: #123D2B; color: #4ADE80; }',
-            targetSelector: '.alert.success',
-            expectedStyles: { 'background-color': '#123D2B', color: '#4ADE80' },
-            hint: '상대가 .alert.success (0,0,2,0)로 배경을 잡고 있습니다. 같은 특이도면 나중 규칙이 이기지만, 색까지 맞아야 합니다.'
+            keepDefault: []
         },
         {
-            id: 'mid-desc',
-            name: '카드 설명 텍스트',
-            domHtml: '<section class="panel">\n  <div class="card featured">\n    <h4 class="card-title">추천</h4>\n    <p class="card-desc">가장 많이 선택하는 플랜</p>\n  </div>\n</section>',
-            opponentRules: [
-                '.panel .card p { color: #6B7280; }',
-                '.panel .card .card-desc { color: #6B7280; }'
+            id: 'mid-tags',
+            name: '태그 목록',
+            html:
+`<p class="tags">
+  <span class="tag">디자인</span>
+  <span class="tag tag-primary">공지</span>
+  <span class="tag">개발</span>
+</p>`,
+            answerCss:
+`.tags { margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { padding: 4px 10px; border-radius: 999px; background: #f3f4f6; font-size: 12px; font-weight: 600; color: #4b5563; }
+.tag.tag-primary { background: #fef3c7; color: #92400e; }`,
+            palette: ['#F3F4F6', '#4B5563', '#FEF3C7', '#92400E'],
+            check: [
+                { sel: '.tags', props: ['display', 'gap'] },
+                { sel: '.tag', props: ['padding-top', 'padding-left', 'border-radius', 'background-color', 'font-size', 'font-weight', 'color'] },
+                { sel: '.tag.tag-primary', props: ['background-color', 'color'] }
             ],
-            targetCss: '.card.featured .card-desc { color: #F1EEFA; }',
-            targetSelector: '.card-desc',
-            expectedStyles: { color: '#F1EEFA' },
-            hint: '상대는 .panel .card .card-desc (0,0,3,0). .card.featured .card-desc도 (0,0,3,0)이라 나중에 오면 이깁니다.'
+            keepDefault: []
         },
         {
-            id: 'mid-outline',
-            name: '아웃라인 버튼 테두리',
-            domHtml: '<div class="actions">\n  <button class="btn ghost">더 보기</button>\n</div>',
-            opponentRules: [
-                '.actions .btn { border: 2px solid #6B7280; color: #6B7280; background: transparent; }',
-                '.actions .btn.ghost { border-color: #6B7280; }'
+            id: 'mid-media',
+            name: '미디어 카드',
+            html:
+`<article class="media">
+  <div class="media-thumb"></div>
+  <div class="media-body">
+    <h3 class="media-title">디자인 시스템 구축기</h3>
+    <p class="media-desc">토큰부터 컴포넌트까지</p>
+    <span class="media-meta">5분 읽기</span>
+  </div>
+</article>`,
+            answerCss:
+`.media { display: flex; gap: 16px; padding: 16px; background: #ffffff; border: 1px solid #eceff3; border-radius: 14px; width: 420px; }
+.media-thumb { flex: 0 0 96px; height: 96px; border-radius: 10px; background: #e0e7ff; }
+.media-body { display: flex; flex-direction: column; gap: 4px; }
+.media-title { margin: 0; font-size: 16px; font-weight: 700; color: #111827; }
+.media-desc { margin: 0; font-size: 13px; color: #6b7280; }
+.media-meta { margin-top: auto; font-size: 12px; color: #9ca3af; }`,
+            palette: ['#FFFFFF', '#ECEFF3', '#E0E7FF', '#111827', '#6B7280', '#9CA3AF'],
+            check: [
+                { sel: '.media', props: ['display', 'gap', ...BOX, 'background-color', 'border-radius'] },
+                { sel: '.media-thumb', props: ['height', 'border-radius', 'background-color'] },
+                { sel: '.media-body', props: ['display', 'flex-direction', 'gap'] },
+                { sel: '.media-title', props: TEXT },
+                { sel: '.media-desc', props: ['font-size', 'color'] },
+                { sel: '.media-meta', props: ['font-size', 'color'] }
             ],
-            targetCss: '.actions .btn.ghost { border-color: #FF2E63; color: #FF2E63; }',
-            targetSelector: '.ghost',
-            expectedStyles: { 'border-top-color': '#FF2E63', color: '#FF2E63' },
-            hint: 'border-color는 border-top-color 등으로 계산됩니다. 상대 .actions .btn.ghost (0,0,3,0)를 같은 특이도로 나중에 덮으세요.'
+            keepDefault: []
         }
     ],
     high: [
         {
             id: 'high-header',
-            name: '헤더 로고 색 (!important)',
-            domHtml: '<header class="site">\n  <a id="brand" class="logo">ACME</a>\n  <nav><a class="nav-link">문서</a></nav>\n</header>',
-            opponentRules: ['#brand { color: #6B7280 !important; }'],
-            targetCss: '#brand.logo { color: #FFD23F !important; }',
-            targetSelector: '#brand',
-            expectedStyles: { color: '#FFD23F' },
-            hint: '!important끼리는 다시 특이도로 승부합니다. 같은 #brand라도 .logo를 더 붙이면 (0,1,1,0)로 이깁니다.'
+            name: '사이트 헤더',
+            html:
+`<header class="hd">
+  <a class="hd-logo">ACME</a>
+  <nav class="hd-nav">
+    <a class="hd-link">제품</a>
+    <a class="hd-link hd-link-current">가격</a>
+    <a class="hd-link">문서</a>
+  </nav>
+  <button class="hd-cta">시작하기</button>
+</header>`,
+            answerCss:
+`.hd { display: flex; align-items: center; gap: 32px; padding: 16px 24px; background: #0b1020; width: 640px; }
+.hd-logo { font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 0.02em; }
+.hd-nav { display: flex; gap: 20px; }
+.hd-link { font-size: 14px; color: #9aa4b2; text-decoration: none; }
+.hd-link.hd-link-current { color: #ffffff; font-weight: 700; }
+.hd-cta { margin-left: auto; border: 0; padding: 10px 18px; border-radius: 8px; background: #6366f1; color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer; }`,
+            palette: ['#0B1020', '#FFFFFF', '#9AA4B2', '#6366F1'],
+            check: [
+                { sel: '.hd', props: ['display', 'align-items', 'gap', ...BOX, 'background-color'] },
+                { sel: '.hd-logo', props: ['font-size', 'font-weight', 'color'] },
+                { sel: '.hd-nav', props: ['display', 'gap'] },
+                { sel: '.hd-link', props: ['font-size', 'color'] },
+                { sel: '.hd-link.hd-link-current', props: ['color', 'font-weight'] },
+                { sel: '.hd-cta', props: ['padding-top', 'padding-left', 'border-radius', 'background-color', 'color', 'font-weight'] }
+            ],
+            keepDefault: []
         },
         {
             id: 'high-pricing',
-            name: '강조 가격 카드',
-            domHtml: '<ul class="pricing">\n  <li class="tier">Basic</li>\n  <li id="pro" class="tier highlight">Pro</li>\n</ul>',
-            opponentRules: [
-                '.pricing .tier { background: #1F2937; color: #9CA3AF; }',
-                '#pro { background: #374151; }'
+            name: '가격 카드 (추천)',
+            html:
+`<article class="pc pc-featured">
+  <span class="pc-badge">추천</span>
+  <h3 class="pc-name">Pro</h3>
+  <p class="pc-price">₩29,000<span class="pc-per">/월</span></p>
+  <ul class="pc-feats">
+    <li class="pc-feat">무제한 프로젝트</li>
+    <li class="pc-feat">우선 지원</li>
+  </ul>
+  <button class="pc-cta">선택</button>
+</article>`,
+            answerCss:
+`.pc { padding: 24px; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 16px; width: 260px; }
+.pc.pc-featured { border-color: #6366f1; box-shadow: 0 12px 32px rgba(99,102,241,0.18); }
+.pc-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eef2ff; color: #4338ca; font-size: 12px; font-weight: 700; }
+.pc-name { margin: 12px 0 0; font-size: 18px; font-weight: 700; color: #111827; }
+.pc-price { margin: 8px 0 0; font-size: 28px; font-weight: 800; color: #111827; }
+.pc-per { font-size: 14px; font-weight: 500; color: #9ca3af; }
+.pc-feats { list-style: none; margin: 16px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pc-feat { font-size: 14px; color: #4b5563; }
+.pc-cta { width: 100%; border: 0; padding: 12px; border-radius: 10px; background: #6366f1; color: #ffffff; font-size: 14px; font-weight: 700; cursor: pointer; }`,
+            palette: ['#FFFFFF', '#6366F1', '#EEF2FF', '#4338CA', '#111827', '#9CA3AF', '#4B5563'],
+            check: [
+                { sel: '.pc', props: [...BOX, 'background-color', 'border-radius'] },
+                { sel: '.pc.pc-featured', props: ['border-top-color', 'border-top-width'] },
+                { sel: '.pc-badge', props: ['background-color', 'color', 'font-weight', 'border-radius'] },
+                { sel: '.pc-name', props: TEXT },
+                { sel: '.pc-price', props: ['font-size', 'font-weight', 'color'] },
+                { sel: '.pc-per', props: ['font-size', 'color'] },
+                { sel: '.pc-feats', props: ['display', 'flex-direction', 'gap'] },
+                { sel: '.pc-feat', props: ['font-size', 'color'] },
+                { sel: '.pc-cta', props: ['border-radius', 'background-color', 'color', 'font-weight'] }
             ],
-            targetCss: '#pro.highlight { background: #150C22; color: #00E5FF; }',
-            targetSelector: '#pro',
-            expectedStyles: { 'background-color': '#150C22', color: '#00E5FF' },
-            hint: '배경은 #pro (0,1,0,0)가, 색은 .pricing .tier (0,0,2,0)가 잡고 있습니다. 둘 다 이기려면 #pro.highlight.'
+            keepDefault: []
         },
         {
-            id: 'high-cta-hover',
-            name: 'CTA 기본 상태 색',
-            domHtml: '<div class="hero">\n  <a class="cta" href="#">시작하기</a>\n</div>',
-            opponentRules: [
-                '.hero a.cta { color: #9CA3AF; }',
-                '.hero .cta:link { color: #9CA3AF; }'
+            id: 'high-hero',
+            name: '히어로 섹션',
+            html:
+`<section class="hero">
+  <p class="hero-eyebrow">NEW</p>
+  <h1 class="hero-title">더 빠르게 배포하세요</h1>
+  <p class="hero-sub">몇 초 만에 프리뷰를 공유하고 팀과 협업하세요.</p>
+  <div class="hero-actions">
+    <button class="hero-btn hero-btn-primary">무료로 시작</button>
+    <button class="hero-btn">데모 보기</button>
+  </div>
+</section>`,
+            answerCss:
+`.hero { padding: 40px; background: #fafafa; border-radius: 20px; width: 460px; text-align: center; }
+.hero-eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #6366f1; }
+.hero-title { margin: 12px 0 0; font-size: 32px; font-weight: 800; color: #0f172a; }
+.hero-sub { margin: 12px 0 0; font-size: 15px; color: #64748b; }
+.hero-actions { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
+.hero-btn { border: 1px solid #d4d4d8; padding: 10px 20px; border-radius: 10px; background: #ffffff; font-size: 14px; font-weight: 600; color: #18181b; cursor: pointer; }
+.hero-btn.hero-btn-primary { background: #6366f1; border-color: #6366f1; color: #ffffff; }`,
+            palette: ['#FAFAFA', '#6366F1', '#0F172A', '#64748B', '#FFFFFF', '#18181B'],
+            check: [
+                { sel: '.hero', props: [...BOX, 'background-color', 'border-radius', 'text-align'] },
+                { sel: '.hero-eyebrow', props: ['font-size', 'font-weight', 'color'] },
+                { sel: '.hero-title', props: ['font-size', 'font-weight', 'color', 'margin-top'] },
+                { sel: '.hero-sub', props: ['font-size', 'color'] },
+                { sel: '.hero-actions', props: ['display', 'justify-content', 'gap', 'margin-top'] },
+                { sel: '.hero-btn', props: ['padding-top', 'padding-left', 'border-radius', 'background-color', 'color'] },
+                { sel: '.hero-btn.hero-btn-primary', props: ['background-color', 'color'] }
             ],
-            targetCss: '.hero a.cta:link { color: #150C22; }',
-            targetSelector: '.cta',
-            expectedStyles: { color: '#150C22' },
-            hint: ':link는 클래스와 같은 무게입니다. .hero .cta:link (0,0,3,0)를 이기려면 태그를 더한 .hero a.cta:link (0,0,3,1).'
+            keepDefault: []
         },
         {
-            id: 'high-nav-important',
-            name: '내비 링크 색 뒤집기',
-            domHtml: '<nav id="main-nav" class="menu">\n  <a class="item current">대시보드</a>\n</nav>',
-            opponentRules: ['#main-nav a { color: #6B7280 !important; }'],
-            targetCss: '#main-nav a.current { color: #00E5FF !important; }',
-            targetSelector: '.current',
-            expectedStyles: { color: '#00E5FF' },
-            hint: '상대는 #main-nav a (0,1,0,1) + !important. 클래스를 더한 #main-nav a.current + !important로 이기세요.'
+            id: 'high-comment',
+            name: '댓글',
+            html:
+`<article class="cmt">
+  <span class="cmt-avatar">K</span>
+  <div class="cmt-main">
+    <p class="cmt-head"><span class="cmt-author">김하늘</span><span class="cmt-time">2시간 전</span></p>
+    <p class="cmt-body">이 부분 정말 깔끔하게 잘 됐네요.</p>
+    <div class="cmt-actions"><button class="cmt-act">좋아요</button><button class="cmt-act">답글</button></div>
+  </div>
+</article>`,
+            answerCss:
+`.cmt { display: flex; gap: 12px; padding: 16px; background: #ffffff; border-radius: 12px; width: 420px; }
+.cmt-avatar { flex: 0 0 36px; height: 36px; border-radius: 999px; background: #f59e0b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.cmt-head { margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.cmt-author { font-size: 14px; font-weight: 700; color: #111827; }
+.cmt-time { font-size: 12px; color: #9ca3af; }
+.cmt-body { margin: 4px 0 0; font-size: 14px; color: #374151; line-height: 1.5; }
+.cmt-actions { display: flex; gap: 12px; margin-top: 8px; }
+.cmt-act { border: 0; padding: 0; background: transparent; font-size: 12px; font-weight: 600; color: #6b7280; cursor: pointer; }`,
+            palette: ['#FFFFFF', '#F59E0B', '#111827', '#9CA3AF', '#374151', '#6B7280'],
+            check: [
+                { sel: '.cmt', props: ['display', 'gap', ...BOX, 'border-radius'] },
+                { sel: '.cmt-avatar', props: ['height', 'border-radius', 'background-color', 'color', 'font-weight'] },
+                { sel: '.cmt-head', props: ['display', 'align-items', 'gap'] },
+                { sel: '.cmt-author', props: TEXT },
+                { sel: '.cmt-time', props: ['font-size', 'color'] },
+                { sel: '.cmt-body', props: ['font-size', 'color', 'margin-top'] },
+                { sel: '.cmt-actions', props: ['display', 'gap', 'margin-top'] },
+                { sel: '.cmt-act', props: ['font-size', 'font-weight', 'color'] }
+            ],
+            keepDefault: []
         }
     ]
 };
+
+const lastShownId = { low: null, mid: null, high: null };
+
+export function nextBattleProblem(difficulty) {
+    const pool = BATTLE_POOLS[difficulty];
+    const candidates = pool.length > 1 ? pool.filter((p) => p.id !== lastShownId[difficulty]) : pool;
+    const picked = candidates[Math.floor(Math.random() * candidates.length)];
+    lastShownId[difficulty] = picked.id;
+    return picked;
+}
