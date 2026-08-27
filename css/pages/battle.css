@@ -21,6 +21,11 @@
 .battle-page .css-editor:disabled { opacity: 0.6; cursor: not-allowed; }
 .battle-page .preview-frame-lg { height: 300px; }
 
+/* 목표 시안: 개발자도구로 정답을 못 보게 오버레이로 가림 */
+.battle-page .battle-shielded { position: relative; }
+.battle-page .battle-shielded .preview-frame-lg { height: 360px; pointer-events: none; }
+.battle-page .battle-shield { position: absolute; inset: 0; background: transparent; cursor: default; user-select: none; -webkit-user-select: none; }
+
 /* 색상 팔레트 · 스포이드 */
 .battle-page .battle-palette { display: flex; flex-wrap: wrap; gap: var(--sp08); align-items: center; }
 .battle-page .battle-swatch { display: inline-flex; align-items: center; gap: var(--sp04); padding: var(--sp04) var(--sp08); font-family: var(--font-main); font-size: var(--ft12); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp04); cursor: pointer; }

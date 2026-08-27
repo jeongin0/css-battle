@@ -73,6 +73,7 @@
     .landing-hero .landing-hero-logo { font-size: var(--ft40); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); }
     .landing-hero { box-shadow: 6px 6px 0 var(--p2); }
     .landing-players .landing-players-row { flex-wrap: wrap; }
+    .landing-howto .landing-howto-flow { flex-wrap: nowrap; }
 }
 
 @media (max-width: 400px) {

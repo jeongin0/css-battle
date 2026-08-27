@@ -43,6 +43,7 @@
 .btn:hover { filter: brightness(1.1); }
 .btn-ghost { background: transparent; color: var(--ink); border: 2px solid var(--panel-light); }
 .btn-point { font-family: var(--font-point); font-size: var(--ft12); }
+.btn-main { font-family: var(--font-point); font-size: var(--ft12); background: var(--p1); }
 
 /* 카드 */
 .card { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); }

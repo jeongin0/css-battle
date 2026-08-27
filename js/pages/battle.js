@@ -38,7 +38,7 @@ export function render(container) {
                     <button type="button" class="tabs-btn" data-value="ghost">가상 상대 대결</button>
                 </div>
                 <div class="battle-actions">
-                    <button type="button" class="btn btn-point" data-role="fight-btn">FIGHT</button>
+                    <button type="button" class="btn btn-main" data-role="fight-btn">FIGHT</button>
                     <button type="button" class="btn btn-ghost" data-role="stop-btn" disabled>정지</button>
                     <button type="button" class="btn" data-role="done-btn" disabled>완료</button>
                 </div>
@@ -50,22 +50,25 @@ export function render(container) {
 
             <div class="battle-layout">
                 <div class="battle-col">
+                    <h2 class="battle-panel-title">HTML 구조 (수정 불가)</h2>
+                    <pre class="dom-tree" data-role="html-src"></pre>
+
                     <h2 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h2>
-                    <iframe class="preview-frame preview-frame-lg" data-role="answer-frame" sandbox="allow-same-origin" title="목표 시안"></iframe>
+                    <div class="battle-shielded">
+                        <iframe class="preview-frame preview-frame-lg" data-role="shown-frame" sandbox="allow-same-origin" scrolling="no" title="목표 시안"></iframe>
+                        <div class="battle-shield" data-role="shield"></div>
+                    </div>
 
                     <h2 class="battle-panel-title">색상 팔레트 · 스포이드</h2>
                     <div class="battle-palette" data-role="palette"></div>
-
-                    <h2 class="battle-panel-title">HTML 구조 (수정 불가)</h2>
-                    <pre class="dom-tree" data-role="html-src"></pre>
                 </div>
 
                 <div class="battle-col">
-                    <h2 class="battle-panel-title">CSS 작성</h2>
-                    <textarea class="css-editor" data-role="css-input" spellcheck="false" placeholder="FIGHT를 누르면 입력할 수 있습니다"></textarea>
-
                     <h2 class="battle-panel-title">현재 렌더링 (실시간)</h2>
                     <iframe class="preview-frame preview-frame-lg" data-role="live-frame" sandbox="allow-same-origin" title="현재 렌더링"></iframe>
+
+                    <h2 class="battle-panel-title">CSS 작성</h2>
+                    <textarea class="css-editor" data-role="css-input" spellcheck="false" placeholder="FIGHT를 누르면 입력할 수 있습니다"></textarea>
                 </div>
             </div>
 
@@ -74,14 +77,17 @@ export function render(container) {
                 <button type="button" class="btn btn-ghost" data-role="save-btn">전적에 저장</button>
             </div>
 
+            <iframe class="battle-offscreen" data-role="answer-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
             <iframe class="battle-offscreen" data-role="base-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
         </section>
     `;
 
     const el = {
         answerFrame: container.querySelector('[data-role="answer-frame"]'),
+        shownFrame: container.querySelector('[data-role="shown-frame"]'),
         liveFrame: container.querySelector('[data-role="live-frame"]'),
         baseFrame: container.querySelector('[data-role="base-frame"]'),
+        shield: container.querySelector('[data-role="shield"]'),
         htmlSrc: container.querySelector('[data-role="html-src"]'),
         palette: container.querySelector('[data-role="palette"]'),
         cssInput: container.querySelector('[data-role="css-input"]'),
@@ -121,6 +127,30 @@ export function render(container) {
 
     function updateLivePreview() {
         el.liveFrame.srcdoc = previewDoc(problem.html, el.cssInput.value);
+    }
+
+    // 목표 시안을 computed style이 인라인된 형태로 렌더 → 개발자도구로 정답 셀렉터를 볼 수 없게 함
+    function freezeAnswer() {
+        const doc = el.answerFrame.contentDocument;
+        if (!doc || !doc.body) return;
+        const win = doc.defaultView;
+        const inlineStyle = (node) => {
+            const cs = win.getComputedStyle(node);
+            let str = '';
+            for (const prop of cs) str += `${prop}:${cs.getPropertyValue(prop)};`;
+            return str;
+        };
+        const clone = doc.body.cloneNode(true);
+        const srcAll = doc.body.querySelectorAll('*');
+        const dstAll = clone.querySelectorAll('*');
+        srcAll.forEach((s, i) => {
+            dstAll[i].setAttribute('style', inlineStyle(s));
+            dstAll[i].removeAttribute('class');
+            dstAll[i].removeAttribute('id');
+        });
+        el.shownFrame.srcdoc =
+            `<!doctype html><html><head><style>*{box-sizing:border-box}html,body{margin:0}</style></head>`
+            + `<body style="${inlineStyle(doc.body)}">${clone.innerHTML}</body></html>`;
     }
 
     function renderPalette() {
@@ -182,6 +212,7 @@ export function render(container) {
         lastResult = null;
         el.problemName.textContent = `— ${problem.name}`;
         el.htmlSrc.textContent = problem.html;
+        el.answerFrame.onload = () => setTimeout(freezeAnswer, 120);
         el.answerFrame.srcdoc = previewDoc(problem.html, problem.answerCss);
         el.baseFrame.srcdoc = previewDoc(problem.html, '');
         el.cssInput.value = '';
@@ -336,6 +367,7 @@ export function render(container) {
             new window.EyeDropper().open().then((r) => insertToEditor(r.sRGBHex)).catch(() => {});
         }
     });
+    el.shield.addEventListener('contextmenu', (e) => e.preventDefault());
     el.cssInput.addEventListener('input', updateLivePreview);
     btn.fight.addEventListener('click', startBattle);
     btn.stop.addEventListener('click', () => loadProblem(false));
