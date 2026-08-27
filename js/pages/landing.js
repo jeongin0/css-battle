@@ -40,21 +40,27 @@ const PLAYERS = [
     }
 ];
 
-const HOWTO = [
+const HOWTO_INTRO = [
+    'CSS는 화면의 모습을 결정하지만, 어떤 스타일이 최종적으로 적용될지는 코드만 보고 바로 알아채기 어렵습니다.',
+    '같은 화면을 만드는 방법도 사람마다 다르고, 여러 CSS 규칙이 겹치면 어떤 스타일이 우선 적용되는지 찾아내는 데 시간이 걸립니다. 그래서 원하는 스타일이 적용되지 않을 때 하나씩 코드를 꺼보거나, 결국 !important를 붙여 강제로 해결하게 되기도 합니다.',
+    '이 사이트는 이런 CSS 충돌을 감으로 해결하는 대신, specificity의 우선순위를 직접 경험하며 익히도록 만들었습니다.'
+];
+
+const HOWTO_STEPS = [
     {
         no: '1',
-        phase: '문제',
-        text: '같은 화면을 만드는 방법이 사람마다 달라서 남의 CSS는 읽기 어렵고, 우선순위를 모르면 안 먹히는 스타일을 규칙 하나하나 꺼보며 찾아야 해서 오래 걸립니다. 결국 !important로 강제로 덮어버리게 됩니다.'
+        title: '눈으로 비교하고',
+        text: '두 CSS 규칙이 충돌했을 때 어떤 스타일이 적용되는지 직접 확인합니다. 결과를 눈으로 비교하면서 CSS 우선순위의 차이를 자연스럽게 이해합니다.'
     },
     {
         no: '2',
-        phase: '방법',
-        text: '대결로 결과를 눈으로 보고 → 손으로 직접 쳐보고 → 실전 코드에 적용하는 과정을 반복합니다.'
+        title: '손으로 직접 입력하고',
+        text: '정답을 보는 것에서 끝나지 않습니다. 직접 CSS를 타이핑하고 적용해보며 specificity 규칙을 반복해서 익힙니다.'
     },
     {
         no: '3',
-        phase: '결과',
-        text: 'CSS 충돌 원인을 스스로 진단하고, !important 의존도가 줄고, 캐스케이드 개념이 잡힙니다.'
+        title: '실전에서 진단하기',
+        text: '마지막에는 실제 CSS처럼 충돌하는 스타일의 원인을 직접 찾아봅니다. 어떤 선택자가 더 높은 우선순위를 가지는지 판단하면서, CSS를 수정하는 감각을 기릅니다.'
     }
 ];
 
@@ -112,18 +118,36 @@ export function render(container) {
 
         <section class="landing-howto">
             <h2 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h2>
-            <p class="landing-howto-lead">CSS는 화면의 첫인상을 결정하는 언어입니다.<br>정작 "왜 안 먹히는지"는 눈에 잘 안 보입니다.<br>이 사이트는 그 우선순위(specificity) 감각을 대결·타이핑·진단으로 눈과 손에 익히기 위해 만들었습니다.</p>
+            <p class="landing-howto-tagline">CSS가 왜 안 먹히는지, 직접 부딪혀보세요.</p>
+
+            <div class="landing-howto-intro">
+                ${HOWTO_INTRO.map((p) => `<p>${p}</p>`).join('')}
+            </div>
+
             <ol class="landing-howto-list">
-                ${HOWTO.map((h) => `
+                ${HOWTO_STEPS.map((s) => `
                     <li class="landing-howto-step">
-                        <span class="landing-howto-no">${h.no}</span>
+                        <span class="landing-howto-no">${s.no}</span>
                         <span class="landing-howto-body">
-                            <span class="landing-howto-phase">${h.phase}</span>
-                            <span class="landing-howto-text">${h.text}</span>
+                            <span class="landing-howto-step-title">${s.title}</span>
+                            <span class="landing-howto-text">${s.text}</span>
                         </span>
                     </li>
                 `).join('')}
             </ol>
+
+            <div class="landing-howto-outcome">
+                <h3 class="landing-howto-outcome-title">그래서 무엇이 달라질까요?</h3>
+                <p>CSS가 적용되지 않을 때 무작정 코드를 수정하거나 !important를 사용하는 대신,</p>
+                <p class="landing-howto-flow">
+                    <span>왜 이 스타일이 적용되지 않았지?</span>
+                    <span class="landing-howto-arrow">▶</span>
+                    <span>어떤 규칙이 우선순위가 높지?</span>
+                </p>
+                <p>스스로 원인을 찾아낼 수 있게 됩니다.</p>
+                <p class="landing-howto-closing">눈으로 보고 → 직접 입력하고 → 문제를 진단하는 과정을 반복하며, CSS specificity와 Cascade를 머리가 아니라 손에 익히는 것. 이것이 이 사이트가 만들어진 이유입니다.</p>
+            </div>
+
             <a href="#battle" class="landing-hero-start landing-howto-start">▶ PRESS START</a>
         </section>
     `;

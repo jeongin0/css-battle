@@ -43,21 +43,32 @@
 .landing-players .landing-players-desc { color: var(--ink-dim); font-size: var(--ft14); }
 
 /* HOW TO PLAY: 설명서 패널 */
-.landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp40) var(--sp24); margin-bottom: var(--sp60); text-align: center; }
-.landing-howto .landing-heading { flex-direction: column; justify-content: center; }
-.landing-howto .landing-howto-lead { max-width: 720px; margin: 0 auto var(--sp40); color: var(--ink); font-size: var(--ft14); line-height: 1.8; word-break: keep-all; }
-.landing-howto .landing-howto-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); margin-bottom: var(--sp40); text-align: left; }
+.landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp60) var(--sp24); margin-bottom: var(--sp60); }
+.landing-howto > * { max-width: 760px; margin-left: auto; margin-right: auto; }
+.landing-howto .landing-heading { flex-direction: column; align-items: center; }
+.landing-howto .landing-howto-tagline { text-align: center; font-family: var(--font-point); font-size: var(--ft14); color: var(--p1); line-height: 1.8; margin-bottom: var(--sp40); }
+
+.landing-howto .landing-howto-intro { display: grid; gap: var(--sp16); margin-bottom: var(--sp60); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; }
+
+.landing-howto .landing-howto-list { list-style: none; display: grid; gap: var(--sp24); margin-bottom: var(--sp60); }
 .landing-howto .landing-howto-step { display: flex; gap: var(--sp16); }
-.landing-howto .landing-howto-no { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft32); color: var(--gold); line-height: 1; }
-.landing-howto .landing-howto-body { display: flex; flex-direction: column; gap: var(--sp04); }
-.landing-howto .landing-howto-phase { font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); }
-.landing-howto .landing-howto-text { color: var(--ink); font-size: var(--ft14); word-break: keep-all; }
+.landing-howto .landing-howto-no { flex-shrink: 0; width: 2.4rem; height: 2.4rem; display: flex; align-items: center; justify-content: center; font-family: var(--font-point); font-size: var(--ft16); color: var(--bg); background: var(--gold); }
+.landing-howto .landing-howto-body { display: flex; flex-direction: column; gap: var(--sp08); }
+.landing-howto .landing-howto-step-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--gold); }
+.landing-howto .landing-howto-text { color: var(--ink-dim); font-size: var(--ft14); line-height: 1.8; word-break: keep-all; }
+
+.landing-howto .landing-howto-outcome { border-top: 2px solid var(--panel-light); padding-top: var(--sp40); margin-bottom: var(--sp40); display: grid; gap: var(--sp16); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; }
+.landing-howto .landing-howto-outcome-title { font-family: var(--font-point); font-size: var(--ft14); color: var(--p2); }
+.landing-howto .landing-howto-flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp12); font-weight: 700; }
+.landing-howto .landing-howto-flow span:not(.landing-howto-arrow) { background: var(--panel-light); padding: var(--sp08) var(--sp12); }
+.landing-howto .landing-howto-arrow { color: var(--p1); }
+.landing-howto .landing-howto-closing { color: var(--gold); font-weight: 600; }
+.landing-howto .landing-howto-start { display: block; width: max-content; }
 
 @keyframes landing-blink { 50% { opacity: 0; } }
 
 @media (max-width: 1024px) {
-    .landing-modes .landing-modes-list,
-    .landing-howto .landing-howto-list { grid-template-columns: 1fr; }
+    .landing-modes .landing-modes-list { grid-template-columns: 1fr; }
     .landing-hero .landing-hero-logo { font-size: var(--ft40); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); }
     .landing-hero { box-shadow: 6px 6px 0 var(--p2); }
     .landing-players .landing-players-row { flex-wrap: wrap; }
