@@ -30,7 +30,9 @@ footer,header,hgroup,menu,nav,section {
     display:block;
 }
 
-nav ul {
+ul,
+ol,
+dl {
     list-style:none;
 }
 

@@ -109,7 +109,7 @@
 .landing-solution { margin-bottom: var(--sp60); }
 .landing-solution .landing-solution-list { list-style: none; display: grid; gap: var(--sp16); margin-bottom: var(--sp24); }
 .landing-solution .landing-solution-item { display: flex; gap: var(--sp16); align-items: baseline; background: var(--panel); border-left: 3px solid var(--gold); border-radius: var(--sp04); padding: var(--sp16) var(--sp24); }
-.landing-solution .landing-solution-phase { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft12); color: var(--gold); width: 48px; }
+.landing-solution .landing-solution-phase { flex-shrink: 0; font-family: var(--font-main); font-size: var(--ft14); color: var(--gold); width: max-content; }
 .landing-solution .landing-solution-text { color: var(--ink); font-size: var(--ft14); }
 
 
