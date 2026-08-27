@@ -9,11 +9,10 @@
 .battle-page .battle-actions [data-role="stop-btn"]:not(:disabled):hover { background: var(--panel); border-color: var(--p2); filter: none; }
 .battle-page .battle-actions [data-role="done-btn"] { background: var(--gold); }
 
-.battle-page .battle-status { margin-top: var(--sp16); min-height: 20px; }
+.battle-page .battle-status { margin-top: var(--sp16); min-height: 20px; display: flex; align-items: baseline; gap: var(--sp16); flex-wrap: wrap; }
 .battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); }
+.battle-page .battle-best { font-size: var(--ft12); color: var(--ink-dim); }
 .battle-page .battle-clear-time { font-family: var(--font-point); font-size: var(--ft12); color: var(--hp-green); margin-left: var(--sp08); }
-.battle-page .battle-par { font-size: var(--ft12); color: var(--ink-dim); margin-top: var(--sp04); }
-.battle-page .battle-par strong { color: var(--gold); }
 .battle-page .battle-toast { display: inline-block; margin-top: var(--sp08); padding: var(--sp04) var(--sp08); background: var(--panel-light); border-radius: var(--sp04); font-size: var(--ft12); color: var(--ink); }
 
 .battle-page .battle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp24); margin-top: var(--sp24); }
@@ -60,10 +59,6 @@
 @media (max-width: 1024px) { .battle-page .battle-diff { grid-template-columns: 1fr; } }
 
 .battle-offscreen { position: absolute; left: -9999px; top: 0; width: 560px; height: 440px; border: 0; }
-
-/* 체력바 블록 */
-.health-bar-block { margin-bottom: var(--sp08); }
-.health-bar-block .health-bar-label { display: block; font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
 
 @media (max-width: 1024px) {
     .battle-page .battle-layout { grid-template-columns: 1fr; }

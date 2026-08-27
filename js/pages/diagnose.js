@@ -1,4 +1,5 @@
 import { rankRules } from '../core/cascade.js';
+import { attachCodeEditor } from '../components/cssEditor.js';
 import { markQuestDone } from '../store.js';
 
 const SAMPLE_CSS = `.card p { color: #333; }
@@ -35,6 +36,7 @@ export function render(container) {
     const resultEl = container.querySelector('[data-role="result"]');
 
     cssEl.value = SAMPLE_CSS;
+    attachCodeEditor(cssEl);
 
     container.querySelector('[data-role="run"]').addEventListener('click', () => {
         const target = {

@@ -1,41 +1,27 @@
 import { previewDoc, nextBattleProblem, obfuscatedShown } from '../core/battleProblems.js';
-import { scoreAccuracy, scorePrecision, precisionPar } from '../core/battleScore.js';
-import { healthBarHtml } from '../components/healthbar.js';
+import { scoreAccuracy, scorePrecision } from '../core/battleScore.js';
 import { calculateSpecificity } from '../core/specificity.js';
-import { addBattleRecord } from '../store.js';
-
-const MODE_NOTE = {
-    solo: '솔로 · 실패 없이 정확도 90%를 넘길 때까지 도전합니다. 시작~완료 시간이 기록됩니다.',
-    ghost: '가상 상대 · "par"는 정답 CSS를 촘촘하게 짰을 때의 정밀도 점수입니다. 클리어 + 내 정밀도가 par에 근접하면 KO.'
-};
-
-const GHOST_TOLERANCE = 15;
+import { attachCodeEditor } from '../components/cssEditor.js';
+import { addBattleRecord, getBattleBest, updateBattleBest } from '../store.js';
 
 export function render(container) {
     let difficulty = 'low';
-    let mode = 'solo';
     let phase = 'idle';
     let problem = nextBattleProblem(difficulty);
-    let par = precisionPar(problem);
     let timerId = null;
     let elapsed = 0;
-    let myHp = 100;
     let lastResult = null;
 
     container.innerHTML = `
         <section class="container battle-page">
             <h1 class="page-title">배틀 모드</h1>
-            <p class="page-desc">시안과 HTML만 보고 CSS를 0부터 작성해 똑같이 만드세요. 정확도와 셀렉터 정밀도로 채점됩니다.</p>
+            <p class="page-desc">HTML과 목표 시안만 보고 CSS를 직접 작성해, 시안과 똑같이 만드세요. 시안과의 배틀입니다.</p>
 
             <div class="battle-bar">
                 <div class="tabs" data-role="difficulty-tabs">
                     <button type="button" class="tabs-btn" data-value="low">초급</button>
                     <button type="button" class="tabs-btn" data-value="mid">중급</button>
                     <button type="button" class="tabs-btn" data-value="high">고급</button>
-                </div>
-                <div class="tabs" data-role="mode-tabs">
-                    <button type="button" class="tabs-btn" data-value="solo">솔로 타임어택</button>
-                    <button type="button" class="tabs-btn" data-value="ghost">가상 상대 대결</button>
                 </div>
                 <div class="battle-actions">
                     <button type="button" class="btn btn-main" data-role="fight-btn">FIGHT</button>
@@ -44,7 +30,7 @@ export function render(container) {
                 </div>
             </div>
 
-            <p class="hint-text" data-role="mode-note"></p>
+            <p class="hint-text">FIGHT를 누르면 스톱워치가 흐르고 에디터가 열립니다. 정확도 90% 이상이면 클리어이며, 실패는 없습니다.</p>
             <div class="battle-status" data-role="status"></div>
             <p class="battle-toast" data-role="toast" hidden></p>
 
@@ -93,12 +79,10 @@ export function render(container) {
         cssInput: container.querySelector('[data-role="css-input"]'),
         result: container.querySelector('[data-role="result"]'),
         resultActions: container.querySelector('[data-role="result-actions"]'),
-        modeNote: container.querySelector('[data-role="mode-note"]'),
         status: container.querySelector('[data-role="status"]'),
         toast: container.querySelector('[data-role="toast"]'),
         problemName: container.querySelector('[data-role="problem-name"]'),
-        difficultyTabs: container.querySelector('[data-role="difficulty-tabs"]'),
-        modeTabs: container.querySelector('[data-role="mode-tabs"]')
+        difficultyTabs: container.querySelector('[data-role="difficulty-tabs"]')
     };
     const btn = {
         fight: container.querySelector('[data-role="fight-btn"]'),
@@ -106,6 +90,8 @@ export function render(container) {
         done: container.querySelector('[data-role="done-btn"]'),
         save: container.querySelector('[data-role="save-btn"]')
     };
+
+    attachCodeEditor(el.cssInput);
 
     function stopTimer() {
         if (timerId) clearInterval(timerId);
@@ -121,28 +107,12 @@ export function render(container) {
     }
 
     function renderStatus() {
-        if (mode === 'solo') {
-            el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`;
-        } else {
-            el.status.innerHTML = healthBarHtml('내 HP', myHp)
-                + `<p class="battle-par">상대 par 정밀도 <strong>${par}</strong> (±${GHOST_TOLERANCE})</p>`;
-        }
-    }
-
-    function updateLivePreview() {
-        el.liveFrame.srcdoc = previewDoc(problem.html, el.cssInput.value);
-    }
-
-
-    function renderPalette() {
-        const swatches = problem.palette.map((hex) =>
-            `<button type="button" class="battle-swatch" data-hex="${hex}" style="--sw:${hex}" title="${hex}">${hex}</button>`
-        ).join('');
-        const eyedropperIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.5-3.5a2.12 2.12 0 0 1 3 3L21 9l-3-3"/><path d="m18 9-9 9"/></svg>`;
-        const eyedropper = window.EyeDropper
-            ? `<button type="button" class="btn btn-ghost battle-eyedropper" data-role="eyedropper">${eyedropperIcon} 스포이드</button>`
-            : `<span class="hint-text">스포이드는 최신 Chrome/Edge에서 지원됩니다</span>`;
-        el.palette.innerHTML = swatches + eyedropper;
+        const best = getBattleBest(problem.id);
+        const bestText = best
+            ? `이 시안 최고 기록 · 정밀도 ${best.precision} · ${formatTime(best.timeSec)}`
+            : '이 시안 첫 도전';
+        el.status.innerHTML = `<span class="battle-timer">⏱ ${formatTime(elapsed)}</span>`
+            + `<span class="battle-best">${bestText}</span>`;
     }
 
     let toastId = null;
@@ -150,7 +120,21 @@ export function render(container) {
         el.toast.textContent = msg;
         el.toast.hidden = false;
         clearTimeout(toastId);
-        toastId = setTimeout(() => { el.toast.hidden = true; }, 1400);
+        toastId = setTimeout(() => { el.toast.hidden = true; }, 1600);
+    }
+
+    function updateLivePreview() {
+        el.liveFrame.srcdoc = previewDoc(problem.html, el.cssInput.value);
+    }
+
+    function renderPalette() {
+        const swatches = problem.palette.map((hex) =>
+            `<button type="button" class="battle-swatch" data-hex="${hex}" style="--sw:${hex}" title="${hex}">${hex}</button>`
+        ).join('');
+        const eye = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.5-3.5a2.12 2.12 0 0 1 3 3L21 9l-3-3"/><path d="m18 9-9 9"/></svg>';
+        el.palette.innerHTML = swatches + (window.EyeDropper
+            ? `<button type="button" class="btn btn-ghost battle-eyedropper" data-role="eyedropper">${eye} 스포이드</button>`
+            : `<span class="hint-text">스포이드는 최신 Chrome/Edge에서 지원됩니다</span>`);
     }
 
     function insertToEditor(text) {
@@ -173,14 +157,12 @@ export function render(container) {
         const idle = phase === 'idle';
         const running = phase === 'running';
         const result = phase === 'result';
-
         btn.fight.textContent = result ? '다음 문제 ▶' : 'FIGHT';
         btn.fight.disabled = running;
         btn.stop.disabled = !running;
         btn.done.disabled = !running;
         el.cssInput.disabled = !running;
         el.difficultyTabs.classList.toggle('is-locked', !idle);
-        el.modeTabs.classList.toggle('is-locked', !idle);
         el.resultActions.hidden = !(result && lastResult);
         renderStatus();
     }
@@ -188,9 +170,7 @@ export function render(container) {
     function loadProblem(pickNew) {
         stopTimer();
         if (pickNew) problem = nextBattleProblem(difficulty);
-        par = precisionPar(problem);
         elapsed = 0;
-        myHp = 100;
         lastResult = null;
         el.problemName.textContent = `— ${problem.name}`;
         el.htmlSrc.textContent = problem.html;
@@ -210,18 +190,18 @@ export function render(container) {
         elapsed = 0;
         setPhase('running');
         el.cssInput.focus();
-        timerId = setInterval(() => { elapsed += 1; if (mode === 'solo') renderStatus(); }, 1000);
+        timerId = setInterval(() => { elapsed += 1; renderStatus(); }, 1000);
     }
 
-    function setActiveTab(tabsEl, value) {
-        tabsEl.querySelectorAll('.tabs-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.value === value));
+    function setActiveTab(value) {
+        el.difficultyTabs.querySelectorAll('.tabs-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.value === value));
     }
 
-    function ruleRows(cssText, doc) {
-        const { rules } = scorePrecision(cssText, doc, problem.root);
+    function ruleRows() {
+        const { rules } = scorePrecision(el.cssInput.value, el.liveFrame.contentDocument, problem.root);
         return rules.map((r) => {
             const s = calculateSpecificity(r.selector);
-            return `<tr><td><code>${r.selector}</code></td><td>${s.inline}</td><td>${s.id}</td><td>${s.class}</td><td>${s.tag}</td></tr>`;
+            return `<tr><td><code>${escapeHtml(r.selector)}</code></td><td>${s.inline}</td><td>${s.id}</td><td>${s.class}</td><td>${s.tag}</td></tr>`;
         }).join('');
     }
 
@@ -237,54 +217,50 @@ export function render(container) {
 
         const acc = scoreAccuracy({ userDoc, answerDoc, baseDoc });
         const prec = scorePrecision(el.cssInput.value, userDoc, problem.root);
-        const ghostTarget = Math.max(50, par - GHOST_TOLERANCE);
-        const won = mode === 'ghost'
-            ? acc.cleared && prec.score >= ghostTarget
-            : acc.cleared;
+        const won = acc.cleared;
+
+        let newBest = false;
+        if (won) {
+            newBest = updateBattleBest(problem.id, { accuracy: acc.percent, precision: prec.score, timeSec: elapsed });
+        }
 
         lastResult = {
-            mode, difficulty,
+            difficulty,
+            problemId: problem.id,
             accuracy: acc.percent,
             precision: prec.score,
-            par,
             timeSec: elapsed,
             result: won ? 'win' : 'lose'
         };
 
-        if (mode === 'ghost') {
-            if (!acc.cleared) myHp -= 50;
-            if (prec.score < ghostTarget) myHp -= 30;
-            myHp = Math.max(0, myHp);
-        }
-
         setPhase('result');
-        renderResult(acc, prec, won, ghostTarget);
+        renderResult(acc, prec, won, newBest);
     }
 
-    function renderResult(acc, prec, won, ghostTarget) {
+    function renderResult(acc, prec, won, newBest) {
         const parts = [];
 
         parts.push(won
-            ? `<p class="result-badge result-badge-win">클리어</p> ${mode === 'ghost' ? '<span class="ko-stamp">K.O.</span>' : ''} ${mode === 'solo' ? `<span class="battle-clear-time">${formatTime(elapsed)}</span>` : ''}`
+            ? `<p class="result-badge result-badge-win">클리어</p> <span class="battle-clear-time">${formatTime(elapsed)}</span>${newBest ? ' <span class="ko-stamp">BEST!</span>' : ''}`
             : `<p class="result-badge result-badge-lose">아직이에요</p>`);
 
         parts.push(`
             <dl class="battle-score">
                 <div><dt>정확도</dt><dd class="${acc.cleared ? 'is-ok' : 'is-bad'}">${acc.percent}%</dd><span>기준 ${acc.threshold}%</span></div>
-                <div><dt>정밀도</dt><dd>${prec.score}점</dd><span>${mode === 'ghost' ? `par ${par} · 목표 ${ghostTarget}` : 'par ' + par}</span></div>
+                <div><dt>정밀도</dt><dd>${prec.score}점</dd><span>셀렉터 위생</span></div>
             </dl>
         `);
 
         if (acc.mismatches.length) {
             parts.push(`<h3 class="battle-result-head">시안과 다른 부분 (${acc.mismatches.length})</h3>
                 <ul class="battle-feedback">${acc.mismatches.slice(0, 14).map((m) =>
-                    `<li><code>${m.label}</code> ${m.prop}: 시안 <b>${m.expected}</b> / 내 결과 <b>${m.actual}</b></li>`).join('')}
+                    `<li><code>${escapeHtml(m.label)}</code> ${m.prop}: 시안 <b>${escapeHtml(m.expected)}</b> / 내 결과 <b>${escapeHtml(m.actual)}</b></li>`).join('')}
                 ${acc.mismatches.length > 14 ? `<li>…외 ${acc.mismatches.length - 14}개</li>` : ''}</ul>`);
         }
         if (prec.deductions.length) {
             parts.push(`<h3 class="battle-result-head">정밀도 감점 (-${100 - prec.score})</h3>
                 <ul class="battle-feedback">${prec.deductions.map((d) =>
-                    `<li>−${d.points} ${d.reason}${d.detail ? ` · <code>${d.detail}</code>` : ''}</li>`).join('')}</ul>`);
+                    `<li>−${d.points} ${d.reason}${d.detail ? ` · <code>${escapeHtml(d.detail)}</code>` : ''}</li>`).join('')}</ul>`);
         }
 
         parts.push(`
@@ -292,7 +268,7 @@ export function render(container) {
             <div class="table-scroll">
                 <table class="specificity-table">
                     <thead><tr><th>셀렉터</th><th>인라인</th><th>ID</th><th>클래스</th><th>태그</th></tr></thead>
-                    <tbody>${ruleRows(el.cssInput.value, el.liveFrame.contentDocument) || '<tr><td colspan="5">규칙 없음</td></tr>'}</tbody>
+                    <tbody>${ruleRows() || '<tr><td colspan="5">규칙 없음</td></tr>'}</tbody>
                 </table>
             </div>
         `);
@@ -303,7 +279,7 @@ export function render(container) {
                 <div class="battle-diff-col"><h4>내 CSS</h4><pre>${escapeHtml(el.cssInput.value || '(작성 안 함)')}</pre></div>
                 <div class="battle-diff-col"><h4>예시 정답</h4><pre>${escapeHtml(problem.answerCss)}</pre></div>
             </div>
-            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. flex든 inline-block든 <b>결과가 같으면 정답</b>이에요. 예시 정답은 컴포넌트 루트(<code>.${problem.root}</code>)부터 셀렉터를 잡는 권장 패턴을 보여줍니다.</p>
+            <p class="hint-text">정확도는 요소의 위치·크기·색을 시안과 비교합니다. flex든 inline-block든 <b>결과가 같으면 정답</b>이에요. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
         `);
 
         el.result.innerHTML = parts.join('');
@@ -312,14 +288,13 @@ export function render(container) {
     function onSave() {
         if (!lastResult) return;
         addBattleRecord({
-            mode: lastResult.mode,
             difficulty: lastResult.difficulty,
+            problemId: lastResult.problemId,
             selector: '',
             accuracy: lastResult.accuracy,
             precision: lastResult.precision,
-            par: lastResult.par,
-            wonSpecificity: lastResult.precision >= lastResult.par,
             matchedDesign: lastResult.accuracy >= 90,
+            wonSpecificity: lastResult.precision >= 90,
             timeSec: lastResult.timeSec,
             result: lastResult.result
         });
@@ -333,17 +308,8 @@ export function render(container) {
         const b = e.target.closest('.tabs-btn');
         if (!b) return;
         difficulty = b.dataset.value;
-        setActiveTab(el.difficultyTabs, difficulty);
+        setActiveTab(difficulty);
         loadProblem(true);
-    });
-    el.modeTabs.addEventListener('click', (e) => {
-        if (phase !== 'idle') return;
-        const b = e.target.closest('.tabs-btn');
-        if (!b) return;
-        mode = b.dataset.value;
-        setActiveTab(el.modeTabs, mode);
-        el.modeNote.textContent = MODE_NOTE[mode];
-        renderStatus();
     });
     el.palette.addEventListener('click', (e) => {
         const sw = e.target.closest('.battle-swatch');
@@ -359,9 +325,7 @@ export function render(container) {
     btn.done.addEventListener('click', submit);
     btn.save.addEventListener('click', onSave);
 
-    setActiveTab(el.difficultyTabs, difficulty);
-    setActiveTab(el.modeTabs, mode);
-    el.modeNote.textContent = MODE_NOTE[mode];
+    setActiveTab(difficulty);
     loadProblem(false);
 
     return () => stopTimer();
