@@ -45,6 +45,7 @@
 /* HOW TO PLAY: 설명서 패널 */
 .landing-howto { border: 4px dashed var(--ink-dim); padding: var(--sp40) var(--sp24); margin-bottom: var(--sp60); text-align: center; }
 .landing-howto .landing-heading { flex-direction: column; justify-content: center; }
+.landing-howto .landing-howto-lead { max-width: 720px; margin: 0 auto var(--sp40); color: var(--ink); font-size: var(--ft14); line-height: 1.8; word-break: keep-all; }
 .landing-howto .landing-howto-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp24); margin-bottom: var(--sp40); text-align: left; }
 .landing-howto .landing-howto-step { display: flex; gap: var(--sp16); }
 .landing-howto .landing-howto-no { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft32); color: var(--gold); line-height: 1; }

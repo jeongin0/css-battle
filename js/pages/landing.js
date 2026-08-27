@@ -44,7 +44,7 @@ const HOWTO = [
     {
         no: '1',
         phase: '문제',
-        text: 'CSS는 글로 배우면 추상적이라, !important로 땜빵하거나 충돌을 감으로 디버깅하게 됩니다.'
+        text: '같은 화면을 만드는 방법이 사람마다 달라서 남의 CSS는 읽기 어렵고, 우선순위를 모르면 안 먹히는 스타일을 규칙 하나하나 꺼보며 찾아야 해서 오래 걸립니다. 결국 !important로 강제로 덮어버리게 됩니다.'
     },
     {
         no: '2',
@@ -112,6 +112,7 @@ export function render(container) {
 
         <section class="landing-howto">
             <h2 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h2>
+            <p class="landing-howto-lead">CSS는 화면의 첫인상을 결정하는 언어인데, 정작 "왜 안 먹히는지"는 눈에 잘 안 보입니다. 이 사이트는 그 우선순위(specificity) 감각을 대결·타이핑·진단으로 눈과 손에 익히려고 만들었습니다.</p>
             <ol class="landing-howto-list">
                 ${HOWTO.map((h) => `
                     <li class="landing-howto-step">
