@@ -53,7 +53,7 @@ const SOLUTION = [
 ];
 
 const ICONS = {
-    question: '<circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.5 2.2-2.5 4"/><path d="M12 17.5h.01"/>',
+    question: '<path d="M8.5 8.5a3.5 3.5 0 0 1 6.8 1.2c0 2.3-3.3 2.8-3.3 5"/><path d="M12 19h.01"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     robot: '<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01M9 17h6"/>'
 };
