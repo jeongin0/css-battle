@@ -82,13 +82,34 @@
 .hint-text { color: var(--ink-dim); font-size: var(--ft14); margin-top: var(--sp08); }
 
 /* 랜딩 */
-.landing-hero { text-align: center; padding: var(--sp40) 0; }
-.landing-hero .landing-hero-headline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft24); color: var(--gold); line-height: 1.6; margin-bottom: var(--sp16); }
+.landing-section-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft20); color: var(--ink); margin-bottom: var(--sp16); }
+
+.landing-hero { text-align: center; padding: var(--sp60) 0 var(--sp40); }
+.landing-hero .landing-hero-kicker { font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); letter-spacing: 2px; margin-bottom: var(--sp16); }
+.landing-hero .landing-hero-headline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft32); color: var(--gold); line-height: 1.4; margin-bottom: var(--sp16); }
 .landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp24); }
-.landing-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); margin-bottom: var(--sp40); }
-.landing-benefits { margin-bottom: var(--sp40); }
-.landing-benefits ul { margin-top: var(--sp08); padding-left: var(--sp24); }
-.landing-benefits li { margin-bottom: var(--sp04); }
+
+.landing-features { margin-bottom: var(--sp60); }
+.landing-features .landing-features-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); }
+.landing-features .landing-feature-card { display: flex; flex-direction: column; gap: var(--sp08); height: 100%; background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); transition: border-color 0.15s ease, transform 0.15s ease; }
+.landing-features .landing-feature-card:hover { border-color: var(--p1); transform: translateY(-2px); }
+.landing-features .landing-feature-step { font-family: var(--font-point); font-size: var(--ft12); color: var(--ink-dim); }
+.landing-features .landing-feature-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft20); color: var(--p1); }
+.landing-features .landing-feature-desc { color: var(--ink-dim); font-size: var(--ft14); flex-grow: 1; }
+.landing-features .landing-feature-go { font-size: var(--ft14); color: var(--gold); }
+
+.landing-audience { margin-bottom: var(--sp60); }
+.landing-audience .landing-audience-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp16); }
+.landing-audience .landing-audience-item { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp24); }
+.landing-audience .landing-icon { width: 32px; height: 32px; color: var(--p2); margin-bottom: var(--sp08); }
+.landing-audience .landing-audience-item-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--ink); margin-bottom: var(--sp08); }
+.landing-audience .landing-audience-item-desc { color: var(--ink-dim); font-size: var(--ft14); }
+
+.landing-solution { margin-bottom: var(--sp60); }
+.landing-solution .landing-solution-list { list-style: none; display: grid; gap: var(--sp16); margin-bottom: var(--sp24); }
+.landing-solution .landing-solution-item { display: flex; gap: var(--sp16); align-items: baseline; background: var(--panel); border-left: 3px solid var(--gold); border-radius: var(--sp04); padding: var(--sp16) var(--sp24); }
+.landing-solution .landing-solution-phase { flex-shrink: 0; font-family: var(--font-point); font-size: var(--ft12); color: var(--gold); width: 48px; }
+.landing-solution .landing-solution-text { color: var(--ink); font-size: var(--ft14); }
 
 
 /* 배틀 컨트롤 */
@@ -163,8 +184,10 @@
 .report-page .report-panel .tabs { margin-bottom: var(--sp16); }
 
 @media (max-width: 1024px) {
-    .landing-features,
+    .landing-features .landing-features-list,
+    .landing-audience .landing-audience-list,
     .battle-page .battle-layout,
     .report-page .report-cards,
     .report-page .dex-list { grid-template-columns: 1fr; }
+    .landing-hero .landing-hero-headline { font-size: var(--ft24); }
 }
