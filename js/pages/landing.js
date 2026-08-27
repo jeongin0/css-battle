@@ -21,7 +21,7 @@ const FEATURES = [
 
 const AUDIENCE = [
     {
-        icon: 'puzzle',
+        icon: 'question',
         title: 'CSS만 만나면 멈추는 입문·주니어',
         desc: '선택자 우선순위가 감으로만 잡혀서, 스타일이 왜 안 먹히는지 설명하지 못하는 분'
     },
@@ -53,7 +53,7 @@ const SOLUTION = [
 ];
 
 const ICONS = {
-    puzzle: '<path d="M9 3a2 2 0 0 1 4 0c0 .5-.2 1 .3 1.2.6.2 1-.2 1.4-.2a2 2 0 0 1 0 4c-.5 0-1-.2-1.2.3-.2.6.2 1 .2 1.4a2 2 0 0 1-4 0c0-.4.4-.8.2-1.4-.2-.5-.7-.3-1.2-.3a2 2 0 0 1 0-4c.5 0 1 .2 1.2-.3S9 3.5 9 3Z"/>',
+    question: '<circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.5 2.2-2.5 4"/><path d="M12 17.5h.01"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     robot: '<rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01M9 17h6"/>'
 };
@@ -65,10 +65,10 @@ function icon(name) {
 export function render(container) {
     container.innerHTML = `
         <section class="container landing-hero">
-            <p class="landing-hero-kicker">CSS SPECIFICITY BATTLE</p>
+            <p class="landing-hero-kicker">CSS BATTLE</p>
             <h1 class="landing-hero-headline">분명 스타일 줬는데, 왜 안 먹지?</h1>
             <p class="landing-hero-sub">CSS 특이도를 대결·타이핑·실전 진단으로 몸에 익히는 학습 도구</p>
-            <a href="#battle" class="btn btn-point">지금 배틀 시작</a>
+            <a href="#battle" class="btn">지금 배틀 시작</a>
         </section>
 
         <section class="container landing-features">
@@ -110,7 +110,6 @@ export function render(container) {
                     </li>
                 `).join('')}
             </ol>
-            <a href="#battle" class="btn">지금 배틀 시작</a>
         </section>
     `;
 }
