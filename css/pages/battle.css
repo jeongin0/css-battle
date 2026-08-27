@@ -3,7 +3,11 @@
 .battle-page .battle-bar .battle-actions { margin-left: auto; }
 .battle-page .tabs.is-locked { opacity: 0.45; pointer-events: none; }
 .battle-page .battle-actions { display: flex; gap: var(--sp08); flex-wrap: wrap; }
+.battle-page .battle-actions .btn { padding: var(--sp12) var(--sp20); border-radius: var(--sp08); }
 .battle-page .battle-actions .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.battle-page .battle-actions [data-role="stop-btn"] { background: var(--panel-light); color: var(--ink); border: 1px solid var(--panel-light); font-weight: 600; }
+.battle-page .battle-actions [data-role="stop-btn"]:not(:disabled):hover { background: var(--panel); border-color: var(--p2); filter: none; }
+.battle-page .battle-actions [data-role="done-btn"] { background: var(--gold); }
 
 .battle-page .battle-status { margin-top: var(--sp16); min-height: 20px; }
 .battle-page .battle-timer { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); }
@@ -23,7 +27,7 @@
 
 /* 목표 시안: 개발자도구로 정답을 못 보게 오버레이로 가림 */
 .battle-page .battle-shielded { position: relative; }
-.battle-page .battle-shielded .preview-frame-lg { height: 360px; pointer-events: none; }
+.battle-page .battle-shielded .preview-frame-lg { height: 440px; pointer-events: none; }
 .battle-page .battle-shield { position: absolute; inset: 0; background: transparent; cursor: default; user-select: none; -webkit-user-select: none; }
 
 /* 색상 팔레트 · 스포이드 */
@@ -31,7 +35,11 @@
 .battle-page .battle-swatch { display: inline-flex; align-items: center; gap: var(--sp04); padding: var(--sp04) var(--sp08); font-family: var(--font-main); font-size: var(--ft12); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp04); cursor: pointer; }
 .battle-page .battle-swatch::before { content: ""; width: 14px; height: 14px; border-radius: 3px; background: var(--sw); border: 1px solid rgba(255,255,255,0.2); }
 .battle-page .battle-swatch:hover { border-color: var(--p1); }
-.battle-page .battle-eyedropper { padding: var(--sp04) var(--sp12); font-size: var(--ft12); }
+.battle-page .battle-eyedropper { display: inline-flex; align-items: center; gap: var(--sp04); padding: var(--sp04) var(--sp12); font-size: var(--ft12); }
+.battle-page .battle-eyedropper svg { flex-shrink: 0; }
+
+/* 목표 시안 프레임: 컴포넌트가 세로로 길면 스크롤 대신 넉넉히 */
+.battle-page .battle-shielded .preview-frame-lg { background: #f4f4f6; }
 
 /* 결과 */
 .battle-page .battle-result { margin-top: var(--sp24); }

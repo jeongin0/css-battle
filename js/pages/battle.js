@@ -1,4 +1,4 @@
-import { previewDoc, nextBattleProblem } from '../core/battleProblems.js';
+import { previewDoc, nextBattleProblem, obfuscatedShown } from '../core/battleProblems.js';
 import { scoreAccuracy, scorePrecision, precisionPar } from '../core/battleScore.js';
 import { healthBarHtml } from '../components/healthbar.js';
 import { calculateSpecificity } from '../core/specificity.js';
@@ -129,36 +129,14 @@ export function render(container) {
         el.liveFrame.srcdoc = previewDoc(problem.html, el.cssInput.value);
     }
 
-    // 목표 시안을 computed style이 인라인된 형태로 렌더 → 개발자도구로 정답 셀렉터를 볼 수 없게 함
-    function freezeAnswer() {
-        const doc = el.answerFrame.contentDocument;
-        if (!doc || !doc.body) return;
-        const win = doc.defaultView;
-        const inlineStyle = (node) => {
-            const cs = win.getComputedStyle(node);
-            let str = '';
-            for (const prop of cs) str += `${prop}:${cs.getPropertyValue(prop)};`;
-            return str;
-        };
-        const clone = doc.body.cloneNode(true);
-        const srcAll = doc.body.querySelectorAll('*');
-        const dstAll = clone.querySelectorAll('*');
-        srcAll.forEach((s, i) => {
-            dstAll[i].setAttribute('style', inlineStyle(s));
-            dstAll[i].removeAttribute('class');
-            dstAll[i].removeAttribute('id');
-        });
-        el.shownFrame.srcdoc =
-            `<!doctype html><html><head><style>*{box-sizing:border-box}html,body{margin:0}</style></head>`
-            + `<body style="${inlineStyle(doc.body)}">${clone.innerHTML}</body></html>`;
-    }
 
     function renderPalette() {
         const swatches = problem.palette.map((hex) =>
             `<button type="button" class="battle-swatch" data-hex="${hex}" style="--sw:${hex}" title="${hex}">${hex}</button>`
         ).join('');
+        const eyedropperIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.5-3.5a2.12 2.12 0 0 1 3 3L21 9l-3-3"/><path d="m18 9-9 9"/></svg>`;
         const eyedropper = window.EyeDropper
-            ? `<button type="button" class="btn btn-ghost battle-eyedropper" data-role="eyedropper">스포이드</button>`
+            ? `<button type="button" class="btn btn-ghost battle-eyedropper" data-role="eyedropper">${eyedropperIcon} 스포이드</button>`
             : `<span class="hint-text">스포이드는 최신 Chrome/Edge에서 지원됩니다</span>`;
         el.palette.innerHTML = swatches + eyedropper;
     }
@@ -212,8 +190,8 @@ export function render(container) {
         lastResult = null;
         el.problemName.textContent = `— ${problem.name}`;
         el.htmlSrc.textContent = problem.html;
-        el.answerFrame.onload = () => setTimeout(freezeAnswer, 120);
         el.answerFrame.srcdoc = previewDoc(problem.html, problem.answerCss);
+        el.shownFrame.srcdoc = obfuscatedShown(problem);
         el.baseFrame.srcdoc = previewDoc(problem.html, '');
         el.cssInput.value = '';
         el.result.innerHTML = '';
