@@ -1,155 +1,139 @@
-import { generateProblem, validateSelector, adaptDifficulty } from '../core/problemGenerator.js';
+import { nextDrill } from '../core/typingDrills.js';
 import { addTypingRecord } from '../store.js';
 
-function highlightHtml(answer, typed) {
-    let out = '';
-    for (let i = 0; i < answer.length; i++) {
-        const ch = answer[i].replace('<', '&lt;');
-        if (i >= typed.length) out += `<span class="typing-char">${ch}</span>`;
-        else if (typed[i] === answer[i]) out += `<span class="typing-char is-ok">${ch}</span>`;
-        else out += `<span class="typing-char is-bad">${ch}</span>`;
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+}
+
+function renderTarget(target, typed) {
+    let html = '';
+    for (let i = 0; i < target.length; i++) {
+        const ch = target[i] === ' ' ? '&nbsp;' : escapeHtml(target[i]);
+        let cls = 'is-pending';
+        if (i < typed.length) cls = typed[i] === target[i] ? 'is-ok' : 'is-bad';
+        else if (i === typed.length) cls = 'is-cursor';
+        html += `<span class="typing-char ${cls}">${ch}</span>`;
     }
-    if (typed.length > answer.length) {
-        out += `<span class="typing-char is-bad">${typed.slice(answer.length).replace(/</g, '&lt;')}</span>`;
+    if (typed.length > target.length) {
+        html += `<span class="typing-char is-bad">${escapeHtml(typed.slice(target.length))}</span>`;
     }
-    return out;
+    return html;
 }
 
 export function render(container) {
-    let difficulty = 'low';
-    let autoAdapt = true;
-    let problem = null;
+    let target = nextDrill();
     let startedAt = 0;
     let keystrokes = 0;
     let correctKeystrokes = 0;
+    let correctChars = 0;      // 완료한 드릴의 글자 수 누적
     let combo = 0;
     let bestCombo = 0;
-    const recentResults = [];
+    let completed = 0;
+    let hadErrorThisDrill = false;
 
     container.innerHTML = `
         <section class="container typing-page">
-            <h1 class="page-title">타자연습 모드</h1>
-            <p class="page-desc">DOM 구조를 보고 조건에 맞는 셀렉터를 직접 타이핑하며 반복 연습합니다.</p>
+            <h2 class="page-title">타자연습 모드</h2>
+            <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하세요. 정확히 일치해야 다음으로 넘어갑니다.</p>
 
-            <div class="battle-controls">
-                <div class="tabs" data-role="difficulty-tabs">
-                    <button type="button" class="tabs-btn" data-value="low">초급</button>
-                    <button type="button" class="tabs-btn" data-value="mid">중급</button>
-                    <button type="button" class="tabs-btn" data-value="high">고급</button>
-                </div>
-                <label class="typing-adapt">
-                    <input type="checkbox" data-role="adapt" checked> 적응형 난이도
-                </label>
+            <ul class="typing-stats">
+                <li><span class="typing-stats-value" data-role="wpm">0</span><span class="typing-stats-label">타 / 분</span></li>
+                <li><span class="typing-stats-value" data-role="acc">100</span><span class="typing-stats-label">정확도 %</span></li>
+                <li><span class="typing-stats-value" data-role="combo">0</span><span class="typing-stats-label">콤보</span></li>
+            </ul>
+
+            <pre class="typing-target" data-role="target"></pre>
+            <input type="text" class="css-editor typing-input" data-role="input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="여기에 그대로 입력">
+
+            <div class="typing-actions">
+                <button type="button" class="btn btn-ghost" data-role="skip">다음 (건너뛰기)</button>
+                <span class="hint-text" data-role="feedback"></span>
             </div>
-
-            <dl class="typing-stats">
-                <div><dt>타수</dt><dd data-role="wpm">0</dd><span>타/분</span></div>
-                <div><dt>정확도</dt><dd data-role="acc">100</dd><span>%</span></div>
-                <div><dt>콤보</dt><dd data-role="combo">0</dd><span>연속</span></div>
-            </dl>
-
-            <h2 class="battle-panel-title">DOM 트리 (data-target 표시가 목표 엘리먼트)</h2>
-            <pre class="dom-tree" data-role="dom-tree"></pre>
-
-            <p class="typing-mission" data-role="mission"></p>
-
-            <div class="typing-answer" data-role="answer"></div>
-            <input type="text" class="css-editor typing-input" data-role="input" spellcheck="false" autocomplete="off" placeholder="셀렉터 입력 후 Enter">
-
-            <p class="hint-text" data-role="feedback"></p>
         </section>
     `;
 
-    const difficultyTabs = container.querySelector('[data-role="difficulty-tabs"]');
-    const adaptEl = container.querySelector('[data-role="adapt"]');
-    const domTreeEl = container.querySelector('[data-role="dom-tree"]');
-    const missionEl = container.querySelector('[data-role="mission"]');
-    const answerEl = container.querySelector('[data-role="answer"]');
-    const inputEl = container.querySelector('[data-role="input"]');
-    const feedbackEl = container.querySelector('[data-role="feedback"]');
-    const wpmEl = container.querySelector('[data-role="wpm"]');
-    const accEl = container.querySelector('[data-role="acc"]');
-    const comboEl = container.querySelector('[data-role="combo"]');
-
-    function setActiveTab(value) {
-        difficultyTabs.querySelectorAll('.tabs-btn').forEach((btn) => {
-            btn.classList.toggle('is-active', btn.dataset.value === value);
-        });
-    }
+    const el = {
+        target: container.querySelector('[data-role="target"]'),
+        input: container.querySelector('[data-role="input"]'),
+        feedback: container.querySelector('[data-role="feedback"]'),
+        wpm: container.querySelector('[data-role="wpm"]'),
+        acc: container.querySelector('[data-role="acc"]'),
+        combo: container.querySelector('[data-role="combo"]'),
+        skip: container.querySelector('[data-role="skip"]')
+    };
 
     function renderStats() {
         const minutes = startedAt ? (Date.now() - startedAt) / 60000 : 0;
-        const wpm = minutes > 0 ? Math.round(keystrokes / minutes) : 0;
-        const acc = keystrokes > 0 ? Math.round((correctKeystrokes / keystrokes) * 100) : 100;
-        wpmEl.textContent = wpm;
-        accEl.textContent = acc;
-        comboEl.textContent = combo;
-        return { wpm, acc };
+        const liveChars = correctChars + [...el.input.value].filter((c, i) => c === target[i]).length;
+        el.wpm.textContent = minutes > 0 ? Math.round(liveChars / minutes) : 0;
+        el.acc.textContent = keystrokes > 0 ? Math.round((correctKeystrokes / keystrokes) * 100) : 100;
+        el.combo.textContent = combo;
     }
 
-    function nextProblem() {
-        problem = generateProblem(difficulty);
-        domTreeEl.textContent = problem.markedHtml;
-        missionEl.textContent = problem.mission;
-        inputEl.value = '';
-        answerEl.innerHTML = highlightHtml(problem.answer, '');
-        feedbackEl.textContent = `예시 정답: ${problem.answer} (똑같이 치지 않아도 조건만 맞으면 정답)`;
-        inputEl.focus();
+    function loadDrill(resetCombo) {
+        if (resetCombo) { combo = 0; }
+        hadErrorThisDrill = false;
+        target = nextDrill();
+        el.input.value = '';
+        el.target.innerHTML = renderTarget(target, '');
+        el.feedback.textContent = '';
+        el.input.focus();
+        renderStats();
+    }
+
+    function completeDrill() {
+        completed += 1;
+        correctChars += target.length;
+        if (!hadErrorThisDrill) {
+            combo += 1;
+            bestCombo = Math.max(bestCombo, combo);
+        } else {
+            combo = 0;
+        }
+        el.combo.textContent = combo;
+        if (completed % 5 === 0) {
+            renderStats();
+            addTypingRecord({
+                wpm: Number(el.wpm.textContent),
+                accuracy: Number(el.acc.textContent),
+                combo: bestCombo,
+                difficulty: 'all'
+            });
+        }
+        el.feedback.textContent = '정확해요! 다음 문제로 넘어갑니다.';
+        setTimeout(() => loadDrill(false), 350);
     }
 
     function onInput() {
         if (!startedAt) startedAt = Date.now();
-        const typed = inputEl.value;
+        const typed = el.input.value;
         keystrokes += 1;
-        if (problem.answer.startsWith(typed)) correctKeystrokes += 1;
-        answerEl.innerHTML = highlightHtml(problem.answer, typed);
+        const pos = typed.length - 1;
+        if (pos >= 0 && typed[pos] === target[pos]) correctKeystrokes += 1;
+        else if (pos >= 0) hadErrorThisDrill = true;
+
+        el.target.innerHTML = renderTarget(target, typed);
         renderStats();
+
+        if (typed === target) completeDrill();
     }
 
-    function onSubmit() {
-        const res = validateSelector(problem, inputEl.value);
-        if (!res.valid) {
-            feedbackEl.textContent = res.reason;
-            return;
-        }
-        if (res.pass) {
-            combo += 1;
-            bestCombo = Math.max(bestCombo, combo);
-            recentResults.push(true);
-        } else {
-            combo = 0;
-            recentResults.push(false);
-        }
-        const { wpm, acc } = renderStats();
-
-        if (!res.pass) {
-            feedbackEl.textContent = `${res.reason} 콤보가 끊겼습니다.`;
-            return;
-        }
-        addTypingRecord({ wpm, accuracy: acc, combo: bestCombo, difficulty });
-        if (autoAdapt) {
-            const nextDiff = adaptDifficulty(difficulty, recentResults);
-            if (nextDiff !== difficulty) {
-                difficulty = nextDiff;
-                setActiveTab(difficulty);
-            }
-        }
-        nextProblem();
+    function onKeyDown(e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        if (el.input.value === target) { completeDrill(); return; }
+        el.feedback.textContent = '아직 시안과 정확히 일치하지 않습니다.';
+        el.input.classList.remove('is-shake');
+        void el.input.offsetWidth;
+        el.input.classList.add('is-shake');
+        hadErrorThisDrill = true;
+        combo = 0;
+        el.combo.textContent = 0;
     }
 
-    difficultyTabs.addEventListener('click', (e) => {
-        const btn = e.target.closest('.tabs-btn');
-        if (!btn) return;
-        difficulty = btn.dataset.value;
-        setActiveTab(difficulty);
-        nextProblem();
-    });
-    adaptEl.addEventListener('change', () => { autoAdapt = adaptEl.checked; });
-    inputEl.addEventListener('input', onInput);
-    inputEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); onSubmit(); }
-    });
+    el.input.addEventListener('input', onInput);
+    el.input.addEventListener('keydown', onKeyDown);
+    el.skip.addEventListener('click', () => loadDrill(true));
 
-    setActiveTab(difficulty);
-    nextProblem();
+    loadDrill(false);
 }

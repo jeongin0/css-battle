@@ -1,12 +1,18 @@
 /* ===== 타자연습 모드 ===== */
-.typing-page .typing-adapt { font-size: var(--ft14); color: var(--ink-dim); display: flex; align-items: center; gap: var(--sp04); }
-.typing-page .typing-stats { display: flex; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
-.typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 90px; }
-.typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
-.typing-page .typing-stats dd { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
-.typing-page .typing-stats span { font-size: var(--ft12); color: var(--ink-dim); }
-.typing-page .typing-mission { color: var(--gold); margin-top: var(--sp16); }
-.typing-page .typing-answer { font-size: var(--ft20); letter-spacing: 1px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); margin: var(--sp08) 0; min-height: 3rem; overflow-x: auto; white-space: nowrap; }
+.typing-page .typing-stats { list-style: none; display: flex; gap: var(--sp16); margin: var(--sp24) 0; flex-wrap: wrap; }
+.typing-page .typing-stats li { display: flex; flex-direction: column; align-items: center; gap: var(--sp04); min-width: 96px; padding: var(--sp12) var(--sp16); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); }
+.typing-page .typing-stats-value { font-family: var(--font-point); font-size: var(--ft20); color: var(--p1); }
+.typing-page .typing-stats-label { font-size: var(--ft12); color: var(--ink-dim); }
+
+.typing-page .typing-target { margin: 0 0 var(--sp16); padding: var(--sp24); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); font-family: var(--font-main); font-size: var(--ft24); line-height: 1.8; white-space: pre-wrap; word-break: break-all; overflow-x: auto; }
+.typing-page .typing-char { color: var(--ink-dim); }
 .typing-page .typing-char.is-ok { color: var(--hp-green); }
-.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
-.typing-page .typing-input { min-height: 0; }
+.typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.22); border-radius: 2px; }
+.typing-page .typing-char.is-cursor { border-left: 2px solid var(--gold); margin-left: -2px; animation: typing-blink 1s steps(1) infinite; }
+@keyframes typing-blink { 50% { border-color: transparent; } }
+
+.typing-page .typing-input { min-height: 0; height: 56px; font-size: var(--ft20); }
+.typing-page .typing-input.is-shake { animation: typing-shake 0.3s; }
+@keyframes typing-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+.typing-page .typing-actions { display: flex; align-items: center; gap: var(--sp16); margin-top: var(--sp16); flex-wrap: wrap; }
