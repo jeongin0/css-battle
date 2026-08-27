@@ -100,8 +100,8 @@
 .landing-hero .landing-hero-start { color: var(--ink); background-color: var(--bg); background-image: linear-gradient(var(--hp-green), var(--hp-green)); background-repeat: no-repeat; background-position: left center; background-size: 0% 100%; transition: transform 0.1s ease, box-shadow 0.1s ease, background-size 0.5s linear, color 0.2s ease 0.15s; }
 .landing-hero .landing-hero-start:hover { color: var(--bg); background-size: 100% 100%; }
 
-/* 하단 버튼: 계속 깜빡임 */
-.landing-howto-start { animation: landing-blink 1s steps(1) infinite; }
+/* 하단 버튼: hover할 때만 깜빡임 */
+.landing-howto-start:hover { animation: landing-blink 1s steps(1) infinite; }
 
 /* STAGE SELECT */
 .landing-modes { margin-bottom: var(--sp80); }
