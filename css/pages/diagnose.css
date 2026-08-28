@@ -1,6 +1,123 @@
-/* ===== 실전 진단 모드 ===== */
-.diagnose-page .diagnose-target { display: flex; gap: var(--sp16); flex-wrap: wrap; margin: var(--sp16) 0; }
-.diagnose-page .diagnose-target label { display: flex; flex-direction: column; gap: var(--sp04); font-size: var(--ft12); color: var(--ink-dim); }
-.diagnose-page .diagnose-target input { font-family: var(--font-main); font-size: var(--ft14); color: var(--ink); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08); }
-.diagnose-page .diagnose-table td { text-align: left; }
-.diagnose-page .diagnose-table .is-winner { background: rgba(74, 222, 128, 0.15); }
+/* ===== CSS 디버그 모드 ===== */
+
+.diagnose-page .dgc-intro { margin: var(--sp16) 0 var(--sp24); padding: var(--sp16); background: var(--panel); border: 1px solid var(--panel-light); border-left: 3px solid var(--gold); border-radius: var(--radius); }
+.diagnose-page .dgc-intro-lead { font-size: var(--ft14); color: var(--ink); font-weight: 600; margin-bottom: var(--sp12); }
+.diagnose-page .dgc-flow { list-style: none; margin: 0 0 var(--sp12); display: flex; flex-wrap: wrap; gap: var(--sp08); }
+.diagnose-page .dgc-flow li { display: flex; align-items: baseline; gap: var(--sp08); font-size: var(--ft14); color: var(--ink-dim); background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp08); padding: var(--sp08) var(--sp12); }
+.diagnose-page .dgc-flow li b { color: var(--p1); }
+.diagnose-page .dgc-flow li span { font-family: var(--font-point); font-size: 10px; color: var(--gold); }
+.diagnose-page .dgc-intro-why { font-size: var(--ft14); color: var(--ink-dim); line-height: 1.7; }
+.diagnose-page .dgc-intro-why code { background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); color: var(--ink); }
+
+.diagnose-page .dgc-stats { display: flex; gap: var(--sp16); margin: var(--sp16) 0 var(--sp24); flex-wrap: wrap; }
+.diagnose-page .dgc-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp20); text-align: center; min-width: 110px; }
+.diagnose-page .dgc-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .dgc-stats dd { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); margin-top: var(--sp04); }
+
+.diagnose-page .dgc-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp24); }
+.diagnose-page .dgc-stage .card { padding: var(--sp16); }
+
+/* 문제 패널 */
+.diagnose-page .dgc-symptom { font-size: var(--ft16); color: var(--ink); margin-bottom: var(--sp12); }
+.diagnose-page .dgc-symptom-tag { display: inline-block; font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .dgc-symptom-tag code { background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); }
+.diagnose-page .dgc-frames { display: flex; gap: var(--sp12); margin-bottom: var(--sp16); }
+.diagnose-page .dgc-frames figure { flex: 1; min-width: 0; margin: 0; }
+.diagnose-page .dgc-frames figcaption { font-size: var(--ft12); color: var(--ink-dim); margin-bottom: var(--sp04); }
+.diagnose-page .dgc-frame { width: 100%; height: 150px; border: 1px solid var(--panel-light); border-radius: var(--sp08); background: #fff; }
+.diagnose-page .dgc-offscreen { position: absolute; left: -9999px; top: 0; width: 380px; height: 320px; border: 0; }
+
+.diagnose-page .dgc-css { list-style: none; margin: 0; font-family: var(--font-main); font-size: var(--ft14); }
+.diagnose-page .dgc-css li { display: grid; grid-template-columns: 22px 1fr; gap: var(--sp08); padding: var(--sp04) var(--sp08); border-left: 3px solid transparent; }
+.diagnose-page .dgc-css .dgc-ln { color: var(--ink-dim); text-align: right; }
+.diagnose-page .dgc-css .dgc-rule { word-break: break-word; }
+.diagnose-page .dgc-css li.is-winner { background: rgba(74, 222, 128, 0.16); border-left-color: var(--hp-green); }
+.diagnose-page .dgc-css li.is-loser { opacity: 0.55; }
+.diagnose-page .dgc-css li.is-loser .dgc-rule { text-decoration: line-through; text-decoration-color: var(--ink-dim); }
+
+.diagnose-page .s-id { color: var(--p2); }
+.diagnose-page .s-class { color: var(--p1); }
+.diagnose-page .s-pseudo { color: var(--gold); }
+.diagnose-page .s-brace { color: var(--ink-dim); }
+
+/* 문답 패널 */
+.diagnose-page .dgc-quiz { display: flex; flex-direction: column; gap: var(--sp16); }
+.diagnose-page .dgc-step h3 { font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); margin-bottom: var(--sp08); }
+.diagnose-page .dgc-q { font-size: var(--ft14); color: var(--ink); margin: var(--sp12) 0 var(--sp08); }
+.diagnose-page .dgc-q:first-of-type { margin-top: 0; }
+.diagnose-page .dgc-q b { color: var(--gold); font-family: var(--font-main); }
+.diagnose-page .dgc-opts { list-style: none; margin: 0; display: flex; flex-direction: column; gap: var(--sp04); }
+.diagnose-page .dgc-opts li { border: 1px solid var(--panel-light); border-radius: var(--sp08); background: var(--bg); }
+.diagnose-page .dgc-opts label { display: flex; gap: var(--sp08); align-items: baseline; padding: var(--sp08) var(--sp12); font-size: var(--ft14); color: var(--ink); cursor: pointer; }
+.diagnose-page .dgc-opts input { margin: 0; flex-shrink: 0; }
+.diagnose-page .dgc-opts code { background: inherit; padding: 0 var(--sp04); border-radius: var(--sp04); font-size: 0.95em; }
+.diagnose-page .dgc-opts li:has(input:checked) { border-color: var(--p1); }
+.diagnose-page .dgc-opts li.is-correct { border-color: var(--hp-green); background: rgba(74, 222, 128, 0.12); }
+.diagnose-page .dgc-opts li.is-wrong { border-color: var(--hp-red); background: rgba(255, 71, 87, 0.1); }
+.diagnose-page .dgc-opts li.is-chosen label { font-weight: 600; }
+.diagnose-page .dgc-opts li.is-correct::after { content: "정답"; margin-left: auto; align-self: center; padding-right: var(--sp12); font-size: var(--ft12); color: var(--hp-green); }
+.diagnose-page .dgc-opts li.is-wrong.is-chosen::after { content: "내 선택"; margin-left: auto; align-self: center; padding-right: var(--sp12); font-size: var(--ft12); color: var(--hp-red); }
+.diagnose-page .dgc-quiz .btn { align-self: flex-start; }
+
+/* 결과 */
+.diagnose-page .dgc-result { margin-top: var(--sp24); }
+
+/* 고정 참고 + 내 답 채점 (1:1) */
+.diagnose-page .dgc-teach-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp24); align-items: start; }
+.diagnose-page .dgc-teach-grid .card { padding: var(--sp16); }
+.diagnose-page .dgc-teach-grid h3 { font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); margin-bottom: var(--sp12); }
+
+.diagnose-page .dgc-ref { position: sticky; top: var(--sp16); }
+.diagnose-page .dgc-ref h3 { color: var(--gold); }
+.diagnose-page .dgc-ref-intro { font-size: var(--ft14); color: var(--ink-dim); margin-bottom: var(--sp12); word-break: keep-all; }
+.diagnose-page .dgc-ref-steps { list-style: none; margin: 0 0 var(--sp16); padding: 0; display: flex; flex-direction: column; gap: var(--sp12); }
+.diagnose-page .dgc-ref-steps li { font-size: var(--ft14); color: var(--ink-dim); line-height: 1.7; }
+.diagnose-page .dgc-ref-steps li b { display: block; color: var(--ink); margin-bottom: var(--sp04); }
+.diagnose-page .dgc-ref-steps li span { display: block; word-break: keep-all; }
+.diagnose-page .dgc-ref-list { margin: 0; display: flex; flex-direction: column; gap: var(--sp12); }
+.diagnose-page .dgc-ref-list dt { font-size: var(--ft12); color: var(--p1); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--sp04); }
+.diagnose-page .dgc-ref-list dd { margin: 0; font-size: var(--ft14); color: var(--ink-dim); line-height: 1.8; word-break: keep-all; }
+.diagnose-page .dgc-ref code { background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); color: var(--ink); font-size: 0.92em; }
+
+.diagnose-page .dgc-ref-table { width: 100%; border-collapse: collapse; margin: var(--sp16) 0; font-family: var(--font-main); font-size: var(--ft14); }
+.diagnose-page .dgc-ref-table th { color: var(--ink-dim); font-weight: normal; font-size: 11px; padding: var(--sp04) var(--sp08); text-align: center; border-bottom: 1px solid var(--panel-light); }
+.diagnose-page .dgc-ref-table th:first-child { text-align: left; }
+.diagnose-page .dgc-ref-table td { padding: var(--sp04) var(--sp08); text-align: center; border-bottom: 1px solid var(--panel-light); color: var(--ink); font-variant-numeric: tabular-nums; }
+.diagnose-page .dgc-ref-table td:first-child { text-align: left; color: var(--ink-dim); }
+.diagnose-page .dgc-ref-note { color: var(--ink-dim); font-size: 10px; }
+
+.diagnose-page .dgc-ref-example { background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp08); padding: var(--sp12); margin: var(--sp16) 0; font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .dgc-ref-example p { margin: 0 0 var(--sp08); line-height: 1.7; word-break: keep-all; }
+.diagnose-page .dgc-ref-example p:last-child { margin-bottom: 0; }
+.diagnose-page .dgc-ref-example pre { margin: 0 0 var(--sp08); padding: var(--sp08); background: var(--panel); border-radius: var(--sp04); font-family: var(--font-main); font-size: 11px; line-height: 1.6; color: var(--ink); overflow-x: auto; }
+.diagnose-page .dgc-ref-example b { color: var(--ink); }
+
+/* 이번 문제 해설 */
+.diagnose-page .dgc-ans { border-left: 3px solid var(--panel-light); padding: var(--sp04) 0 var(--sp12) var(--sp16); margin-bottom: var(--sp16); }
+.diagnose-page .dgc-ans:last-child { margin-bottom: 0; }
+.diagnose-page .dgc-ans.is-ok { border-left-color: var(--hp-green); }
+.diagnose-page .dgc-ans.is-bad { border-left-color: var(--hp-red); }
+.diagnose-page .dgc-ans-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp08); margin-bottom: var(--sp04); }
+.diagnose-page .dgc-ans-label { font-weight: 600; font-size: var(--ft14); color: var(--ink); }
+.diagnose-page .dgc-ans-mark { font-size: var(--ft12); font-weight: 700; }
+.diagnose-page .dgc-ans.is-ok .dgc-ans-mark { color: var(--hp-green); }
+.diagnose-page .dgc-ans.is-bad .dgc-ans-mark { color: var(--hp-red); }
+.diagnose-page .dgc-ans-body { font-size: var(--ft14); color: var(--ink-dim); line-height: 1.8; word-break: keep-all; }
+.diagnose-page .dgc-ans-body b { color: var(--ink); }
+.diagnose-page .dgc-ans-body code { background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); color: var(--ink); }
+
+/* 명시도 비교표 (정지) */
+.diagnose-page .dgc-spec-cmp { border-collapse: collapse; margin-top: var(--sp12); font-family: var(--font-main); font-size: var(--ft12); width: 100%; }
+.diagnose-page .dgc-spec-cmp th { color: var(--ink-dim); font-weight: normal; font-size: 10px; padding: 2px var(--sp08); text-align: center; }
+.diagnose-page .dgc-spec-cmp td { padding: var(--sp04) var(--sp08); text-align: center; border: 1px solid var(--panel-light); color: var(--ink); font-variant-numeric: tabular-nums; }
+.diagnose-page .dgc-spec-cmp td:first-child { text-align: left; color: var(--ink-dim); }
+.diagnose-page .dgc-spec-cmp td.is-dec { background: rgba(74, 222, 128, 0.18); color: var(--hp-green); font-weight: 700; }
+.diagnose-page .dgc-spec-cmp td.is-off { opacity: 0.3; }
+.diagnose-page .dgc-spec-note { margin-top: var(--sp08); font-size: var(--ft12); color: var(--ink); font-weight: 600; }
+.diagnose-page .dgc-spec-note b { color: var(--hp-green); }
+
+@media (max-width: 1024px) {
+    .diagnose-page .dgc-stage { grid-template-columns: 1fr; }
+    .diagnose-page .dgc-teach-grid { grid-template-columns: 1fr; }
+    .diagnose-page .dgc-ref { position: static; }
+}

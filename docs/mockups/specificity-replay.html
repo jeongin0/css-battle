@@ -1,0 +1,883 @@
+<title>특이도 판정 리플레이</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  :root{
+    --paper:#eef1f2;
+    --surface:#ffffff;
+    --surface-2:#e6eaeb;
+    --sunken:#f5f7f7;
+    --ink:#14171b;
+    --ink-2:#3b424b;
+    --slate:#5f6771;
+    --line:#d3d9db;
+    --line-strong:#bcc4c6;
+    --accent:#0e7490;
+    --accent-ink:#ffffff;
+    --scan:#0891b2;
+    --win:#15803d;
+    --win-bg:#dcf5e4;
+    --important:#b42318;
+    --important-bg:#fbe5e2;
+    --amber:#a35b09;
+    --amber-bg:#fbeccf;
+    --muted:#98a0a8;
+    --sel-id:#b42318;
+    --sel-class:#0e7490;
+    --sel-tag:#7a3ea3;
+    --shadow-sm:0 1px 2px rgba(16,24,28,.06);
+    --shadow-md:0 2px 6px rgba(16,24,28,.06), 0 14px 34px -18px rgba(16,24,28,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0d0f12;
+      --surface:#15181d;
+      --surface-2:#1c2128;
+      --sunken:#101318;
+      --ink:#eef1f3;
+      --ink-2:#c4cad0;
+      --slate:#8b939d;
+      --line:#2a3039;
+      --line-strong:#3a424d;
+      --accent:#22d3ee;
+      --accent-ink:#04191d;
+      --scan:#67e8f9;
+      --win:#57d98a;
+      --win-bg:#12301e;
+      --important:#f98d84;
+      --important-bg:#3a1613;
+      --amber:#f5b63d;
+      --amber-bg:#3a2c0c;
+      --muted:#5b636d;
+      --sel-id:#f98d84;
+      --sel-class:#4dd4e8;
+      --sel-tag:#c99be6;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+      --shadow-md:0 2px 6px rgba(0,0,0,.4), 0 18px 40px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0d0f12;
+    --surface:#15181d;
+    --surface-2:#1c2128;
+    --sunken:#101318;
+    --ink:#eef1f3;
+    --ink-2:#c4cad0;
+    --slate:#8b939d;
+    --line:#2a3039;
+    --line-strong:#3a424d;
+    --accent:#22d3ee;
+    --accent-ink:#04191d;
+    --scan:#67e8f9;
+    --win:#57d98a;
+    --win-bg:#12301e;
+    --important:#f98d84;
+    --important-bg:#3a1613;
+    --amber:#f5b63d;
+    --amber-bg:#3a2c0c;
+    --muted:#5b636d;
+    --sel-id:#f98d84;
+    --sel-class:#4dd4e8;
+    --sel-tag:#c99be6;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow-md:0 2px 6px rgba(0,0,0,.4), 0 18px 40px -18px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  code,kbd,.mono{font-family:"JetBrains Mono","IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  .app{max-width:1200px;margin:0 auto;padding:22px 20px 64px}
+
+  /* ---------- header ---------- */
+  .top{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:16px;flex-wrap:wrap;padding-bottom:16px;border-bottom:2px solid var(--ink);
+  }
+  .brand h1{
+    font-family:"Big Shoulders Display",sans-serif;
+    font-weight:800;font-size:clamp(30px,5vw,46px);line-height:.94;
+    letter-spacing:.01em;text-transform:uppercase;
+  }
+  .brand .kr{
+    font-size:13px;color:var(--slate);letter-spacing:.16em;text-transform:uppercase;
+    margin-top:6px;font-weight:600;
+  }
+  .theme-btn{
+    font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--surface);color:var(--ink-2);border:1px solid var(--line-strong);
+    padding:8px 14px;border-radius:2px;cursor:pointer;white-space:nowrap;
+  }
+  .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- console ---------- */
+  .console{
+    margin-top:20px;background:var(--surface);border:1px solid var(--line);
+    border-radius:4px;box-shadow:var(--shadow-sm);overflow:hidden;
+    display:grid;grid-template-columns:1fr;
+  }
+  @media(min-width:820px){ .console{grid-template-columns:1.35fr 1fr} }
+  .console-pane{padding:16px 18px}
+  .console-pane + .console-pane{border-top:1px solid var(--line)}
+  @media(min-width:820px){ .console-pane + .console-pane{border-top:0;border-left:1px solid var(--line)} }
+  .field-label{
+    font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--slate);display:block;margin-bottom:8px;
+  }
+  textarea.css-in{
+    width:100%;min-height:132px;resize:vertical;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.7;
+    background:var(--sunken);color:var(--ink);border:1px solid var(--line);
+    border-radius:3px;padding:10px 12px;
+  }
+  textarea.css-in:focus,input.chip-in:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .target-html{
+    background:var(--sunken);border:1px solid var(--line);border-radius:3px;
+    padding:10px 12px;font-size:12px;white-space:pre;overflow-x:auto;color:var(--ink-2);
+  }
+  .target-html .t-tag{color:var(--sel-tag)}
+  .target-html .t-attr{color:var(--sel-class)}
+  .target-html .t-val{color:var(--important)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip-in{
+    font:inherit;font-family:"JetBrains Mono",monospace;font-size:12px;
+    background:var(--surface);border:1px solid var(--line-strong);border-radius:2px;
+    padding:6px 9px;width:120px;color:var(--ink);
+  }
+  .chip-in::placeholder{color:var(--muted)}
+  .run-btn{
+    margin-top:12px;font:inherit;font-weight:700;font-size:13px;letter-spacing:.04em;
+    background:var(--accent);color:var(--accent-ink);border:0;border-radius:2px;
+    padding:10px 20px;cursor:pointer;
+  }
+  .run-btn:hover{filter:brightness(1.06)}
+
+  /* ---------- scenario switch ---------- */
+  .scenarios{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px;align-items:center}
+  .scenarios .lead-label{
+    font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);
+    margin-right:2px;
+  }
+  .sc-btn{
+    font:inherit;font-size:12.5px;font-weight:600;
+    background:var(--surface);color:var(--ink-2);border:1px solid var(--line-strong);
+    padding:7px 13px;border-radius:2px;cursor:pointer;
+  }
+  .sc-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .sc-btn:hover:not([aria-pressed="true"]){border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- deck ---------- */
+  .deck{display:grid;grid-template-columns:1fr;gap:18px;margin-top:14px}
+  @media(min-width:960px){ .deck{grid-template-columns:minmax(320px,410px) 1fr} }
+
+  .panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:4px;
+    box-shadow:var(--shadow-sm);
+  }
+  .panel-h{
+    font-family:"Big Shoulders Display",sans-serif;font-weight:700;
+    font-size:19px;letter-spacing:.02em;text-transform:uppercase;
+    padding:12px 16px;border-bottom:1px solid var(--line);display:flex;
+    justify-content:space-between;align-items:center;gap:8px;
+  }
+  .panel-h .sub{font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;color:var(--slate);letter-spacing:.1em}
+
+  /* ---------- evidence (left) ---------- */
+  .evidence{align-self:start;position:sticky;top:14px}
+  @media(max-width:959px){ .evidence{position:static} }
+  ol.code-lines{list-style:none;padding:8px 0;font-family:"JetBrains Mono",monospace;font-size:12.5px}
+  .cline{
+    display:grid;grid-template-columns:30px 1fr;gap:2px;
+    padding:6px 14px 6px 0;cursor:pointer;border-left:3px solid transparent;
+  }
+  .cline .ln{color:var(--muted);text-align:right;padding-right:10px;user-select:none}
+  .cline .code .sel-id{color:var(--sel-id);font-weight:500}
+  .cline .code .sel-class{color:var(--sel-class);font-weight:500}
+  .cline .code .sel-tag{color:var(--sel-tag)}
+  .cline .code .brace{color:var(--slate)}
+  .cline .code .prop{color:var(--ink-2)}
+  .cline .code .bang{color:var(--important);font-weight:700}
+  .cline .meta{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .tag-pill{
+    font-family:"IBM Plex Sans",sans-serif;font-size:10.5px;font-weight:700;
+    letter-spacing:.04em;padding:2px 7px;border-radius:2px;text-transform:uppercase;
+  }
+  .tag-pill.spec{background:var(--surface-2);color:var(--ink-2)}
+  .tag-pill.win{background:var(--win-bg);color:var(--win)}
+  .tag-pill.imp{background:var(--important-bg);color:var(--important)}
+  .tag-pill.out{background:var(--surface-2);color:var(--muted)}
+  .cline.is-winner{background:var(--win-bg);border-left-color:var(--win)}
+  .cline.is-loser:hover{background:var(--sunken);border-left-color:var(--line-strong)}
+  .cline.is-eliminated{opacity:.5}
+  .cline.is-eliminated .code{text-decoration:line-through;text-decoration-color:var(--muted)}
+  .cline.linked{background:var(--sunken);border-left-color:var(--accent)}
+
+  .legend{
+    display:flex;gap:14px;flex-wrap:wrap;padding:11px 16px;border-top:1px solid var(--line);
+    font-size:11px;color:var(--slate);
+  }
+  .legend span{display:flex;align-items:center;gap:5px}
+  .sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+
+  /* ---------- replay (right) ---------- */
+  .replay{display:flex;flex-direction:column;gap:18px}
+
+  .verdict{
+    background:var(--surface);border:1px solid var(--ink);border-radius:4px;
+    box-shadow:var(--shadow-md);overflow:hidden;
+  }
+  .verdict-top{
+    background:var(--ink);color:var(--paper);padding:9px 16px;
+    font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:15px;
+    letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px;
+  }
+  .verdict-body{padding:16px}
+  .verdict-winner{
+    display:block;background:var(--sunken);border:1px solid var(--line);border-left:3px solid var(--win);
+    border-radius:3px;padding:10px 12px;font-size:13px;overflow-x:auto;white-space:pre;
+  }
+  .verdict-sentence{margin-top:12px;font-size:14px;color:var(--ink-2)}
+  .verdict-sentence b{color:var(--ink)}
+  .copy-row{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .copy-btn{
+    font:inherit;font-size:12.5px;font-weight:700;letter-spacing:.03em;
+    background:var(--surface);border:1px solid var(--ink);color:var(--ink);
+    padding:8px 15px;border-radius:2px;cursor:pointer;
+  }
+  .copy-btn:hover{background:var(--ink);color:var(--paper)}
+  .copy-note{font-size:12px;color:var(--win);font-weight:600;opacity:0;transition:opacity .2s}
+  .copy-note.show{opacity:1}
+
+  /* rounds */
+  ol.rounds{list-style:none;display:flex;flex-direction:column}
+  .round{
+    display:grid;grid-template-columns:44px 1fr;gap:14px;
+    padding:16px;border-bottom:1px solid var(--line);position:relative;
+  }
+  .round:last-child{border-bottom:0}
+  .round .rn{
+    font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:30px;
+    line-height:1;color:var(--line-strong);
+  }
+  .round.done .rn{color:var(--slate)}
+  .round.decider .rn{color:var(--accent)}
+  .round.skipped{opacity:.55}
+  .round-title{
+    font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .round-status{
+    font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:2px 7px;border-radius:2px;
+  }
+  .st-done{background:var(--surface-2);color:var(--slate)}
+  .st-decider{background:var(--win-bg);color:var(--win)}
+  .st-skip{background:var(--surface-2);color:var(--muted)}
+  .round-body{font-size:13px;color:var(--ink-2);margin-top:5px}
+  .round-body code{background:var(--sunken);padding:1px 5px;border-radius:2px;font-size:12px}
+  .elim-list{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+  .elim-list .e{font-size:12px;color:var(--slate)}
+  .elim-list .e code{color:var(--important)}
+
+  /* ---------- digit duel ---------- */
+  .duel-wrap{grid-column:1 / -1;margin-top:12px;background:var(--sunken);border:1px solid var(--line);border-radius:4px;padding:16px 14px 14px}
+  .duel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .duel-head .names{font-size:11.5px;color:var(--slate);line-height:1.5}
+  .duel-head .names b{color:var(--ink);font-weight:600}
+  .duel-head .names .mono{font-size:11px}
+  .replay-btn{
+    font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+    background:var(--accent);color:var(--accent-ink);border:0;border-radius:2px;
+    padding:6px 13px;cursor:pointer;white-space:nowrap;
+  }
+  .replay-btn:hover{filter:brightness(1.07)}
+
+  .duel-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .scanline{
+    position:absolute;top:-4px;bottom:-4px;left:0;width:25%;
+    border:2px solid var(--scan);border-radius:3px;
+    background:color-mix(in srgb,var(--scan) 10%,transparent);
+    transform:translateX(0);transition:transform .45s cubic-bezier(.5,0,.2,1);
+    pointer-events:none;opacity:0;
+  }
+  .duel-grid.active .scanline{opacity:1}
+  .duel-col{
+    text-align:center;padding:8px 2px 10px;border-radius:3px;
+    background:var(--surface);border:1px solid var(--line);transition:opacity .3s,background .3s,border-color .3s;
+  }
+  .duel-col .clabel{
+    font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:7px;
+  }
+  .duel-col .dnum{
+    font-family:"JetBrains Mono",monospace;font-weight:700;font-size:26px;line-height:1.1;
+    font-variant-numeric:tabular-nums;color:var(--ink);
+  }
+  .duel-col .dnum + .dnum{margin-top:2px}
+  .duel-col .dnum.a{color:var(--ink)}
+  .duel-col .dnum.b{color:var(--slate)}
+  .duel-col.equal{background:var(--surface-2);border-color:var(--line)}
+  .duel-col.equal .dnum{color:var(--slate)}
+  .duel-col.decider{background:var(--win-bg);border-color:var(--win)}
+  .duel-col.decider .dnum.a{color:var(--win)}
+  .duel-col.decider .dnum{font-size:30px}
+  .duel-col.faded{opacity:.32}
+  .duel-callout{
+    margin-top:12px;font-size:12.5px;font-weight:600;color:var(--ink);
+    min-height:1.5em;display:flex;align-items:center;gap:7px;
+  }
+  .duel-callout::before{content:"→";color:var(--accent);font-weight:700}
+  .duel-callout.tie::before{content:"=";}
+
+  /* ---------- misconceptions ---------- */
+  .myths{padding:16px}
+  .myths h3,.cheapest h3{
+    font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:17px;
+    letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px;
+  }
+  .myth-card{
+    display:grid;grid-template-columns:auto 1fr;gap:10px;padding:11px 12px;
+    background:var(--important-bg);border-radius:3px;margin-bottom:8px;
+  }
+  .myth-card:last-child{margin-bottom:0}
+  .myth-x{color:var(--important);font-weight:800;font-size:15px;line-height:1.3}
+  .myth-card p{font-size:12.5px;color:var(--ink-2)}
+  .myth-card p b{color:var(--ink)}
+
+  /* ---------- cheapest win ---------- */
+  .cheapest{padding:16px}
+  .cheapest .rule-name{font-size:12px;color:var(--slate);margin-bottom:10px}
+  .cheapest .rule-name code{color:var(--important);font-size:12px}
+  .cheap-opt{
+    display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:10px 0;
+    border-top:1px solid var(--line);
+  }
+  .cheap-opt:first-of-type{border-top:0}
+  .cheap-verdict{font-weight:700;font-size:12.5px;white-space:nowrap}
+  .cheap-verdict.good{color:var(--win)}
+  .cheap-verdict.bad{color:var(--muted)}
+  .cheap-verdict.warn{color:var(--amber)}
+  .cheap-label{font-weight:600;font-size:13px}
+  .cheap-note{grid-column:2;font-size:12px;color:var(--slate)}
+  .cheapest.pulse{animation:pulse .5s ease}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 40%,transparent)}100%{box-shadow:0 0 0 8px transparent}}
+
+  /* ---------- coverage ---------- */
+  .coverage{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px}
+  .coverage h3{
+    font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:16px;
+    letter-spacing:.03em;text-transform:uppercase;margin-bottom:12px;
+  }
+  .cov-row{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px}
+  @media(min-width:640px){ .cov-row{grid-template-columns:130px 1fr;align-items:baseline} }
+  .cov-row:last-child{margin-bottom:0}
+  .cov-tier{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .cov-tier .dot{width:8px;height:8px;border-radius:50%}
+  .cov-items{display:flex;gap:6px;flex-wrap:wrap}
+  .cov-chip{font-family:"JetBrains Mono",monospace;font-size:11px;background:var(--sunken);border:1px solid var(--line);border-radius:2px;padding:3px 7px;color:var(--ink-2)}
+  .cov-note{font-size:11.5px;color:var(--slate);margin-top:4px}
+
+  .foot{margin-top:20px;font-size:11px;color:var(--muted);text-align:center;letter-spacing:.03em}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Specificity&nbsp;Replay</h1>
+      <div class="kr">특이도 판정 리플레이 · 실전 진단 모드</div>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">테마 전환</button>
+  </header>
+
+  <section class="console" aria-label="입력 콘솔">
+    <div class="console-pane">
+      <label class="field-label" for="cssIn">CSS 붙여넣기</label>
+      <textarea id="cssIn" class="css-in" spellcheck="false"></textarea>
+    </div>
+    <div class="console-pane">
+      <span class="field-label">대상 엘리먼트</span>
+      <div class="target-html" id="targetHtml"></div>
+      <div class="chips">
+        <input class="chip-in" id="tTag" placeholder="태그">
+        <input class="chip-in" id="tClass" placeholder="클래스">
+        <input class="chip-in" id="tId" placeholder="ID">
+      </div>
+      <button class="run-btn" id="runBtn" type="button">진단하기</button>
+    </div>
+  </section>
+
+  <div class="scenarios">
+    <span class="lead-label">예시 케이스</span>
+    <button class="sc-btn" data-sc="important" type="button">!important 반전</button>
+    <button class="sc-btn" data-sc="idclass" type="button">ID vs 클래스 5개</button>
+    <button class="sc-btn" data-sc="sourceorder" type="button">동점 → 소스 순서</button>
+  </div>
+
+  <div class="deck">
+    <!-- LEFT: evidence -->
+    <section class="panel evidence">
+      <div class="panel-h">제출된 스타일시트 <span class="sub" id="evCount"></span></div>
+      <ol class="code-lines" id="codeLines"></ol>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--win)"></i> 적용됨(승자)</span>
+        <span><i class="sw" style="background:var(--line-strong)"></i> 밀림</span>
+        <span><i class="sw" style="background:var(--important)"></i> !important</span>
+        <span><i class="sw" style="background:var(--muted)"></i> 매칭 탈락</span>
+      </div>
+    </section>
+
+    <!-- RIGHT: replay -->
+    <div class="replay">
+      <article class="verdict">
+        <div class="verdict-top">👑 최종 판정 <span id="decidedBadge" style="font-size:11px;opacity:.75"></span></div>
+        <div class="verdict-body">
+          <code class="verdict-winner" id="winnerCode"></code>
+          <p class="verdict-sentence" id="verdictSentence"></p>
+          <div class="copy-row">
+            <button class="copy-btn" id="copyBtn" type="button">진단서 복사</button>
+            <span class="copy-note" id="copyNote">복사됨 ✓</span>
+          </div>
+        </div>
+      </article>
+
+      <section class="panel">
+        <div class="panel-h">판정 리플레이 <span class="sub">4 라운드</span></div>
+        <ol class="rounds" id="rounds"></ol>
+      </section>
+
+      <section class="panel myths">
+        <h3>이번 케이스가 깨는 오해</h3>
+        <div id="mythList"></div>
+      </section>
+
+      <section class="panel cheapest" id="cheapest">
+        <h3>가장 싼 승리법</h3>
+        <div class="rule-name" id="cheapRuleName"></div>
+        <div id="cheapOpts"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="coverage">
+    <h3>지원 범위 — 무엇을 얼마나 정확히 판정하나</h3>
+    <div class="cov-row">
+      <span class="cov-tier"><i class="dot" style="background:var(--win)"></i> 완전 지원</span>
+      <div>
+        <div class="cov-items">
+          <span class="cov-chip">.class</span><span class="cov-chip">#id</span><span class="cov-chip">tag</span>
+          <span class="cov-chip">*</span><span class="cov-chip">[attr]</span><span class="cov-chip">:pseudo-class</span>
+          <span class="cov-chip">::pseudo-element</span><span class="cov-chip">A B / A &gt; B</span>
+          <span class="cov-chip">!important</span><span class="cov-chip">쉼표 목록</span><span class="cov-chip">소스 순서</span>
+        </div>
+        <p class="cov-note">특이도 규칙은 결정론적 — 브라우저 결과와 100% 일치합니다.</p>
+      </div>
+    </div>
+    <div class="cov-row">
+      <span class="cov-tier"><i class="dot" style="background:var(--amber)"></i> 근사 · 경고 표시</span>
+      <div>
+        <div class="cov-items">
+          <span class="cov-chip">:not() :is()</span><span class="cov-chip">:where()</span>
+          <span class="cov-chip">:nth-child()</span><span class="cov-chip">A + B / A ~ B</span>
+        </div>
+        <p class="cov-note">특이도 점수는 정확하나, 텍스트 대상만으로는 매칭 여부를 단정하지 못해 ⚠️ 배지를 붙입니다.</p>
+      </div>
+    </div>
+    <div class="cov-row">
+      <span class="cov-tier"><i class="dot" style="background:var(--muted)"></i> 범위 밖 · 손 듦</span>
+      <div>
+        <div class="cov-items">
+          <span class="cov-chip">@media</span><span class="cov-chip">@layer</span><span class="cov-chip">@scope</span>
+          <span class="cov-chip">인라인 style</span><span class="cov-chip">상속</span><span class="cov-chip">UA 기본값</span>
+          <span class="cov-chip">단축 ↔ 개별 속성</span><span class="cov-chip">:hover 등 상태</span>
+        </div>
+        <p class="cov-note">파싱은 하되 계산에서 분리하고 "이 규칙은 @layer 안이라 브라우저에선 다릅니다" 라고 배지로 알립니다. 파싱 실패 줄은 빨간 밑줄 + 툴팁.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">MOCKUP · 더미 데이터 · 실제 브라우저 렌더링 아님</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- theme toggle ---------- */
+  var root = document.documentElement;
+  try{ var saved = localStorage.getItem("sr-theme"); if(saved) root.setAttribute("data-theme", saved); }catch(e){}
+  document.getElementById("themeBtn").addEventListener("click", function(){
+    var cur = root.getAttribute("data-theme");
+    var next = cur === "dark" ? "light" : cur === "light" ? "dark"
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+    root.setAttribute("data-theme", next);
+    try{ localStorage.setItem("sr-theme", next); }catch(e){}
+  });
+
+  var COL = ["inline","id","class","tag"];
+
+  /* ---------- scenarios ---------- */
+  var SCENARIOS = {
+    important: {
+      label:"!important 반전",
+      css:
+".card p { color: #333; }\n"+
+"#main .card p.lead { color: #0a7; }\n"+
+".card p { color: tomato !important; }\n"+
+"article p { color: blue; }",
+      target:{ tag:"p", cls:"lead", id:"", html:
+        '<span class="t-tag">&lt;main</span> <span class="t-attr">id</span>=<span class="t-val">"main"</span><span class="t-tag">&gt;</span>\n'+
+        '  <span class="t-tag">&lt;div</span> <span class="t-attr">class</span>=<span class="t-val">"card"</span><span class="t-tag">&gt;</span>\n'+
+        '    <span class="t-tag">&lt;p</span> <span class="t-attr">class</span>=<span class="t-val">"lead"</span><span class="t-tag">&gt;</span>…<span class="t-tag">&lt;/p&gt;</span>  ← 대상\n'+
+        '  <span class="t-tag">&lt;/div&gt;</span>\n'+
+        '<span class="t-tag">&lt;/main&gt;</span>' },
+      rules:[
+        { sel:[["sel-class",".card"],["sel-tag"," p"]], decl:"color: #333", spec:[0,0,1,1], important:false, fate:"loser", matched:true },
+        { sel:[["sel-id","#main"],["sel-class"," .card"],["sel-tag"," p"],["sel-class",".lead"]], decl:"color: #0a7", spec:[0,1,2,1], important:false, fate:"loser", matched:true },
+        { sel:[["sel-class",".card"],["sel-tag"," p"]], decl:"color: tomato", bang:true, spec:[0,0,1,1], important:true, fate:"winner", matched:true },
+        { sel:[["sel-tag","article"],["sel-tag"," p"]], decl:"color: blue", spec:[0,0,0,1], important:false, fate:"eliminated", matched:false }
+      ],
+      decidedAt:2,
+      rounds:[
+        { status:"done", title:"매칭 필터", body:'4개 규칙 중 <code>article p</code> 탈락 — 대상의 조상에 <code>&lt;article&gt;</code> 이 없습니다. 3개 진출.',
+          elim:["article p — 조상에 <article> 없음"] },
+        { status:"decider", title:"!important 층 분리", body:'<code>.card p</code> 에 <code>!important</code> 가 있어 별도 층으로 승격됩니다. 이 층에 경쟁자가 없으므로 <b>특이도와 무관하게</b> 최종 승자로 확정. — 여기서 승부 종료.' },
+        { status:"done", title:"특이도 자릿수 대결", body:'일반 층 내부 순위(차순위 결정)용. <code>#main .card p.lead</code> 와 <code>.card p</code> 를 비교합니다.', duel:{ aName:"#main .card p.lead", bName:".card p", a:[0,1,2,1], b:[0,0,1,1] } },
+        { status:"skipped", title:"소스 순서", body:'앞 라운드에서 승자와 차순위가 모두 결정됨 — 사용하지 않습니다.' }
+      ],
+      winnerCode:".card p { color: tomato !important; }",
+      sentence:'대상 <b>p.lead</b> 의 <code>color</code> 는 <b>.card p 의 !important</b> 가 결정합니다. 특이도가 훨씬 높은 <code>#main .card p.lead</code> (0,1,2,1) 도 <code>!important</code> 층에는 닿지 못합니다. <code>!important</code> 를 지우면 <code>#main .card p.lead</code> 가 이깁니다.',
+      diagnosis:
+"[특이도 진단서]\n"+
+"대상: <p class=\"lead\">  (#main .card 내부)\n"+
+"적용: .card p { color: tomato !important; }\n"+
+"사유: !important 층 단독 → 특이도 비교 없이 승리\n"+
+"차순위: #main .card p.lead  (0,1,2,1)\n"+
+"조언: !important 를 제거하면 #main .card p.lead 가 적용됩니다.\n"+
+"      새 !important 를 추가하지 마세요 — 다음 충돌을 부릅니다.",
+      myths:[
+        { t:'<b>!important 는 특이도 점수를 높인다</b> → 아닙니다. (0,0,1,1) 인 <code>.card p</code> 가 (0,1,2,1) 을 이겼습니다. !important 는 점수가 아니라 <b>별도 층</b>입니다.' },
+        { t:'<b>ID 를 이기려면 클래스를 여러 개 붙이면 된다</b> → 아닙니다. <code>#main</code> 의 id 자리 하나에서 갈렸고, class 자리 숫자(2 vs 1)는 보지도 않았습니다.' }
+      ],
+      cheap:{ rule:".card p  (일반, #333)", opts:[
+        { v:"✗ 소용없음", cls:"bad", label:"클래스 더 붙이기", note:"class 자리만 커집니다. id 자리를 못 넘어요." },
+        { v:"✓ 최소 비용", cls:"good", label:"#main .card p 로 스코프 지정", note:"id 자리 1 확보 → #main .card p.lead 와 동률 후 소스 순서. 더 뒤에 두면 승리." },
+        { v:"⚠ 비권장", cls:"warn", label:"!important 추가", note:"현재 !important 규칙과 또 충돌. 다음 개발자가 같은 문제를 겪습니다." }
+      ]}
+    },
+
+    idclass: {
+      label:"ID vs 클래스 5개",
+      css:
+".box.alpha.beta.gamma.delta { color: navy; }\n"+
+"#hero { color: crimson; }\n"+
+"div { color: slategray; }",
+      target:{ tag:"div", cls:"box alpha beta gamma delta", id:"hero", html:
+        '<span class="t-tag">&lt;div</span> <span class="t-attr">id</span>=<span class="t-val">"hero"</span>\n'+
+        '     <span class="t-attr">class</span>=<span class="t-val">"box alpha beta gamma delta"</span><span class="t-tag">&gt;</span>  ← 대상\n'+
+        '  …\n'+
+        '<span class="t-tag">&lt;/div&gt;</span>' },
+      rules:[
+        { sel:[["sel-class",".box.alpha.beta.gamma.delta"]], decl:"color: navy", spec:[0,0,5,0], important:false, fate:"loser", matched:true },
+        { sel:[["sel-id","#hero"]], decl:"color: crimson", spec:[0,1,0,0], important:false, fate:"winner", matched:true },
+        { sel:[["sel-tag","div"]], decl:"color: slategray", spec:[0,0,0,1], important:false, fate:"loser", matched:true }
+      ],
+      decidedAt:2,
+      rounds:[
+        { status:"done", title:"매칭 필터", body:'3개 규칙 모두 대상과 매칭됩니다. 탈락 없음.' },
+        { status:"skipped", title:"!important 층 분리", body:'<code>!important</code> 규칙이 없습니다 — 이 라운드 건너뜀.' },
+        { status:"decider", title:"특이도 자릿수 대결", body:'<code>#hero</code> (0,1,0,0) 와 <code>.box.alpha.beta.gamma.delta</code> (0,0,5,0) 비교. — 여기서 승자 확정.', duel:{ aName:"#hero", bName:".box.alpha.beta.gamma.delta", a:[0,1,0,0], b:[0,0,5,0] } },
+        { status:"skipped", title:"소스 순서", body:'특이도로 결판났으므로 사용하지 않습니다.' }
+      ],
+      winnerCode:"#hero { color: crimson; }",
+      sentence:'클래스를 <b>5개</b> 겹쳐도 (0,0,5,0), <b>ID 하나</b> (0,1,0,0) 를 못 이깁니다. 자릿수 비교는 <b>왼쪽(강한 자리)부터</b>라, id 자리에서 승부가 나면 오른쪽 class·tag 자리는 아예 읽지 않습니다.',
+      diagnosis:
+"[특이도 진단서]\n"+
+"대상: <div id=\"hero\" class=\"box alpha beta gamma delta\">\n"+
+"적용: #hero { color: crimson; }\n"+
+"사유: id 자리 1 > 0 에서 즉시 결정, 이후 자리 비교 없음\n"+
+"차순위: .box.alpha.beta.gamma.delta  (0,0,5,0)\n"+
+"조언: navy 를 적용하려면 #hero.box… 처럼 id 를 포함하세요.\n"+
+"      클래스 추가는 효과가 없습니다.",
+      myths:[
+        { t:'<b>클래스 여러 개 = ID 한 개</b> → 아닙니다. 클래스는 몇 개를 모아도 <b>class 자리</b>에만 쌓입니다. id 자리로 올라가지 않습니다.' },
+        { t:'<b>더 길고 구체적으로 보이는 셀렉터가 이긴다</b> → 아닙니다. 길이가 아니라 <b>자릿수</b>입니다. <code>#hero</code> 는 짧지만 이겼습니다.' }
+      ],
+      cheap:{ rule:".box.alpha.beta.gamma.delta  (navy)", opts:[
+        { v:"✗ 소용없음", cls:"bad", label:"클래스 더 추가", note:"class 자리 숫자만 올라갑니다." },
+        { v:"✓", cls:"good", label:"#hero.box.alpha… 로 id 포함", note:"id 자리 동률 + class 자리 우위 → 승리." },
+        { v:"✓ 권장", cls:"good", label:"스타일을 #hero 규칙에 직접 병합", note:"경쟁 자체를 없앱니다." }
+      ]}
+    },
+
+    sourceorder: {
+      label:"동점 → 소스 순서",
+      css:
+".alert .text { color: #111; }\n"+
+".box .text { color: crimson; }",
+      target:{ tag:"span", cls:"text", id:"", html:
+        '<span class="t-tag">&lt;div</span> <span class="t-attr">class</span>=<span class="t-val">"alert"</span><span class="t-tag">&gt;</span>\n'+
+        '  <span class="t-tag">&lt;div</span> <span class="t-attr">class</span>=<span class="t-val">"box"</span><span class="t-tag">&gt;</span>\n'+
+        '    <span class="t-tag">&lt;span</span> <span class="t-attr">class</span>=<span class="t-val">"text"</span><span class="t-tag">&gt;</span>…  ← 대상\n'+
+        '  <span class="t-tag">&lt;/div&gt;</span>\n'+
+        '<span class="t-tag">&lt;/div&gt;</span>' },
+      rules:[
+        { sel:[["sel-class",".alert"],["sel-class"," .text"]], decl:"color: #111", spec:[0,0,2,0], important:false, fate:"loser", matched:true },
+        { sel:[["sel-class",".box"],["sel-class"," .text"]], decl:"color: crimson", spec:[0,0,2,0], important:false, fate:"winner", matched:true }
+      ],
+      decidedAt:3,
+      rounds:[
+        { status:"done", title:"매칭 필터", body:'2개 규칙 모두 매칭 — 대상은 <code>.alert</code> 와 <code>.box</code> 양쪽 안에 있습니다.' },
+        { status:"skipped", title:"!important 층 분리", body:'<code>!important</code> 없음 — 건너뜀.' },
+        { status:"done", title:"특이도 자릿수 대결", body:'<code>.alert .text</code> 와 <code>.box .text</code> 비교.', duel:{ aName:".alert .text", bName:".box .text", a:[0,0,2,0], b:[0,0,2,0] } },
+        { status:"decider", title:"소스 순서", body:'네 자리가 모두 (0,0,2,0) 로 동일 → 특이도로는 판정 불가. 스타일시트에서 <code>.box .text</code> 가 <code>.alert .text</code> <b>아래</b>에 선언되어 있고, <b>동점일 때는 나중 선언이 이깁니다.</b> — 여기서 승자 확정.' }
+      ],
+      winnerCode:".box .text { color: crimson; }",
+      sentence:'두 규칙의 특이도가 <b>(0,0,2,0) 로 완전히 같습니다.</b> 이럴 때는 CSS 에서 <b>나중에 오는 규칙</b>이 이깁니다. 두 규칙의 순서를 바꾸면 결과도 바뀝니다.',
+      diagnosis:
+"[특이도 진단서]\n"+
+"대상: <span class=\"text\">  (.alert > .box 내부)\n"+
+"적용: .box .text { color: crimson; }\n"+
+"사유: 특이도 동점 (0,0,2,0) → 소스 순서상 마지막\n"+
+"차순위: .alert .text — 동일 특이도, 더 앞에 선언됨\n"+
+"조언: #111 을 적용하려면 .alert .text 를 파일 더 아래로 옮기거나\n"+
+"      특이도를 한 단계 올리세요 (.alert > .box .text 등).",
+      myths:[
+        { t:'<b>먼저 작성한 규칙이 우선한다</b> → 아닙니다. 특이도가 동점이면 <b>마지막에 온 규칙</b>이 이깁니다.' },
+        { t:'<b>"경고(alert)" 처럼 의미가 강한 이름이 이긴다</b> → 아닙니다. 이름의 뜻은 특이도와 무관합니다. 둘 다 그냥 클래스 2개입니다.' }
+      ],
+      cheap:{ rule:".alert .text  (#111)", opts:[
+        { v:"✓ 최소 비용", cls:"good", label:"규칙을 파일 맨 아래로 이동", note:"동점 유지 + 소스 순서 역전." },
+        { v:"⚠", cls:"warn", label:".alert .text.text 같은 꼼수", note:"동작하지만 읽는 사람을 혼란시킵니다." },
+        { v:"✓", cls:"good", label:".alert > .box .text 로 구체화", note:"class 자리 3개로 우위 확보." }
+      ]}
+    }
+  };
+
+  /* ---------- render ---------- */
+  var el = function(id){ return document.getElementById(id); };
+  var current = "important";
+  var duelTimer = null;
+
+  function specStr(s){ return s.join(","); }
+
+  function renderCodeLines(sc){
+    var ol = el("codeLines"); ol.innerHTML = "";
+    el("evCount").textContent = sc.rules.length + " RULES";
+    sc.rules.forEach(function(r, i){
+      var li = document.createElement("li");
+      li.className = "cline is-" + (r.fate === "winner" ? "winner" : r.fate === "eliminated" ? "eliminated" : "loser");
+      li.dataset.idx = i;
+      var selHtml = r.sel.map(function(p){ return '<span class="'+p[0]+'">'+p[1]+'</span>'; }).join("");
+      var declHtml = '<span class="prop">'+r.decl+'</span>';
+      if(r.bang) declHtml += ' <span class="bang">!important</span>';
+      var pills = '<span class="tag-pill spec">'+specStr(r.spec)+'</span>';
+      if(r.important) pills += '<span class="tag-pill imp">!important 층</span>';
+      if(r.fate === "winner") pills += '<span class="tag-pill win">적용됨</span>';
+      if(r.fate === "eliminated") pills += '<span class="tag-pill out">매칭 탈락</span>';
+      li.innerHTML =
+        '<span class="ln">'+(i+1)+'</span>'+
+        '<span class="code">'+selHtml+' <span class="brace">{</span> '+declHtml+' <span class="brace">}</span></span>'+
+        '<span class="meta">'+pills+'</span>';
+      li.addEventListener("mouseenter", function(){ if(r.fate === "loser") pulseCheapest(); });
+      li.addEventListener("click", function(){ jumpToDuel(); });
+      ol.appendChild(li);
+    });
+  }
+
+  function renderRounds(sc){
+    var ol = el("rounds"); ol.innerHTML = "";
+    sc.rounds.forEach(function(rd, i){
+      var li = document.createElement("li");
+      li.className = "round " + (rd.status === "decider" ? "decider" : rd.status === "skipped" ? "skipped" : "done");
+      var stCls = rd.status === "decider" ? "st-decider" : rd.status === "skipped" ? "st-skip" : "st-done";
+      var stTxt = rd.status === "decider" ? "승자 확정" : rd.status === "skipped" ? "건너뜀" : "통과";
+      var html =
+        '<span class="rn">'+(i+1)+'</span>'+
+        '<div><div class="round-title">'+rd.title+' <span class="round-status '+stCls+'">'+stTxt+'</span></div>'+
+        '<div class="round-body">'+rd.body+'</div>';
+      if(rd.elim){
+        html += '<div class="elim-list">'+rd.elim.map(function(e){
+          return '<span class="e">✕ '+e.replace(/(^[^\s—]+)/, '<code>$1</code>')+'</span>';
+        }).join("")+'</div>';
+      }
+      html += '</div>';
+      if(rd.duel){
+        html += duelMarkup(rd.duel);
+      }
+      li.innerHTML = html;
+      ol.appendChild(li);
+    });
+    var d = sc.rounds.find(function(r){ return r.duel; });
+    if(d) setupDuel(d.duel);
+  }
+
+  function duelMarkup(d){
+    var cols = "";
+    for(var k=0;k<4;k++){
+      cols +=
+        '<div class="duel-col" data-k="'+k+'">'+
+          '<div class="clabel">'+COL[k]+'</div>'+
+          '<div class="dnum a">'+d.a[k]+'</div>'+
+          '<div class="dnum b">'+d.b[k]+'</div>'+
+        '</div>';
+    }
+    return '<div class="duel-wrap">'+
+      '<div class="duel-head">'+
+        '<div class="names"><b>A</b> <span class="mono">'+d.aName+'</span> &nbsp;·&nbsp; <b>B</b> <span class="mono">'+d.bName+'</span></div>'+
+        '<button class="replay-btn" id="replayBtn" type="button">▶ 다시 재생</button>'+
+      '</div>'+
+      '<div class="duel-grid" id="duelGrid"><div class="scanline"></div>'+cols+'</div>'+
+      '<div class="duel-callout" id="duelCallout"></div>'+
+    '</div>';
+  }
+
+  function setupDuel(d){
+    var btn = el("replayBtn");
+    if(btn) btn.addEventListener("click", function(){ runDuel(d, true); });
+    runDuel(d, !reduced);
+  }
+
+  function runDuel(d, animate){
+    if(duelTimer){ clearTimeout(duelTimer); duelTimer = null; }
+    var grid = el("duelGrid"), callout = el("duelCallout");
+    if(!grid) return;
+    var cols = grid.querySelectorAll(".duel-col");
+    var scan = grid.querySelector(".scanline");
+    cols.forEach(function(c){ c.classList.remove("equal","decider","faded"); });
+    callout.textContent = ""; callout.classList.remove("tie");
+    grid.classList.remove("active");
+
+    var decided = -1, steps = [];
+    for(var k=0;k<4;k++){
+      if(d.a[k] === d.b[k]){ steps.push({k:k, type:"equal"}); }
+      else { steps.push({k:k, type:"decider"}); decided = k; break; }
+    }
+    var tie = decided === -1;
+
+    function finish(){
+      if(!tie && decided < 3){
+        for(var k=decided+1;k<4;k++) cols[k].classList.add("faded");
+      }
+      if(tie){
+        callout.classList.add("tie");
+        callout.textContent = "네 자리가 모두 동일 — 특이도로는 판정 불가. 소스 순서 라운드로 넘어갑니다.";
+      } else {
+        var op = d.a[decided] > d.b[decided] ? ">" : "<";
+        var win = d.a[decided] > d.b[decided] ? "A" : "B";
+        callout.textContent = COL[decided] + " 자리에서 " + d.a[decided] + " " + op + " " + d.b[decided] +
+          " → " + win + " 우세로 결정. 오른쪽 자리(" + COL.slice(decided+1).join("·") + ")는 읽지 않습니다.";
+      }
+    }
+
+    var i = 0;
+    function tick(){
+      var s = steps[i];
+      grid.classList.add("active");
+      if(scan) scan.style.transform = "translateX(" + (s.k * 100) + "%)";
+      cols[s.k].classList.add(s.type);
+      i++;
+      if(i < steps.length){ duelTimer = setTimeout(tick, animate ? 720 : 0); }
+      else { duelTimer = setTimeout(finish, animate ? 520 : 0); }
+    }
+    if(animate){ duelTimer = setTimeout(tick, 260); }
+    else { while(i < steps.length){ var s = steps[i]; if(scan) scan.style.transform = "translateX(" + (s.k*100) + "%)"; cols[s.k].classList.add(s.type); i++; } finish(); }
+  }
+
+  function jumpToDuel(){
+    var w = document.querySelector(".duel-wrap");
+    if(w) w.scrollIntoView({behavior: reduced ? "auto" : "smooth", block: "center"});
+  }
+
+  function renderVerdict(sc){
+    el("winnerCode").textContent = sc.winnerCode;
+    el("verdictSentence").innerHTML = sc.sentence;
+    el("decidedBadge").textContent = "· R" + (sc.decidedAt + 1) + " 에서 확정";
+  }
+
+  function renderMyths(sc){
+    el("mythList").innerHTML = sc.myths.map(function(m){
+      return '<div class="myth-card"><span class="myth-x">✕</span><p>'+m.t+'</p></div>';
+    }).join("");
+  }
+
+  function renderCheapest(sc){
+    el("cheapRuleName").innerHTML = '진 규칙: <code>'+sc.cheap.rule+'</code> — 이 규칙을 이기게 하려면:';
+    el("cheapOpts").innerHTML = sc.cheap.opts.map(function(o){
+      return '<div class="cheap-opt">'+
+        '<span class="cheap-verdict '+o.cls+'">'+o.v+'</span>'+
+        '<span class="cheap-label">'+o.label+'</span>'+
+        '<span class="cheap-note">'+o.note+'</span>'+
+      '</div>';
+    }).join("");
+  }
+
+  var pulseT = null;
+  function pulseCheapest(){
+    var c = el("cheapest");
+    c.classList.remove("pulse");
+    void c.offsetWidth;
+    c.classList.add("pulse");
+  }
+
+  function renderTarget(sc){
+    el("cssIn").value = sc.css;
+    el("targetHtml").innerHTML = sc.target.html;
+    el("tTag").value = sc.target.tag;
+    el("tClass").value = sc.target.cls;
+    el("tId").value = sc.target.id;
+  }
+
+  function render(id){
+    current = id;
+    var sc = SCENARIOS[id];
+    document.querySelectorAll(".sc-btn").forEach(function(b){
+      b.setAttribute("aria-pressed", b.dataset.sc === id ? "true" : "false");
+    });
+    renderTarget(sc);
+    renderCodeLines(sc);
+    renderVerdict(sc);
+    renderRounds(sc);
+    renderMyths(sc);
+    renderCheapest(sc);
+  }
+
+  document.querySelectorAll(".sc-btn").forEach(function(b){
+    b.addEventListener("click", function(){ render(b.dataset.sc); });
+  });
+  el("runBtn").addEventListener("click", function(){
+    render(current);
+    var d = SCENARIOS[current].rounds.find(function(r){ return r.duel; });
+    if(d) runDuel(d.duel, !reduced);
+  });
+
+  el("copyBtn").addEventListener("click", function(){
+    var txt = SCENARIOS[current].diagnosis;
+    var done = function(){
+      var n = el("copyNote"); n.classList.add("show");
+      setTimeout(function(){ n.classList.remove("show"); }, 1600);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, done);
+    } else {
+      var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta);
+      ta.select(); try{ document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); done();
+    }
+  });
+
+  render("important");
+})();
+</script>

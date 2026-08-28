@@ -14,8 +14,8 @@ const MODES = [
     {
         href: '#diagnose',
         stage: 'STAGE 03',
-        title: '진단',
-        desc: '실제 CSS 코드를 붙여넣고 어떤 규칙이 이기는지 우선순위를 진단합니다.'
+        title: 'CSS 디버그',
+        desc: '주어진 CSS 충돌을 직접 진단하고, !important 없이 최소 수정으로 고쳐봅니다.'
     }
 ];
 

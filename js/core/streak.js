@@ -5,7 +5,7 @@ import { todayKey } from '../store.js';
 export const DAILY_QUESTS = [
     { id: 'battle_3win', label: '배틀 3판 승리' },
     { id: 'typing_90acc', label: '타자연습 정확도 90%+ 1회' },
-    { id: 'diagnose_use', label: '진단 모드 1회 사용' }
+    { id: 'diagnose_use', label: 'CSS 디버그 1문제 해결' }
 ];
 
 export const STAMP_REWARDS = [

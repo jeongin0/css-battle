@@ -40,6 +40,10 @@ dl {
     list-style:none;
 }
 
+textarea { 
+    resize: none;
+}
+
 blockquote, q {
     quotes:none;
 }
