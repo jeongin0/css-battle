@@ -1,8 +1,8 @@
 import { previewDoc, nextBattleProblem, obfuscatedShown } from '../core/battleProblems.js';
-import { scoreAccuracy, scorePrecision } from '../core/battleScore.js';
+import { selectorHygiene } from '../core/battleScore.js';
 import { calculateSpecificity } from '../core/specificity.js';
 import { attachCodeEditor } from '../components/cssEditor.js';
-import { addBattleRecord } from '../store.js';
+import { addBattleClear } from '../store.js';
 
 export function render(container) {
     let difficulty = 'low';
@@ -10,12 +10,14 @@ export function render(container) {
     let problem = nextBattleProblem(difficulty);
     let timerId = null;
     let elapsed = 0;
-    let lastResult = null;
+    let hintLines = [];
+    let hintShown = 0;
+    let counted = false;
 
     container.innerHTML = `
         <section class="container battle-page">
             <h1 class="page-title">배틀 모드</h1>
-            <p class="page-desc">HTML과 목표 시안만 보고 CSS를 직접 작성해, 시안과 똑같이 만드세요. 시안과의 배틀입니다.</p>
+            <p class="page-desc">목표 시안과 똑같이 보이도록 CSS를 0부터 작성하는 <strong>모작 연습</strong>입니다. 정답은 하나가 아니라서 점수는 매기지 않아요 — 겹쳐보기와 예시 정답으로 직접 확인하세요.</p>
 
             <div class="battle-bar">
                 <div class="tabs" data-role="difficulty-tabs">
@@ -30,65 +32,76 @@ export function render(container) {
                 </div>
             </div>
 
-            <p class="hint-text">FIGHT를 누르면 스톱워치가 흐르고 에디터가 열립니다. 난이도 탭을 누르면 새 문제가 나옵니다. 정확도 90% 이상이면 클리어이며 실패는 없습니다.</p>
+            <p class="hint-text">FIGHT = 스톱워치 시작 + 에디터 열림. 난이도 탭은 언제든 눌러 새 문제를 받을 수 있어요(진행 중이던 문제는 초기화). 정지 = 기록 없이 리셋.</p>
             <div class="battle-status" data-role="status"></div>
             <p class="battle-toast" data-role="toast" hidden></p>
 
             <div class="battle-layout">
                 <div class="battle-col">
-                    <h3 class="battle-panel-title">HTML 구조 (수정 불가)</h2>
+                    <h3 class="battle-panel-title">HTML 구조 (수정 불가)</h3>
                     <pre class="dom-tree" data-role="html-src"></pre>
 
-                    <h3 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h2>
+                    <h3 class="battle-panel-title">색상 팔레트 · 스포이드</h3>
+                    <div class="battle-palette" data-role="palette"></div>
+
+                    <h3 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h3>
                     <div class="battle-shielded">
                         <iframe class="preview-frame preview-frame-lg" data-role="shown-frame" sandbox="allow-same-origin" scrolling="no" title="목표 시안"></iframe>
                         <div class="battle-shield" data-role="shield"></div>
                     </div>
-
-                    <h3 class="battle-panel-title">색상 팔레트 · 스포이드</h2>
-                    <div class="battle-palette" data-role="palette"></div>
                 </div>
 
                 <div class="battle-col">
-                    <h3 class="battle-panel-title">현재 렌더링 (실시간)</h2>
-                    <iframe class="preview-frame preview-frame-lg" data-role="live-frame" sandbox="allow-same-origin" title="현재 렌더링"></iframe>
+                    <h3 class="battle-panel-title">현재 렌더링 (실시간)</h3>
+                    <div class="battle-overlay-wrap">
+                        <iframe class="preview-frame preview-frame-lg" data-role="live-frame" sandbox="allow-same-origin" title="현재 렌더링"></iframe>
+                        <iframe class="preview-frame preview-frame-lg battle-overlay-frame" data-role="overlay-frame" sandbox="allow-same-origin" scrolling="no" title="시안 겹쳐보기" hidden></iframe>
+                    </div>
+                    <div class="battle-overlay-ctl">
+                        <label><input type="checkbox" data-role="overlay-toggle"> 시안 겹쳐보기</label>
+                        <input type="range" data-role="overlay-opacity" min="20" max="90" value="50" disabled>
+                    </div>
 
-                    <h3 class="battle-panel-title">CSS 작성</h2>
+                    <h3 class="battle-panel-title">CSS 작성</h3>
                     <textarea class="css-editor" data-role="css-input" spellcheck="false" placeholder="FIGHT를 누르면 입력할 수 있습니다"></textarea>
+                    <div class="battle-hint" data-role="hint-box" hidden>
+                        <div class="battle-hint-head">
+                            <span>예시 정답 <span data-role="hint-count">0 / 0</span></span>
+                            <button type="button" class="btn btn-ghost" data-role="hint-btn">힌트 한 줄 보기</button>
+                        </div>
+                        <pre data-role="hint-pre"></pre>
+                    </div>
                 </div>
             </div>
 
             <div class="battle-result" data-role="result"></div>
-            <div class="battle-actions" data-role="result-actions" hidden>
-                <button type="button" class="btn btn-ghost" data-role="save-btn">전적에 저장</button>
-            </div>
-
-            <iframe class="battle-offscreen" data-role="answer-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
-            <iframe class="battle-offscreen" data-role="base-frame" sandbox="allow-same-origin" title="" aria-hidden="true"></iframe>
         </section>
     `;
 
     const el = {
-        answerFrame: container.querySelector('[data-role="answer-frame"]'),
         shownFrame: container.querySelector('[data-role="shown-frame"]'),
         liveFrame: container.querySelector('[data-role="live-frame"]'),
-        baseFrame: container.querySelector('[data-role="base-frame"]'),
+        overlayFrame: container.querySelector('[data-role="overlay-frame"]'),
+        overlayToggle: container.querySelector('[data-role="overlay-toggle"]'),
+        overlayOpacity: container.querySelector('[data-role="overlay-opacity"]'),
         shield: container.querySelector('[data-role="shield"]'),
         htmlSrc: container.querySelector('[data-role="html-src"]'),
         palette: container.querySelector('[data-role="palette"]'),
         cssInput: container.querySelector('[data-role="css-input"]'),
         result: container.querySelector('[data-role="result"]'),
-        resultActions: container.querySelector('[data-role="result-actions"]'),
         status: container.querySelector('[data-role="status"]'),
         toast: container.querySelector('[data-role="toast"]'),
         problemName: container.querySelector('[data-role="problem-name"]'),
-        difficultyTabs: container.querySelector('[data-role="difficulty-tabs"]')
+        difficultyTabs: container.querySelector('[data-role="difficulty-tabs"]'),
+        hintBox: container.querySelector('[data-role="hint-box"]'),
+        hintBtn: container.querySelector('[data-role="hint-btn"]'),
+        hintPre: container.querySelector('[data-role="hint-pre"]'),
+        hintCount: container.querySelector('[data-role="hint-count"]')
     };
     const btn = {
         fight: container.querySelector('[data-role="fight-btn"]'),
         stop: container.querySelector('[data-role="stop-btn"]'),
-        done: container.querySelector('[data-role="done-btn"]'),
-        save: container.querySelector('[data-role="save-btn"]')
+        done: container.querySelector('[data-role="done-btn"]')
     };
 
     attachCodeEditor(el.cssInput);
@@ -150,7 +163,6 @@ export function render(container) {
 
     function setPhase(next) {
         phase = next;
-        const idle = phase === 'idle';
         const running = phase === 'running';
         const result = phase === 'result';
         btn.fight.textContent = result ? '다음 문제 ▶' : 'FIGHT';
@@ -158,25 +170,53 @@ export function render(container) {
         btn.stop.disabled = !running;
         btn.done.disabled = !running;
         el.cssInput.disabled = !running;
-        el.difficultyTabs.classList.toggle('is-locked', !idle);
-        el.resultActions.hidden = !(result && lastResult);
-        if (result) { btn.save.disabled = false; btn.save.textContent = '전적에 저장'; }
+        el.hintBox.hidden = !running;
         renderStatus();
+    }
+
+    function resetHints() {
+        hintLines = (problem.answerCss || '').split('\n').filter((l) => l.trim());
+        hintShown = 0;
+        el.hintPre.textContent = '';
+        el.hintCount.textContent = `0 / ${hintLines.length}`;
+        el.hintBtn.disabled = false;
+        el.hintBtn.textContent = '힌트 한 줄 보기';
+    }
+
+    function showNextHint() {
+        if (hintShown >= hintLines.length) return;
+        hintShown += 1;
+        el.hintPre.textContent = hintLines.slice(0, hintShown).join('\n');
+        el.hintCount.textContent = `${hintShown} / ${hintLines.length}`;
+        if (hintShown >= hintLines.length) {
+            el.hintBtn.disabled = true;
+            el.hintBtn.textContent = '예시 정답 전체 공개됨';
+        }
+    }
+
+    function syncOverlay() {
+        const on = el.overlayToggle.checked;
+        el.overlayFrame.hidden = !on;
+        el.overlayOpacity.disabled = !on;
+        el.overlayFrame.style.opacity = String(el.overlayOpacity.value / 100);
     }
 
     function loadProblem(pickNew) {
         stopTimer();
         if (pickNew) problem = nextBattleProblem(difficulty);
         elapsed = 0;
-        lastResult = null;
+        counted = false;
         el.problemName.textContent = `— ${problem.name}`;
         el.htmlSrc.textContent = problem.html;
-        el.answerFrame.srcdoc = previewDoc(problem.html, problem.answerCss);
-        el.shownFrame.srcdoc = obfuscatedShown(problem);
-        el.baseFrame.srcdoc = previewDoc(problem.html, '');
+        const shownDoc = obfuscatedShown(problem);
+        el.shownFrame.srcdoc = shownDoc;
+        el.overlayFrame.srcdoc = shownDoc;
         el.cssInput.value = '';
         el.result.innerHTML = '';
+        el.overlayToggle.checked = false;
+        syncOverlay();
         renderPalette();
+        resetHints();
         updateLivePreview();
         setPhase('idle');
     }
@@ -194,78 +234,59 @@ export function render(container) {
         el.difficultyTabs.querySelectorAll('.tabs-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.value === value));
     }
 
-    function ruleRows() {
-        const { rules } = scorePrecision(el.cssInput.value, el.liveFrame.contentDocument, problem.root);
+    function specRows(rules) {
         return rules.map((r) => {
-            const s = calculateSpecificity(r.selector);
-            return `<tr><td><code>${escapeHtml(r.selector)}</code></td><td>${s.inline}</td><td>${s.id}</td><td>${s.class}</td><td>${s.tag}</td></tr>`;
+            const s = r.spec;
+            return `<tr><td><code>${escapeHtml(r.selector)}</code></td><td>${s.id}</td><td>${s.class}</td><td>${s.tag}</td></tr>`;
         }).join('');
     }
 
     function submit() {
         const userDoc = el.liveFrame.contentDocument;
-        const answerDoc = el.answerFrame.contentDocument;
-        const baseDoc = el.baseFrame.contentDocument;
-        if (!userDoc || !answerDoc || !baseDoc) {
-            el.result.innerHTML = `<p class="result-badge result-badge-lose">미리보기 로딩 중입니다. 잠시 후 완료를 다시 누르세요.</p>`;
+        if (!userDoc) {
+            el.result.innerHTML = `<p class="hint-text">미리보기 로딩 중입니다. 잠시 후 완료를 다시 누르세요.</p>`;
             return;
         }
         stopTimer();
+        if (!counted) { addBattleClear(); counted = true; }
 
-        const acc = scoreAccuracy({ userDoc, answerDoc, baseDoc });
-        const prec = scorePrecision(el.cssInput.value, userDoc, problem.root);
-        const won = acc.cleared;
-
-        lastResult = {
-            difficulty,
-            problemId: problem.id,
-            accuracy: acc.percent,
-            precision: prec.score,
-            timeSec: elapsed,
-            result: won ? 'win' : 'lose'
-        };
-
+        const hygiene = selectorHygiene(el.cssInput.value, userDoc, problem.root);
         setPhase('result');
-        renderResult(acc, prec, won);
+        renderResult(hygiene);
     }
 
-    function renderResult(acc, prec, won) {
+    function renderResult(hygiene) {
         const parts = [];
 
-        parts.push(won
-            ? `<p class="result-badge result-badge-win">클리어</p> <span class="battle-clear-time">${formatTime(elapsed)}</span>`
-            : `<p class="result-badge result-badge-lose">아직이에요</p>`);
+        parts.push(`<p class="battle-done-line">완료 · ${formatTime(elapsed)} 소요 · <a href="#quest">퀘스트</a>에 1판 반영됨</p>`);
 
-        parts.push(`
-            <dl class="battle-score">
-                <div><dt>정확도</dt><dd class="${acc.cleared ? 'is-ok' : 'is-bad'}">${acc.percent}%</dd><span>기준 ${acc.threshold}%</span></div>
-                <div><dt>정밀도</dt><dd>${prec.score}점</dd><span>셀렉터 위생</span></div>
-            </dl>
-        `);
-
-        if (acc.mismatches.length) {
-            const lis = acc.mismatches.map((m) =>
-                `<li><code>${escapeHtml(m.label)}</code> ${m.prop}: 시안 <b>${escapeHtml(m.expected)}</b> / 내 결과 <b>${escapeHtml(m.actual)}</b></li>`).join('');
-            const collapsed = acc.mismatches.length > 14;
-            parts.push(`<h3 class="battle-result-head">시안과 다른 부분 (${acc.mismatches.length})</h3>
-                <ul class="battle-feedback battle-mismatch${collapsed ? ' is-collapsed' : ''}">${lis}</ul>
-                ${collapsed ? `<button type="button" class="btn btn-ghost battle-expand" data-role="expand-mismatch">전체 ${acc.mismatches.length}개 보기</button>` : ''}`);
-        }
-        if (prec.deductions.length) {
-            parts.push(`<h3 class="battle-result-head">정밀도 감점 (-${100 - prec.score})</h3>
-                <ul class="battle-feedback">${prec.deductions.map((d) =>
-                    `<li>−${d.points} ${d.reason}${d.detail ? ` · <code>${escapeHtml(d.detail)}</code>` : ''}</li>`).join('')}</ul>`);
+        if (problem.tip) {
+            parts.push(`<p class="battle-tip">💡 이 시안에서 연습한 것 — ${escapeHtml(problem.tip)}</p>`);
         }
 
         parts.push(`
-            <h3 class="battle-result-head">내 규칙 특이도</h3>
-            <div class="table-scroll">
-                <table class="specificity-table">
-                    <thead><tr><th>셀렉터</th><th>인라인</th><th>ID</th><th>클래스</th><th>태그</th></tr></thead>
-                    <tbody>${ruleRows() || '<tr><td colspan="5">규칙 없음</td></tr>'}</tbody>
-                </table>
-            </div>
+            <h3 class="battle-result-head">시안과 비교</h3>
+            <p class="hint-text">위 "시안 겹쳐보기"를 켜서 내 렌더와 목표 시안을 겹쳐 확인하세요. 색·간격·정렬이 눈으로 맞으면 통과입니다.</p>
         `);
+
+        if (hygiene.empty) {
+            parts.push(`<h3 class="battle-result-head">셀렉터 위생</h3><p class="hint-text">CSS를 작성하지 않았습니다.</p>`);
+        } else {
+            const items = hygiene.checks.map((c) =>
+                `<li class="${c.ok ? 'is-ok' : 'is-warn'}"><span class="battle-check-mark">${c.ok ? '✓' : '주의'}</span>
+                    <span>${escapeHtml(c.label)}${c.detail ? ` <em>(${escapeHtml(c.detail)})</em>` : ''}</span></li>`).join('');
+            parts.push(`
+                <h3 class="battle-result-head">셀렉터 위생 (점수 아님 · 체크리스트)</h3>
+                <ul class="battle-checklist">${items}</ul>
+                <div class="table-scroll">
+                    <table class="specificity-table">
+                        <thead><tr><th>셀렉터</th><th>ID</th><th>클래스</th><th>태그</th></tr></thead>
+                        <tbody>${specRows(hygiene.rules)}</tbody>
+                    </table>
+                </div>
+                <p class="hint-text">ID 칸부터 비교합니다. 낮은 칸이 아무리 많아도 높은 칸 하나를 못 이깁니다.</p>
+            `);
+        }
 
         parts.push(`
             <h3 class="battle-result-head">예시 정답 (이대로일 필요는 없어요)</h3>
@@ -273,34 +294,15 @@ export function render(container) {
                 <div class="battle-diff-col"><h4>내 CSS</h4><pre>${escapeHtml(el.cssInput.value || '(작성 안 함)')}</pre></div>
                 <div class="battle-diff-col"><h4>예시 정답</h4><pre>${escapeHtml(problem.answerCss)}</pre></div>
             </div>
-            <p class="hint-text">정확도는 요소의 색·테두리·스타일이 시안과 같은지만 봅니다. 크기·위치는 시안에 맞게 구현했다면 정답이에요. 예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
-            <p class="hint-text">"전적에 저장"을 누르면 이 결과가 <a href="#report">리포트</a> 페이지에 통계로 쌓입니다.</p>
+            <p class="hint-text">예시 정답은 컴포넌트 루트(<code>.${escapeHtml(problem.root)}</code>)부터 셀렉터를 잡는 권장 패턴입니다.</p>
         `);
 
         el.result.innerHTML = parts.join('');
     }
 
-    function onSave() {
-        if (!lastResult) return;
-        addBattleRecord({
-            difficulty: lastResult.difficulty,
-            problemId: lastResult.problemId,
-            selector: '',
-            accuracy: lastResult.accuracy,
-            precision: lastResult.precision,
-            matchedDesign: lastResult.accuracy >= 90,
-            wonSpecificity: lastResult.precision >= 90,
-            timeSec: lastResult.timeSec,
-            result: lastResult.result
-        });
-        btn.save.disabled = true;
-        btn.save.textContent = '저장됨 · 리포트에서 확인';
-    }
-
     el.difficultyTabs.addEventListener('click', (e) => {
-        if (phase !== 'idle') return;
         const b = e.target.closest('.tabs-btn');
-        if (!b) return;
+        if (!b || b.dataset.value === difficulty) return;
         difficulty = b.dataset.value;
         setActiveTab(difficulty);
         loadProblem(true);
@@ -313,17 +315,13 @@ export function render(container) {
         }
     });
     el.shield.addEventListener('contextmenu', (e) => e.preventDefault());
-    el.result.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-role="expand-mismatch"]');
-        if (!b) return;
-        b.previousElementSibling.classList.remove('is-collapsed');
-        b.remove();
-    });
+    el.overlayToggle.addEventListener('change', syncOverlay);
+    el.overlayOpacity.addEventListener('input', syncOverlay);
+    el.hintBtn.addEventListener('click', showNextHint);
     el.cssInput.addEventListener('input', updateLivePreview);
     btn.fight.addEventListener('click', startBattle);
     btn.stop.addEventListener('click', () => loadProblem(false));
     btn.done.addEventListener('click', submit);
-    btn.save.addEventListener('click', onSave);
 
     setActiveTab(difficulty);
     loadProblem(false);

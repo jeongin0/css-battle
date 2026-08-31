@@ -5,9 +5,9 @@ import { todayKey } from '../store.js';
 // 슬롯은 항상 배틀·타자·디버그 3개. 목표치만 날짜에 따라 로테이션한다.
 const QUEST_POOL = {
     battle: [
-        { variant: 'w2', label: '배틀 2판 승리', target: 2 },
-        { variant: 'w3', label: '배틀 3판 승리', target: 3 },
-        { variant: 'w4', label: '배틀 4판 승리', target: 4 }
+        { variant: 'b2', label: '배틀 시안 2개 따라 만들기', target: 2 },
+        { variant: 'b3', label: '배틀 시안 3개 따라 만들기', target: 3 },
+        { variant: 'b4', label: '배틀 시안 4개 따라 만들기', target: 4 }
     ],
     typing: [
         { variant: 'a85', label: '타자연습 정확도 85%+ 1회', target: 85 },

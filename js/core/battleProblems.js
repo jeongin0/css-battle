@@ -990,10 +990,60 @@ function anchorCss(css, root) {
         return `${ws}${sels.join(', ')} {${rest}`;
     }).join('\n');
 }
+// 문제별 "이 시안에서 연습하는 것" 한 줄 — 결과 화면 툴팁
+const BATTLE_TIPS = {
+    'low-profile': 'flex 정렬 + margin-left: auto 로 한 요소만 오른쪽으로 밀기, 원형 아바타(border-radius).',
+    'low-stat': '어두운 카드 위에서 크기·굵기·색만으로 값 / 라벨 / 증감을 구분하는 타이포 위계.',
+    'low-notice': '아이콘과 텍스트의 수직 중앙 정렬 + border-left 강조선 + flex-shrink: 0.',
+    'low-price': 'align-items: baseline 으로 통화 기호·숫자·단위의 밑선 맞추기.',
+    'low-avatars': '겹치는 아바타 — 음수 margin 으로 포개고 흰 테두리로 분리.',
+    'low-status': '알약 배지(border-radius 큰 값) + 상태색 배경과 글자색 대비.',
+    'low-iconbtn': '아이콘 버튼의 padding·정렬과 배경/테두리 형태.',
+    'low-progress': '트랙 + 채움 2겹 구조, width 퍼센트로 진행률 표현.',
+    'low-rating': '채운 별과 빈 별의 색 구분, 인라인 정렬.',
+    'low-kbd': 'kbd 키캡의 입체감 — 테두리 + 아래쪽 box-shadow.',
+    'low-notif': '벨 아이콘 위에 카운트 배지를 position: absolute 로 우상단 배치.',
+    'low-linkprev': '썸네일 + 본문 가로 배치, 제목/설명 줄 위계.',
+    'low-toggle': '트랙 + 노브 토글, 켜짐 상태 색과 노브 위치.',
+    'low-quote': '큰 따옴표 장식 + 왼쪽 인용선 + 이탤릭 본문.',
+    'low-chip': '라벨과 닫기(×)가 한 몸인 칩 — 배경·라운드·간격.',
+    'mid-segmented': '버튼이 붙어 있는 세그먼트 컨트롤, 선택된 칸만 배경 강조.',
+    'mid-todo': '체크박스 + 완료 시 취소선과 흐린 색 처리.',
+    'mid-tags': '여러 태그를 flex-wrap + gap 으로 자연스럽게 흘리기.',
+    'mid-media': '이미지 위 / 텍스트 아래 카드, 썸네일 비율 유지.',
+    'mid-tabbar': '활성 탭을 아래쪽 보더(border-bottom)로 표시.',
+    'mid-pagination': '숫자 버튼 나열 + 현재 페이지 강조 + 화살표.',
+    'mid-breadcrumb': '항목 사이 구분자(/)를 ::before content 로 넣기.',
+    'mid-toast': '떠 있는 알림 — box-shadow + 아이콘 + 상태 톤.',
+    'mid-accordion': '제목 + 오른쪽 펼침 화살표(열림 시 회전).',
+    'mid-steps': '단계 원과 연결선, 완료 / 현재 / 대기 색 구분.',
+    'mid-fileitem': '파일 아이콘 + 이름·용량 + 우측 액션 버튼 배치.',
+    'mid-filterchips': '선택된 칩과 비선택 칩의 색 대비, 그룹 정렬.',
+    'mid-stats3': '3열 균등 배치(flex 또는 grid) + 칸 사이 구분선.',
+    'mid-profilecard': '세로 정렬 카드 — 중앙 아바타 + 이름 + 버튼.',
+    'mid-alertbox': '아이콘 + 제목 / 본문 2줄, 배경·테두리 색 세트.',
+    'high-header': '로고 좌 / 내비 우, justify-content: space-between 헤더.',
+    'high-pricing': '추천 배지를 얹은 가격 카드 — 테두리 강조 + 특징 리스트.',
+    'high-hero': '큰 제목·부제·버튼 중앙 정렬, 여백으로 위계 만들기.',
+    'high-comment': '아바타 + 이름·시간 + 본문 + 액션, 들여쓰기 구조.',
+    'high-sidebar': '세로 내비, 활성 항목 배경 + 좌측 강조 바.',
+    'high-formfield': '라벨 + 인풋 + 에러 메시지, 에러 색(테두리·글자).',
+    'high-tablerow': '셀 정렬(텍스트 좌 / 숫자 우), 행 구분선.',
+    'high-modal': '헤더(제목+닫기) / 푸터(버튼) 위·아래 보더로 구획.',
+    'high-calendar': '날짜 셀 격자, 오늘 / 선택 상태를 원으로 강조.',
+    'high-dropdown': '메뉴 항목 — hover 배경, 아이콘과 단축키 양끝 배치.',
+    'high-product': '상품 이미지 + 이름 + 가격 + 담기 버튼 카드.',
+    'high-bannercta': '좌 텍스트 / 우 버튼, 강한 배경색 대비.',
+    'high-dashtile': '지표 타일 — 라벨 + 큰 수치 + 보조 그래프 영역.',
+    'high-userrow': '아바타 + 이름·이메일 + 역할 배지 + 더보기, 양끝 정렬.',
+    'high-notifcenter': '안읽음 점 + 아이콘 + 본문·시간, 안읽음 배경색.'
+};
+
 for (const diff of Object.keys(BATTLE_POOLS)) {
     for (const p of BATTLE_POOLS[diff]) {
         p.root = rootOf(p.html);
         p.answerCss = anchorCss(p.answerCss, p.root);
+        p.tip = BATTLE_TIPS[p.id] || '';
     }
 }
 

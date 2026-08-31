@@ -1,29 +1,20 @@
-import { getState, markQuestDone, setStreak, todayKey } from '../store.js';
-import { dailyQuests, STAMP_REWARDS, calculateStreak, perfectDays, nextReward } from '../core/streak.js';
+import { getState, markQuestDone, setStreak, getDayStat } from '../store.js';
+import { dailyQuests, calculateStreak, perfectDays, nextReward } from '../core/streak.js';
 import { stampCalendarHtml } from '../components/stampCalendar.js';
 
-function evaluateQuests(state, quests) {
-    const today = todayKey();
-    const battleWinsToday = state.battleRecords
-        .filter((r) => r.date === today && r.result === 'win').length;
-    const bestTypingAccToday = state.typingRecords
-        .filter((r) => r.date === today)
-        .reduce((max, r) => Math.max(max, r.accuracy || 0), 0);
-    const diagnoseSolvedToday = (state.diagnoseRecords || [])
-        .filter((r) => r.date === today).length;
-
+function evaluateQuests(quests) {
+    const today = getDayStat();
     const bySlot = Object.fromEntries(quests.map((q) => [q.slot, q]));
     return {
-        battle_3win: battleWinsToday >= bySlot.battle.target,
-        typing_90acc: bestTypingAccToday >= bySlot.typing.target,
-        diagnose_use: diagnoseSolvedToday >= bySlot.diagnose.target
+        battle_3win: today.battle >= bySlot.battle.target,
+        typing_90acc: today.typingAcc >= bySlot.typing.target,
+        diagnose_use: today.diagnose >= bySlot.diagnose.target
     };
 }
 
 export function render(container) {
-    const state = getState();
     const quests = dailyQuests();
-    const status = evaluateQuests(state, quests);
+    const status = evaluateQuests(quests);
 
     Object.entries(status).forEach(([id, done]) => {
         if (done) markQuestDone(id);
@@ -66,13 +57,9 @@ export function render(container) {
             <p class="quest-reward">
                 ${reward
                     ? `<strong>${reward.title}</strong> 까지 스탬프 ${reward.remaining}개 남음`
-                    : '모든 보상을 달성했습니다! 🎉'}
+                    : '모든 칭호를 모았습니다! 🎉'}
             </p>
-            <ul class="quest-reward-list">
-                ${STAMP_REWARDS.map((r) => `
-                    <li class="${stamps >= r.count ? 'is-unlocked' : ''}">${r.count}개 — ${r.title}</li>
-                `).join('')}
-            </ul>
+            <p class="hint-text">모은 칭호는 <a href="#me">마이페이지</a>와 헤더 오른쪽에서 볼 수 있어요.</p>
         </section>
     `;
 }

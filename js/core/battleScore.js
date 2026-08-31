@@ -1,161 +1,64 @@
-// 배틀 채점
-//  정확도 = "같아 보이나" : 요소별 위치·크기(getBoundingClientRect) + 칠(색/테두리/라운드/굵기)
-//  정밀도 = 셀렉터 위생 : 컴포넌트 루트부터 잡았는지 + !important/*/죽은 규칙
+// 배틀 자기평가
+//  - 시안 일치(정확도)는 "정답이 하나가 아니라" 채점하지 않는다. 겹쳐보기 + 예시 정답으로 사용자가 직접 확인.
+//  - 셀렉터 위생만 객관적으로 체크리스트로 보여준다 (점수 X, 통과/주의만).
 
 import { parseStylesheet } from './cascade.js';
 import { calculateSpecificity } from './specificity.js';
-
-const CLEAR_THRESHOLD = 90;
-
-const PAINT_PROPS = [
-    'background-color', 'color',
-    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
-    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
-    'border-top-left-radius', 'border-bottom-right-radius',
-    'font-weight', 'font-style', 'text-decoration-line', 'text-align', 'opacity', 'box-shadow'
-];
-
-function rgb(value) {
-    if (/transparent|^none$/.test(value)) return [0, 0, 0, 0];
-    const m = String(value).match(/-?\d+(\.\d+)?/g);
-    return m ? m.slice(0, 3).map(Number) : null;
-}
-
-function weightBucket(v) {
-    const n = parseInt(v, 10) || 400;
-    return n >= 600 ? 'bold' : n >= 500 ? 'medium' : 'normal';
-}
-
-function paintMatches(prop, expected, actual) {
-    if (expected === actual) return true;
-    if (prop === 'font-weight') return weightBucket(expected) === weightBucket(actual);
-    if (prop === 'box-shadow') return (expected === 'none') === (actual === 'none');
-    if (/color/.test(prop)) {
-        const e = rgb(expected);
-        const a = rgb(actual);
-        if (!e || !a) return false;
-        return e.every((c, i) => Math.abs(c - a[i]) <= 16);
-    }
-    if (/radius/.test(prop)) {
-        const round = (v) => v.includes('%') ? parseFloat(v) >= 40 : parseFloat(v) >= 100;
-        if (round(expected) && round(actual)) return true;
-        return Math.abs(parseFloat(expected) - parseFloat(actual)) <= 2;
-    }
-    if (/width/.test(prop)) return Math.abs(parseFloat(expected) - parseFloat(actual)) <= 1.5;
-    return String(expected).trim() === String(actual).trim();
-}
-
-function elLabel(el) {
-    const cls = el.getAttribute('class');
-    return cls ? `.${cls.trim().split(/\s+/)[0]}` : el.tagName.toLowerCase();
-}
-
-// 같은 html을 렌더한 3개 문서 → 요소 트리 인덱스 정렬됨
-export function scoreAccuracy({ userDoc, answerDoc, baseDoc }) {
-    const aEls = [...answerDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
-    const uEls = [...userDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
-    const bEls = [...baseDoc.body.querySelectorAll('*')].filter((el) => !/SCRIPT|STYLE/.test(el.tagName));
-
-    const aWin = answerDoc.defaultView;
-    const uWin = userDoc.defaultView;
-    const bWin = baseDoc.defaultView;
-
-    let total = 0;
-    let passed = 0;
-    const mismatches = [];
-
-    aEls.forEach((aEl, i) => {
-        const uEl = uEls[i];
-        const bEl = bEls[i];
-        if (!uEl || !bEl) return;
-        const label = elLabel(aEl);
-
-        // 크기·위치는 채점하지 않는다. 시안에 보이는 요소가 내 결과에서도 "렌더되어 보이나"만 확인.
-        const ar = aEl.getBoundingClientRect();
-        if (ar.width > 2 && ar.height > 2) {
-            const ur = uEl.getBoundingClientRect();
-            total += 1;
-            if (ur.width > 2 && ur.height > 2) passed += 1;
-            else mismatches.push({ label, prop: '렌더', expected: '보임', actual: '보이지 않음 (크기 0)' });
-        }
-
-        const acs = aWin.getComputedStyle(aEl);
-        const ucs = uWin.getComputedStyle(uEl);
-        const bcs = bWin.getComputedStyle(bEl);
-        for (const p of PAINT_PROPS) {
-            // border 색/두께는 그 변에 실제 테두리가 있을 때만 채점 (color 기본값=currentColor 오탐 방지)
-            const bd = p.match(/^border-(top|right|bottom|left)-(color|width)$/);
-            if (bd) {
-                const style = acs.getPropertyValue(`border-${bd[1]}-style`).trim();
-                const w = parseFloat(acs.getPropertyValue(`border-${bd[1]}-width`));
-                if (style === 'none' || !(w > 0)) continue;
-            }
-            const av = acs.getPropertyValue(p).trim();
-            const bv = bcs.getPropertyValue(p).trim();
-            if (av === bv) continue; // 시안이 기본값에서 바꾸지 않은 속성은 채점 안 함
-            total += 1;
-            const uv = ucs.getPropertyValue(p).trim();
-            if (paintMatches(p, av, uv)) passed += 1;
-            else mismatches.push({ label, prop: p, expected: av, actual: uv });
-        }
-    });
-
-    const percent = total === 0 ? 100 : Math.round((passed / total) * 100);
-    return { percent, cleared: percent >= CLEAR_THRESHOLD, mismatches, threshold: CLEAR_THRESHOLD };
-}
 
 function safeQueryAll(doc, sel) {
     try { return [...doc.querySelectorAll(sel)]; } catch { return []; }
 }
 
+function depthOf(selector) {
+    return selector.trim().split(/\s*[>+~]\s*|\s+/).filter(Boolean).length;
+}
+
 // cssText: 사용자 CSS / doc: 사용자 CSS 적용 문서 / rootClass: 컴포넌트 루트 클래스명
-export function scorePrecision(cssText, doc, rootClass) {
-    const rules = parseStylesheet(cssText);
-    const deductions = [];
+export function selectorHygiene(cssText, doc, rootClass) {
+    const rules = parseStylesheet(cssText).map((r) => ({
+        selector: r.selector,
+        spec: calculateSpecificity(r.selector)
+    }));
 
     if (!rules.length) {
-        return { score: 0, deductions: [{ reason: 'CSS 없음', points: 100 }], rules: [] };
+        return { rules, checks: [], empty: true };
     }
 
     const rootRe = rootClass ? new RegExp(`\\.${rootClass.replace(/-/g, '\\-')}(?![\\w-])`) : null;
 
-    for (const rule of rules) {
+    const withImportant = [];
+    const withId = [];
+    const withUniversal = [];
+    const dead = [];
+    const notAnchored = [];
+    const tooDeep = [];
+
+    for (const rule of parseStylesheet(cssText)) {
         const sel = rule.selector;
-        const matched = safeQueryAll(doc, sel);
-
-        const importants = (rule.body.match(/!\s*important/gi) || []).length;
-        if (importants) deductions.push({ reason: '!important 사용', detail: sel, points: 8 * importants });
-
-        if (/(^|[\s>+~(])\*(?![=\]])/.test(sel)) {
-            deductions.push({ reason: '전체 선택자(*) 사용', detail: sel, points: 10 });
-        }
-
-        const ids = (sel.match(/#[\w-]+/g) || []).length;
-        if (ids) deductions.push({ reason: '스타일에 ID 선택자 사용', detail: sel, points: 4 * ids });
-
-        if (matched.length === 0) {
-            deductions.push({ reason: '아무 요소도 선택하지 않는 규칙', detail: sel, points: 6 });
-        } else if (rootRe && !rootRe.test(sel)) {
-            // 루트를 앵커로 쓰지 않음 → 다른 곳의 같은 클래스에도 적용될 수 있음
-            deductions.push({
-                reason: `컴포넌트 루트(.${rootClass})부터 시작하지 않음`,
-                detail: `${sel} → .${rootClass} ${sel} 처럼`,
-                points: 5
-            });
-        }
+        if (/!\s*important/i.test(rule.body)) withImportant.push(sel);
+        if (/#[\w-]+/.test(sel)) withId.push(sel);
+        if (/(^|[\s>+~(])\*(?![=\]])/.test(sel)) withUniversal.push(sel);
+        if (safeQueryAll(doc, sel).length === 0) dead.push(sel);
+        else if (rootRe && !rootRe.test(sel)) notAnchored.push(sel);
+        if (depthOf(sel) > 3) tooDeep.push(sel);
     }
 
-    const lost = deductions.reduce((s, d) => s + d.points, 0);
-    return { score: Math.max(0, 100 - lost), deductions, rules };
-}
+    const check = (label, offenders, hint) => ({
+        label,
+        ok: offenders.length === 0,
+        detail: offenders.length ? `${[...new Set(offenders)].join(', ')} — ${hint}` : ''
+    });
 
-export function rootClassOf(problem) {
-    if (problem.root) return problem.root;
-    const m = problem.html.match(/class="([^"\s]+)/);
-    return m ? m[1] : null;
-}
+    const checks = [
+        check('!important 없이 해결', withImportant, '특이도로 이겨보세요'),
+        check('스타일에 ID 선택자 미사용', withId, '재사용을 막습니다. 클래스로'),
+        check('전체 선택자(*) 미사용', withUniversal, '의도치 않은 요소까지 잡힙니다'),
+        check('죽은 규칙 없음', dead, '아무 요소도 선택하지 않습니다'),
+        rootClass
+            ? check(`컴포넌트 루트(.${rootClass})부터 시작`, notAnchored, `.${rootClass} 안으로 범위를 좁히세요`)
+            : null,
+        check('3단계 이하의 얕은 셀렉터', tooDeep, '체이닝이 깊으면 깨지기 쉽습니다')
+    ].filter(Boolean);
 
-export function precisionPar(problem) {
-    const fake = { querySelectorAll: () => [{ matches: () => true }] };
-    return scorePrecision(problem.answerCss, fake, rootClassOf(problem)).score;
+    return { rules, checks, empty: false };
 }

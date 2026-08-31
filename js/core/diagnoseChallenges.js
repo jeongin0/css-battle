@@ -267,7 +267,446 @@ const BEHAVIOR = [
     }
 ];
 
-const POOL = [...CASCADE, ...BEHAVIOR];
+const CASCADE_MORE = [
+    {
+        id: 'badge-classes', type: 'cascade', concept: 'specificity',
+        symptom: '태그 칩 글자가 흰색이어야 하는데 회색으로 나옵니다.',
+        html: `<span id="lead" class="chip small solid rounded muted">중요</span>`,
+        target: '#lead', prop: 'color',
+        wrong: '회색(gray)', right: '흰색(white)', wrongProbe: 'gray', rightProbe: 'white',
+        rules: [
+            { sel: '.chip.small.solid.rounded.muted', decl: 'color: white' },
+            { sel: '#lead', decl: 'color: gray' }
+        ],
+        answerWinner: 1, answerReason: 'specificity',
+        fixes: [
+            { label: '.chip.small.solid.rounded.muted 를 #lead.chip.small.solid.rounded.muted 로 바꾼다', kind: 'best', op: { op: 'selector', ruleIdx: 0, value: '#lead.chip.small.solid.rounded.muted' } },
+            { label: 'white 선언에 !important 를 붙인다', kind: 'important', op: { op: 'important', ruleIdx: 0 } },
+            { label: '.chip.small.solid.rounded.muted 를 #lead#lead 로 바꾼다', kind: 'works', op: { op: 'selector', ruleIdx: 0, value: '#lead#lead' } },
+            { label: '.chip.small.solid.rounded.muted 앞에 span 을 붙인다', kind: 'nope', op: { op: 'prefix', ruleIdx: 0, value: 'span' } }
+        ]
+    },
+    {
+        id: 'list-scope', type: 'cascade', concept: 'specificity',
+        symptom: '사이드바 링크가 파란색이어야 하는데 검정으로 나옵니다.',
+        html: `<aside id="side"><a class="nav-link">메뉴</a></aside>`,
+        target: '#side .nav-link', prop: 'color',
+        wrong: '검정(black)', right: '파랑(#2563eb)', wrongProbe: 'black', rightProbe: '#2563eb',
+        rules: [
+            { sel: '.nav-link', decl: 'color: #2563eb' },
+            { sel: '#side a', decl: 'color: black' }
+        ],
+        answerWinner: 1, answerReason: 'specificity',
+        fixes: [
+            { label: '.nav-link 앞에 #side 를 붙인다', kind: 'best', op: { op: 'prefix', ruleIdx: 0, value: '#side ' } },
+            { label: '.nav-link 에 !important 를 붙인다', kind: 'important', op: { op: 'important', ruleIdx: 0 } },
+            { label: '.nav-link 를 a.nav-link 로 바꾼다', kind: 'nope', op: { op: 'selector', ruleIdx: 0, value: 'a.nav-link' } },
+            { label: '#side a 규칙을 맨 위로 옮긴다', kind: 'nope', op: { op: 'move-first', ruleIdx: 1 } }
+        ]
+    },
+    {
+        id: 'card-title-scope', type: 'cascade', concept: 'specificity',
+        symptom: '카드 제목이 검정이어야 하는데 연회색으로 나옵니다.',
+        html: `<section class="card"><h3 class="card-title">제목</h3></section>`,
+        target: '.card .card-title', prop: 'color',
+        wrong: '연회색(#cbd5e1)', right: '검정(#111827)', wrongProbe: '#cbd5e1', rightProbe: '#111827',
+        rules: [
+            { sel: '.card-title', decl: 'color: #111827' },
+            { sel: '.card h3', decl: 'color: #cbd5e1' }
+        ],
+        answerWinner: 1, answerReason: 'specificity',
+        fixes: [
+            { label: '.card-title 앞에 .card 를 붙인다', kind: 'best', op: { op: 'prefix', ruleIdx: 0, value: '.card ' } },
+            { label: '.card-title 에 !important 를 붙인다', kind: 'important', op: { op: 'important', ruleIdx: 0 } },
+            { label: '.card-title 를 .card h3.card-title 로 바꾼다', kind: 'works', op: { op: 'selector', ruleIdx: 0, value: '.card h3.card-title' } },
+            { label: '.card h3 규칙을 맨 위로 옮긴다', kind: 'nope', op: { op: 'move-first', ruleIdx: 1 } }
+        ]
+    },
+    {
+        id: 'label-important', type: 'cascade', concept: 'specificity',
+        symptom: '폼 라벨이 진회색이어야 하는데 빨간색으로 나옵니다.',
+        html: `<div class="form"><label class="label">이름</label></div>`,
+        target: 'label.label', prop: 'color',
+        wrong: '빨강(red)', right: '진회색(#374151)', wrongProbe: 'red', rightProbe: '#374151',
+        rules: [
+            { sel: '.form .label', decl: 'color: #374151' },
+            { sel: 'label', decl: 'color: red !important' }
+        ],
+        answerWinner: 1, answerReason: 'important',
+        fixes: [
+            { label: 'label 규칙에서 !important 를 제거한다', kind: 'best', op: { op: 'drop-important', ruleIdx: 1 } },
+            { label: '.form .label 에도 !important 를 붙인다', kind: 'works', op: { op: 'important', ruleIdx: 0 } },
+            { label: '.form .label 앞에 #app 를 붙인다', kind: 'nope', op: { op: 'prefix', ruleIdx: 0, value: '#app ' } }
+        ]
+    },
+    {
+        id: 'tab-order', type: 'cascade', concept: 'specificity',
+        symptom: '선택된 탭 글자가 파란색이어야 하는데 회색으로 나옵니다.',
+        html: `<div class="tabs"><button class="tab is-active">개요</button></div>`,
+        target: 'button.is-active', prop: 'color',
+        wrong: '회색(#6b7280)', right: '파랑(#2563eb)', wrongProbe: '#6b7280', rightProbe: '#2563eb',
+        rules: [
+            { sel: '.tabs .is-active', decl: 'color: #2563eb' },
+            { sel: '.tabs .tab', decl: 'color: #6b7280' }
+        ],
+        answerWinner: 1, answerReason: 'source-order',
+        fixes: [
+            { label: '파란색 규칙을 스타일시트 맨 아래로 옮긴다', kind: 'best', op: { op: 'move-last', ruleIdx: 0 } },
+            { label: '.tabs .is-active 를 .tabs .tab.is-active 로 바꾼다', kind: 'works', op: { op: 'selector', ruleIdx: 0, value: '.tabs .tab.is-active' } },
+            { label: '.tabs .is-active 에 !important 를 붙인다', kind: 'important', op: { op: 'important', ruleIdx: 0 } },
+            { label: '.tabs .is-active 를 .is-active 로 짧게 바꾼다', kind: 'nope', op: { op: 'selector', ruleIdx: 0, value: '.is-active' } }
+        ]
+    },
+    {
+        id: 'alert-order', type: 'cascade', concept: 'specificity',
+        symptom: '삭제 경고 텍스트가 흰색이어야 하는데 어두운 색으로 나옵니다.',
+        html: `<div class="alert danger"><p class="alert-msg">삭제됩니다</p></div>`,
+        target: 'p.alert-msg', prop: 'color',
+        wrong: '어두운 남색(#1e293b)', right: '흰색(white)', wrongProbe: '#1e293b', rightProbe: 'white',
+        rules: [
+            { sel: '.danger .alert-msg', decl: 'color: white' },
+            { sel: '.alert .alert-msg', decl: 'color: #1e293b' }
+        ],
+        answerWinner: 1, answerReason: 'source-order',
+        fixes: [
+            { label: '흰색 규칙을 스타일시트 맨 아래로 옮긴다', kind: 'best', op: { op: 'move-last', ruleIdx: 0 } },
+            { label: '.danger .alert-msg 를 .alert.danger .alert-msg 로 바꾼다', kind: 'works', op: { op: 'selector', ruleIdx: 0, value: '.alert.danger .alert-msg' } },
+            { label: '.danger .alert-msg 에 !important 를 붙인다', kind: 'important', op: { op: 'important', ruleIdx: 0 } },
+            { label: '흰색 규칙을 스타일시트 맨 위로 옮긴다', kind: 'nope', op: { op: 'move-first', ruleIdx: 0 } }
+        ]
+    }
+];
+
+const INHERIT = [
+    {
+        id: 'inherit-card-link', type: 'behavior', concept: 'inherit',
+        symptom: '카드 본문 색을 진회색으로 정했는데, 그 안의 링크만 기본 파란색으로 나옵니다.',
+        html: `<div class="card">
+    <p>자세한 내용은 <a href="#doc" class="card-link">문서</a>를 보세요.</p>
+</div>`,
+        target: '.card-link',
+        rules: [
+            { sel: '.card', decl: 'color: #334155' },
+            { sel: '.card-link', decl: 'text-decoration: underline' }
+        ],
+        causes: [
+            { text: '.card 의 color 선언이 자식에게 안 내려간다', correct: false },
+            { text: 'a 는 브라우저 기본 스타일이 color 를 직접 지정해서, 부모 색이 상속될 자리가 없다', correct: true },
+            { text: '.card-link 규칙이 색을 덮어썼다', correct: false },
+            { text: 'href 가 있는 a 는 색을 못 바꾼다', correct: false }
+        ],
+        fixes: [
+            { label: '.card-link 에 color: inherit 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: inherit' } },
+            { label: '.card-link 에 color: #334155 를 직접 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: #334155' } },
+            { label: '.card 에 color: #334155 !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 0, prop: 'color', value: '#334155 !important' } },
+            { label: '.card-link 에 text-decoration: none 을 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 1, decl: 'text-decoration: none' } }
+        ],
+        verify: { kind: 'computedEquals', prop: 'color', probe: '#334155' },
+        teach: {
+            cause: '<code>color</code> 는 상속되는 속성이지만, <b>자식에게 이미 값이 있으면</b> 상속되지 않습니다. <code>a</code> 요소는 브라우저 기본 스타일이 링크 색을 직접 지정하므로 <code>.card</code> 의 색이 들어올 자리가 없습니다.',
+            fix: '<code>.card-link</code> 에 <code>color: inherit</code> 를 주면 부모 색을 명시적으로 물려받습니다. 색을 직접 다시 쓰는 것도 되지만 부모 색이 바뀌면 같이 안 바뀝니다.'
+        }
+    },
+    {
+        id: 'inherit-footer-link', type: 'behavior', concept: 'inherit',
+        symptom: '푸터 글자색을 흐린 회색으로 정했는데 푸터 링크만 파란색입니다.',
+        html: `<footer class="ft">
+    <p>이용약관 <a href="#tos" class="ft-link">보기</a></p>
+</footer>`,
+        target: '.ft-link',
+        rules: [
+            { sel: '.ft', decl: 'color: #94a3b8' },
+            { sel: '.ft-link', decl: 'margin-left: 4px' }
+        ],
+        causes: [
+            { text: '.ft 의 color 가 자식에게 안 내려간다', correct: false },
+            { text: 'a 는 브라우저 기본 색이 있어서 부모 색이 상속되지 않는다', correct: true },
+            { text: '.ft-link 의 margin 때문에 색이 바뀐다', correct: false },
+            { text: 'footer 안에서는 상속이 안 된다', correct: false }
+        ],
+        fixes: [
+            { label: '.ft-link 에 color: inherit 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: inherit' } },
+            { label: '.ft-link 에 color: #94a3b8 를 직접 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: #94a3b8' } },
+            { label: '.ft 에 color: #94a3b8 !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 0, prop: 'color', value: '#94a3b8 !important' } },
+            { label: '.ft-link 에 opacity: 0.6 을 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 1, decl: 'opacity: 0.6' } }
+        ],
+        verify: { kind: 'computedEquals', prop: 'color', probe: '#94a3b8' },
+        teach: {
+            cause: '상속은 "그 요소에 값이 없을 때"만 일어납니다. <code>a</code> 는 브라우저 기본 스타일에 색이 있어서, 부모 <code>.ft</code> 의 색이 상속될 자리가 없습니다.',
+            fix: '<code>.ft-link</code> 에 <code>color: inherit</code>. 링크만 골라 <code>a { color: inherit }</code> 로 리셋해두는 패턴도 많이 씁니다.'
+        }
+    },
+    {
+        id: 'inherit-nav-link', type: 'behavior', concept: 'inherit',
+        symptom: '내비 전체 글자를 흰색으로 정했는데 메뉴 링크만 파란색으로 보입니다.',
+        html: `<nav class="topnav">
+    <a href="#home" class="topnav-link">홈</a>
+</nav>`,
+        target: '.topnav-link',
+        rules: [
+            { sel: '.topnav', decl: 'color: #ffffff' },
+            { sel: '.topnav-link', decl: 'padding: 6px 10px' }
+        ],
+        causes: [
+            { text: '.topnav 의 color 가 안 내려간다', correct: false },
+            { text: 'a 에 브라우저 기본 색이 있어서 흰색이 상속되지 않는다', correct: true },
+            { text: 'nav 요소는 색을 못 정한다', correct: false },
+            { text: 'padding 이 색을 가린다', correct: false }
+        ],
+        fixes: [
+            { label: '.topnav-link 에 color: inherit 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: inherit' } },
+            { label: '.topnav-link 에 color: #ffffff 를 직접 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'color: #ffffff' } },
+            { label: '.topnav 에 color: #ffffff !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 0, prop: 'color', value: '#ffffff !important' } },
+            { label: '.topnav-link 에 text-decoration: none 을 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 1, decl: 'text-decoration: none' } }
+        ],
+        verify: { kind: 'computedEquals', prop: 'color', probe: '#ffffff' },
+        teach: {
+            cause: '<code>a</code> 요소는 UA 스타일시트가 <code>color</code> 를 직접 지정합니다. 자기 값이 있으니 <code>.topnav</code> 의 흰색이 상속되지 않습니다.',
+            fix: '<code>color: inherit</code> 로 부모 색을 물려받게 합니다.'
+        }
+    },
+    {
+        id: 'inherit-button-font', type: 'behavior', concept: 'inherit',
+        symptom: '패널 글꼴 크기를 18px 로 키웠는데 버튼 글자만 작게 그대로입니다.',
+        html: `<div class="panel"><button class="panel-btn" type="button">저장</button></div>`,
+        target: '.panel-btn',
+        rules: [
+            { sel: '.panel', decl: 'font-size: 18px' },
+            { sel: '.panel-btn', decl: 'padding: 8px 14px' }
+        ],
+        causes: [
+            { text: '.panel 의 font-size 가 자식에게 안 내려간다', correct: false },
+            { text: 'button 은 브라우저 기본 스타일이 font 를 직접 지정해서 상속되지 않는다', correct: true },
+            { text: 'button 은 font-size 를 바꿀 수 없다', correct: false },
+            { text: 'padding 때문에 글자가 눌렸다', correct: false }
+        ],
+        fixes: [
+            { label: '.panel-btn 에 font: inherit 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'font: inherit' } },
+            { label: '.panel-btn 에 font-size: 18px 를 직접 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'font-size: 18px' } },
+            { label: '.panel 에 font-size: 18px !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 0, prop: 'font-size', value: '18px !important' } },
+            { label: '.panel-btn 에 transform: scale(1.2) 를 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 1, decl: 'transform: scale(1.2)' } }
+        ],
+        verify: { kind: 'computedEquals', prop: 'font-size', probe: '18px' },
+        teach: {
+            cause: '폰트 관련 속성은 상속되지만 <code>button</code>·<code>input</code>·<code>select</code>·<code>textarea</code> 는 UA 스타일이 <code>font</code> 를 직접 지정합니다. 자기 값이 있으니 부모 값이 상속될 자리가 없습니다.',
+            fix: '<code>button</code> 류에는 <code>font: inherit</code> 한 줄이 관용적인 해법입니다.'
+        }
+    },
+    {
+        id: 'inherit-input-font', type: 'behavior', concept: 'inherit',
+        symptom: '폼 글꼴을 16px 로 정했는데 입력칸 글자만 더 작게 나옵니다.',
+        html: `<div class="fld"><input class="fld-input" type="text" value="입력값"></div>`,
+        target: '.fld-input',
+        rules: [
+            { sel: '.fld', decl: 'font-size: 16px' },
+            { sel: '.fld-input', decl: 'padding: 6px 10px' }
+        ],
+        causes: [
+            { text: '.fld 의 font-size 가 안 내려간다', correct: false },
+            { text: 'input 은 UA 스타일이 font 를 직접 지정해서 상속되지 않는다', correct: true },
+            { text: 'value 속성이 글자 크기를 고정한다', correct: false },
+            { text: 'input 은 CSS 로 글꼴을 못 바꾼다', correct: false }
+        ],
+        fixes: [
+            { label: '.fld-input 에 font: inherit 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'font: inherit' } },
+            { label: '.fld-input 에 font-size: 16px 를 직접 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'font-size: 16px' } },
+            { label: '.fld 에 font-size: 16px !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 0, prop: 'font-size', value: '16px !important' } },
+            { label: '.fld-input 에 letter-spacing: 1px 을 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 1, decl: 'letter-spacing: 1px' } }
+        ],
+        verify: { kind: 'computedEquals', prop: 'font-size', probe: '16px' },
+        teach: {
+            cause: '<code>input</code> 도 <code>button</code> 과 같이 UA 스타일이 <code>font</code> 를 직접 지정합니다. 그래서 부모의 <code>font-size</code> 가 상속되지 않습니다.',
+            fix: '<code>input, button, select, textarea { font: inherit }</code> 를 리셋에 깔아두면 폼 전체가 일관됩니다.'
+        }
+    }
+];
+
+const BEHAVIOR_MORE = [
+    {
+        id: 'stacking-tooltip', type: 'behavior', concept: 'stacking-context',
+        symptom: '툴팁에 z-index: 999 를 줬는데도 옆 카드 뒤로 들어갑니다.',
+        html: `<div class="rowb">
+    <div class="host"><span class="tip">도움말</span></div>
+    <div class="nextb">다음 카드</div>
+</div>`,
+        target: '.tip',
+        rules: [
+            { sel: '.rowb', decl: 'display: flex; align-items: flex-start; padding: 16px' },
+            { sel: '.host', decl: 'position: relative; opacity: 0.99; width: 90px; height: 54px; background: #dddddd' },
+            { sel: '.tip', decl: 'position: absolute; right: -26px; top: 14px; z-index: 999; background: #1e293b; color: #fff; padding: 3px 7px; font-size: 12px' },
+            { sel: '.nextb', decl: 'position: relative; z-index: 1; width: 120px; height: 54px; background: #7db8ff; margin-left: -18px' }
+        ],
+        causes: [
+            { text: '.tip 의 z-index 가 실제로는 더 낮다', correct: false },
+            { text: '부모 .host 의 opacity 가 1 미만이라 새 쌓임 맥락을 만들고, 999 는 그 안에서만 유효하다', correct: true },
+            { text: '.nextb 가 나중에 선언돼서 이긴다', correct: false },
+            { text: 'absolute 요소는 z-index 가 무시된다', correct: false }
+        ],
+        fixes: [
+            { label: '.host 에서 opacity 를 제거한다', kind: 'best', op: { op: 'remove-decl', ruleIdx: 1, prop: 'opacity' } },
+            { label: '.host 자체에 z-index: 2 를 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'z-index: 2' } },
+            { label: '.tip 의 z-index 를 99999 로 올린다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'z-index', value: '99999' } },
+            { label: '.tip 에 z-index: 999 !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'z-index', value: '999 !important' } }
+        ],
+        verify: { kind: 'onTop', overlapWith: '.nextb' },
+        teach: {
+            cause: '<code>opacity</code> 가 1 미만이면 그 요소는 <b>새 쌓임 맥락</b>이 됩니다. 자식 <code>.tip</code> 의 <code>z-index: 999</code> 는 그 맥락 안에서만 유효하고, 바깥 <code>.nextb</code> 와는 <code>.host</code> 자체(z-index auto)로 겨뤄 밀립니다.',
+            fix: '<code>.host</code> 의 <code>opacity</code> 를 없애면 맥락이 안 생깁니다. 못 없애면 <code>.host</code> 자체에 <code>z-index</code> 를 줘서 맥락째로 올립니다.'
+        }
+    },
+    {
+        id: 'containing-toast', type: 'behavior', concept: 'containing-block',
+        symptom: '토스트 오른쪽 위 닫기 버튼에 position: absolute; top: 8px; right: 8px 를 줬는데 화면 구석에 갑니다.',
+        html: `<div class="stagec">
+    <div class="toastc">
+        <button class="toastc-x">×</button>
+        <p>저장됨</p>
+    </div>
+</div>`,
+        target: '.toastc-x',
+        rules: [
+            { sel: '.stagec', decl: 'padding: 28px' },
+            { sel: '.toastc', decl: 'width: 150px; background: #ecfdf5; padding: 16px' },
+            { sel: '.toastc-x', decl: 'position: absolute; top: 8px; right: 8px; width: 20px; height: 20px' }
+        ],
+        causes: [
+            { text: '.toastc-x 의 top / right 값이 잘못됐다', correct: false },
+            { text: '.toastc 에 position 이 없어서 기준(컨테이닝 블록)이 뷰포트까지 올라간다', correct: true },
+            { text: 'absolute 는 언제나 화면 기준이다', correct: false },
+            { text: '.stagec 의 padding 때문에 밀렸다', correct: false }
+        ],
+        fixes: [
+            { label: '.toastc 에 position: relative 를 추가한다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'position: relative' } },
+            { label: '.toastc 에 position: absolute 를 추가한다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'position: absolute' } },
+            { label: '.toastc-x 의 position 을 static 으로 바꾼다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'position', value: 'static' } },
+            { label: '.toastc-x 의 top 을 !important 로 강제한다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'top', value: '8px !important' } }
+        ],
+        verify: { kind: 'insideParent', parent: '.toastc' },
+        teach: {
+            cause: '<code>position: absolute</code> 의 기준은 <b>가장 가까운 위치 지정 조상</b>입니다. <code>.toastc</code> 에 <code>position</code> 이 없으면 계속 올라가 뷰포트가 기준이 됩니다.',
+            fix: '<code>.toastc</code> 에 <code>position: relative</code> 한 줄이면 됩니다 — 레이아웃은 그대로입니다.'
+        }
+    },
+    {
+        id: 'overflowclip-popover', type: 'behavior', concept: 'overflow-clip',
+        symptom: '프로필 버튼 아래로 나와야 할 팝오버(.pop)가 카드 경계에서 잘립니다.',
+        html: `<div class="ava">
+    <button class="ava-btn">프로필 ▾</button>
+    <ul class="pop"><li>보기</li><li>수정</li></ul>
+</div>`,
+        target: '.pop',
+        rules: [
+            { sel: '.ava', decl: 'position: relative; width: 130px; border: 1px solid #cccccc; border-radius: 8px; overflow: hidden; padding: 8px' },
+            { sel: '.ava-btn', decl: 'display: block; width: 100%' },
+            { sel: '.pop', decl: 'position: absolute; top: 100%; left: 8px; width: 120px; background: #ffffff; border: 1px solid #cccccc; list-style: none; margin: 0; padding: 4px' }
+        ],
+        causes: [
+            { text: '.pop 의 top: 100% 가 잘못됐다', correct: false },
+            { text: '.ava 에 준 overflow: hidden 이 absolute 자식(.pop)까지 잘라낸다', correct: true },
+            { text: '.pop 의 z-index 가 없어서', correct: false },
+            { text: 'absolute 요소는 부모 밖으로 못 나간다', correct: false }
+        ],
+        fixes: [
+            { label: '.ava 의 overflow 를 visible 로 되돌린다', kind: 'best', op: { op: 'replace-decl', ruleIdx: 0, prop: 'overflow', value: 'visible' } },
+            { label: '.pop 의 position 을 static 으로 바꿔 흐름에 태운다', kind: 'works', op: { op: 'replace-decl', ruleIdx: 2, prop: 'position', value: 'static' } },
+            { label: '.pop 의 top 을 0 으로 바꾼다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'top', value: '0' } },
+            { label: '.pop 에 z-index: 9999 !important 를 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 2, decl: 'z-index: 9999 !important' } }
+        ],
+        verify: { kind: 'notClipped', below: '.ava-btn' },
+        teach: {
+            cause: '<code>overflow: hidden</code> 은 그 박스를 넘어가는 <b>모든 자손</b>을 자릅니다 — <code>position: absolute</code> 자식도 예외가 아닙니다.',
+            fix: '그 자리에서 <code>overflow: hidden</code> 을 빼거나(라운드는 안쪽 래퍼로), 팝오버를 흐름 요소로 바꿉니다.'
+        }
+    },
+    {
+        id: 'collapse-section', type: 'behavior', concept: 'margin-collapse',
+        symptom: '.lead 에 margin-top: 40px 를 줬는데 .hold 안에서 안 내려가고 .hold 전체가 밀립니다.',
+        html: `<div class="sheet">
+    <div class="hold"><p class="lead">머리말</p></div>
+</div>`,
+        target: '.lead',
+        rules: [
+            { sel: '.sheet', decl: 'padding-top: 4px' },
+            { sel: '.hold', decl: 'background: #eef2ff' },
+            { sel: '.lead', decl: 'margin: 40px 0 0' }
+        ],
+        causes: [
+            { text: '.lead 의 margin 이 무시된다', correct: false },
+            { text: '부모 .hold 와 첫 자식 .lead 의 위쪽 마진이 하나로 합쳐진다(마진 상쇄)', correct: true },
+            { text: '.hold 에 height 가 없어서', correct: false },
+            { text: 'p 기본 margin 때문에', correct: false }
+        ],
+        fixes: [
+            { label: '.hold 에 display: flow-root 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'display: flow-root' } },
+            { label: '.hold 에 overflow: hidden 을 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'overflow: hidden' } },
+            { label: '.lead 의 margin-top 을 80px 로 키운다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 2, prop: 'margin', value: '80px 0 0' } },
+            { label: '.lead 의 margin 에 !important 를 붙인다', kind: 'nope', op: { op: 'important', ruleIdx: 2 } }
+        ],
+        verify: { kind: 'gap', parent: '.hold', min: 24 },
+        teach: {
+            cause: '부모와 첫 자식 사이에 테두리·패딩·인라인 콘텐츠가 없으면 위쪽 마진이 <b>하나로 합쳐집니다</b>. 그래서 자식 안에서 내려가는 대신 부모째로 내려갑니다.',
+            fix: '<code>.hold</code> 에 <code>display: flow-root</code> 를 주면 새 블록 서식 문맥이 생겨 상쇄가 막힙니다(부작용 없음).'
+        }
+    },
+    {
+        id: 'pctheight-sidebar', type: 'behavior', concept: 'percent-height',
+        symptom: '.col 에 height: 100% 를 줬는데 높이가 0 이라 배경이 안 보입니다.',
+        html: `<div class="shell">
+    <div class="col">사이드</div>
+</div>`,
+        target: '.col',
+        rules: [
+            { sel: '.shell', decl: 'width: 170px; border: 1px solid #cccccc' },
+            { sel: '.col', decl: 'height: 100%; background: #dcfce7' }
+        ],
+        causes: [
+            { text: 'background 색이 잘못됐다', correct: false },
+            { text: '퍼센트 높이는 부모 높이가 정해져 있어야 계산된다 — .shell 에 height 가 없어 100% 가 0 이 된다', correct: true },
+            { text: '.col 에 width 가 없어서', correct: false },
+            { text: '100% 대신 100vh 를 써야 한다', correct: false }
+        ],
+        fixes: [
+            { label: '.shell 에 height 를 지정한다 (예: 120px)', kind: 'best', op: { op: 'add-decl', ruleIdx: 0, decl: 'height: 120px' } },
+            { label: '.shell 에 aspect-ratio: 2 / 1 을 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 0, decl: 'aspect-ratio: 2 / 1' } },
+            { label: '.col 의 height 를 100vh 로 바꾼다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 1, prop: 'height', value: '100vh' } },
+            { label: '.col 의 height 에 !important 를 붙인다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 1, prop: 'height', value: '100% !important' } }
+        ],
+        verify: { kind: 'hasHeight', min: 60, max: 260 },
+        teach: {
+            cause: '<code>height</code> 의 퍼센트 값은 부모 높이를 기준으로 계산합니다. 부모가 <code>auto</code>(콘텐츠에 따라 결정)면 계산할 게 없어 <code>0</code> 이 됩니다.',
+            fix: '<code>.shell</code> 에 <code>height</code>(또는 <code>min-height</code>)를 명시하거나 flex/grid 컨테이너로 만들어 자식이 늘어나게 합니다.'
+        }
+    },
+    {
+        id: 'objectfit-hero', type: 'behavior', concept: 'object-fit',
+        symptom: '섬네일 이미지에 object-fit: cover 를 줬는데 120×120 상자에 안 맞고 원본 비율 그대로입니다.',
+        html: `<figure class="hz"><img src="${IMG_240x80}" alt=""></figure>`,
+        target: '.hz img',
+        rules: [
+            { sel: '.hz', decl: 'width: 120px; height: 120px; margin: 0' },
+            { sel: '.hz img', decl: 'object-fit: cover' }
+        ],
+        causes: [
+            { text: 'object-fit 값이 contain 이어야 한다', correct: false },
+            { text: 'img 에 width/height(또는 aspect-ratio)가 없어 맞출 상자가 없다', correct: true },
+            { text: '.hz 에 overflow: hidden 이 없어서', correct: false },
+            { text: 'background-image 를 써야 한다', correct: false }
+        ],
+        fixes: [
+            { label: '.hz img 에 width: 100%; height: 100% 를 준다', kind: 'best', op: { op: 'add-decl', ruleIdx: 1, decl: 'width: 100%; height: 100%' } },
+            { label: '.hz img 에 width: 120px; height: 120px 를 준다', kind: 'works', op: { op: 'add-decl', ruleIdx: 1, decl: 'width: 120px; height: 120px' } },
+            { label: '.hz 에 overflow: hidden 을 준다', kind: 'nope', op: { op: 'add-decl', ruleIdx: 0, decl: 'overflow: hidden' } },
+            { label: '.hz img 에 object-fit: cover !important 를 준다', kind: 'nope', op: { op: 'replace-decl', ruleIdx: 1, prop: 'object-fit', value: 'cover !important' } }
+        ],
+        verify: { kind: 'boxSize', w: 120, h: 120, tol: 6 },
+        teach: {
+            cause: '<code>object-fit</code> 은 "이미지가 <b>주어진 상자</b> 안에서 어떻게 맞춰질지"입니다. 이미지에 크기가 없으면 상자 자체가 원본 크기라 자르거나 늘릴 대상이 없습니다.',
+            fix: '<code>img</code> 에 <code>width</code>·<code>height</code>(부모를 채우려면 <code>100%</code>)를 주면 그 상자에 맞춰 <code>cover</code> 가 동작합니다.'
+        }
+    }
+];
+
+const POOL = [...CASCADE, ...CASCADE_MORE, ...INHERIT, ...BEHAVIOR, ...BEHAVIOR_MORE];
 
 let lastId = null;
 let bag = [];

@@ -1,0 +1,20 @@
+/* ===== 마이페이지 ===== */
+.me-page .me-card { background: var(--panel); border: 1px solid var(--gold); border-radius: var(--radius); padding: var(--sp24); margin: var(--sp16) 0 var(--sp40); }
+.me-page .me-card-label { font-size: var(--ft12); color: var(--ink-dim); text-transform: uppercase; letter-spacing: 1px; }
+.me-page .me-card-title { font-family: var(--font-point); font-size: var(--ft20); color: var(--gold); margin: var(--sp08) 0 var(--sp24); }
+.me-page .me-figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp16); }
+.me-page .me-figures dt { font-size: var(--ft12); color: var(--ink-dim); }
+.me-page .me-figures dd { font-family: var(--font-point); font-size: var(--ft16); color: var(--ink); margin-top: var(--sp04); }
+
+.me-page .me-next { color: var(--gold); margin: var(--sp08) 0 var(--sp16); }
+.me-page .me-titles { list-style: none; display: grid; gap: var(--sp08); }
+.me-page .me-titles li { display: flex; align-items: center; gap: var(--sp16); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); color: var(--ink-dim); }
+.me-page .me-titles li.is-unlocked { border-color: var(--hp-green); color: var(--ink); }
+.me-page .me-titles-count { font-size: var(--ft14); min-width: 90px; }
+.me-page .me-titles-name { font-weight: 600; flex: 1; }
+.me-page .me-titles-state { font-family: var(--font-point); font-size: 10px; }
+.me-page .me-titles li.is-unlocked .me-titles-state { color: var(--hp-green); }
+
+@media (max-width: 1024px) {
+    .me-page .me-figures { grid-template-columns: repeat(2, 1fr); }
+}

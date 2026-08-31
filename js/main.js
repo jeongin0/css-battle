@@ -1,19 +1,23 @@
 import { initRouter, registerRoute } from './router.js';
-import { markVisit } from './store.js';
+import { markVisit, getState } from './store.js';
+import { perfectDays } from './core/streak.js';
 import { render as renderLanding } from './pages/landing.js';
 import { render as renderBattle } from './pages/battle.js';
 import { render as renderTyping } from './pages/typing.js';
 import { render as renderDiagnose } from './pages/diagnose.js';
 import { render as renderQuest } from './pages/quest.js';
-// 리포트 페이지 보류 (2026-08-28) — 되살리려면 이 import 와 아래 registerRoute, index.html 의 report 주석 해제
-// import { render as renderReport } from './pages/report.js';
+import { render as renderMe, currentTitle } from './pages/me.js';
 
 registerRoute('', renderLanding);
 registerRoute('battle', renderBattle);
 registerRoute('typing', renderTyping);
 registerRoute('diagnose', renderDiagnose);
 registerRoute('quest', renderQuest);
-// registerRoute('report', renderReport);
+registerRoute('me', renderMe);
 
 markVisit();
+
+const titleEl = document.querySelector('[data-role="header-title"]');
+if (titleEl) titleEl.textContent = currentTitle(perfectDays(getState().questLog));
+
 initRouter(document.getElementById('app'));

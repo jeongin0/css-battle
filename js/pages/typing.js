@@ -1,5 +1,5 @@
 import { nextDrill } from '../core/typingDrills.js';
-import { addTypingRecord } from '../store.js';
+import { reportTypingAccuracy } from '../store.js';
 
 function escapeHtml(s) {
     return String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -19,7 +19,8 @@ function renderTarget(target, typed) {
 }
 
 export function render(container) {
-    let target = nextDrill();
+    let drill = nextDrill();
+    let target = drill.text;
     let startedAt = 0;
     let keystrokes = 0;
     let correctKeystrokes = 0;
@@ -32,7 +33,7 @@ export function render(container) {
     container.innerHTML = `
         <section class="container typing-page">
             <h2 class="page-title">타자연습 모드</h2>
-            <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하고 Enter로 넘기세요.</p>
+            <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하고 Enter로 넘기세요. 아래 설명으로 그 선택자가 무엇을 고르는지도 같이 익힙니다.</p>
 
             <dl class="typing-stats">
                 <div><dt>타 / 분</dt><dd data-role="wpm">0</dd></div>
@@ -41,6 +42,7 @@ export function render(container) {
             </dl>
 
             <pre class="typing-answer" data-role="target"></pre>
+            <p class="typing-tip" data-role="tip"></p>
 
             <div class="typing-row">
                 <input type="text" class="css-editor typing-input" data-role="input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="여기에 그대로 입력">
@@ -56,6 +58,7 @@ export function render(container) {
 
     const el = {
         target: container.querySelector('[data-role="target"]'),
+        tip: container.querySelector('[data-role="tip"]'),
         input: container.querySelector('[data-role="input"]'),
         feedback: container.querySelector('[data-role="feedback"]'),
         wpm: container.querySelector('[data-role="wpm"]'),
@@ -76,9 +79,11 @@ export function render(container) {
     function loadDrill(resetCombo) {
         if (resetCombo) combo = 0;
         hadErrorThisDrill = false;
-        target = nextDrill();
+        drill = nextDrill();
+        target = drill.text;
         el.input.value = '';
         el.target.innerHTML = renderTarget(target, '');
+        el.tip.textContent = drill.tip || '';
         el.feedback.textContent = '';
         el.input.focus();
         renderStats();
@@ -87,6 +92,9 @@ export function render(container) {
     function submit() {
         if (el.input.value !== target) {
             el.feedback.textContent = '아직 정확히 일치하지 않습니다.';
+            el.input.classList.remove('is-shake');
+            void el.input.offsetWidth;
+            el.input.classList.add('is-shake');
             combo = 0;
             el.combo.textContent = 0;
             hadErrorThisDrill = true;
@@ -101,15 +109,8 @@ export function render(container) {
             combo = 0;
         }
         renderStats();
-        if (completed % 5 === 0) {
-            addTypingRecord({
-                wpm: Number(el.wpm.textContent),
-                accuracy: Number(el.acc.textContent),
-                combo: bestCombo,
-                difficulty: 'all'
-            });
-        }
-        el.feedback.textContent = '정확해요!';
+        reportTypingAccuracy(Number(el.acc.textContent));
+        el.feedback.textContent = completed % 5 === 0 ? `정확해요! (${completed}문제 완료 · 최고 콤보 ${bestCombo})` : '정확해요!';
         loadDrill(false);
     }
 

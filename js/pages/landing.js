@@ -1,67 +1,54 @@
+import { getState, todayKey } from '../store.js';
+import { dailyQuests, calculateStreak, perfectDays } from '../core/streak.js';
+
 const MODES = [
     {
-        href: '#battle',
-        stage: 'STAGE 01',
-        title: '배틀',
-        desc: '구조와 디자인 시안을 보고 CSS로 상대 규칙을 특이도로 이기며 시안을 재현합니다.'
-    },
-    {
         href: '#typing',
-        stage: 'STAGE 02',
+        stage: 'STAGE 01',
         title: '타자연습',
-        desc: 'DOM 구조를 보고 조건에 맞는 셀렉터를 직접 타이핑하며 반복 연습합니다.'
+        desc: '주어진 CSS 선택자를 그대로 빠르고 정확하게 타이핑하며, 그 선택자가 무엇을 고르는지 함께 익힙니다.',
+        demo: `<span class="landing-demo-code"><b class="ok">.card</b> <b class="ok">&gt;</b> <b class="ok">.title</b> <b class="bad">+</b><span class="cur"></span></span>`
     },
     {
         href: '#diagnose',
-        stage: 'STAGE 03',
+        stage: 'STAGE 02',
         title: 'CSS 디버그',
-        desc: '주어진 CSS 충돌을 직접 진단하고, !important 없이 최소 수정으로 고쳐봅니다.'
+        desc: '"스타일 줬는데 왜 안 먹히지?" 상황을 앱이 출제합니다. 원인을 고르고, !important 없이 최소 수정으로 직접 고칩니다.',
+        demo: `<span class="landing-demo-mini is-bug">지금</span><span class="landing-demo-arrow">▶</span><span class="landing-demo-mini is-fix">수정 후</span>`
+    },
+    {
+        href: '#battle',
+        stage: 'STAGE 03',
+        title: '배틀',
+        desc: '완성된 디자인 시안을 보고 CSS를 0부터 작성해 똑같이 재현하는 모작 연습. 겹쳐보기와 예시 정답으로 확인합니다.',
+        demo: `<span class="landing-demo-card"><span class="landing-demo-card-dot"></span><span class="landing-demo-card-bar"></span><span class="landing-demo-card-bar short"></span></span>`
     }
 ];
 
+const COURSE = [
+    { no: '1', href: '#typing', title: '타자연습으로 손 풀기', text: '가장 가벼운 시작. 선택자를 손에 익히면서 조합자·의사클래스·속성 선택자의 생김새를 눈에 익힙니다.' },
+    { no: '2', href: '#diagnose', title: 'CSS 디버그로 원리 잡기', text: '충돌·버그 상황에서 "무엇이 이기나 / 왜 효과가 안 나나"를 고르고 직접 고쳐보며 캐스케이드를 이해합니다.' },
+    { no: '3', href: '#battle', title: '배틀로 실전 재현', text: '시안을 CSS로 처음부터 재현. 앞서 익힌 선택자와 캐스케이드 감각을 결과물로 확인합니다.' }
+];
+
 const PLAYERS = [
-    {
-        tag: '1P',
-        icon: 'question',
+    { tag: '1P', icon: 'question', href: '#typing', cta: '타자연습부터',
         title: 'CSS만 만나면 멈추는 입문·주니어',
-        desc: '선택자 우선순위가 감으로만 잡혀서, 스타일이 왜 안 먹히는지 설명하지 못하는 분'
-    },
-    {
-        tag: '2P',
-        icon: 'clock',
+        desc: '선택자 우선순위가 감으로만 잡혀서, 스타일이 왜 안 먹히는지 설명하지 못하는 분' },
+    { tag: '2P', icon: 'clock', href: '#diagnose', cta: 'CSS 디버그로',
         title: '실무에서 스타일 충돌에 시간 쓰는 현직자',
-        desc: '어떤 규칙이 이기는지 찾느라 개발자도구를 한참 뒤지는 분'
-    },
-    {
-        tag: '3P',
-        icon: 'robot',
+        desc: '어떤 규칙이 이기는지 찾느라 개발자도구를 한참 뒤지는 분' },
+    { tag: '3P', icon: 'robot', href: '#diagnose', cta: 'CSS 디버그로',
         title: '막히면 바로 AI에 붙여넣는 분',
-        desc: '되긴 하는데 원리는 여전히 모르는 채로 넘어가서, 다음에 또 똑같이 막히는 분'
-    }
+        desc: '되긴 하는데 원리는 여전히 모르는 채로 넘어가서, 다음에 또 똑같이 막히는 분' }
 ];
 
 const HOWTO_INTRO = [
     '같은 화면을 만드는 방법도 사람마다 다르고, 여러 CSS 규칙이 겹치면 어떤 스타일이 우선 적용되는지 찾아내는 데 시간이 걸립니다.<br>그래서 원하는 스타일이 적용되지 않을 때 하나씩 코드를 확인해보거나, 결국 !important를 붙여 강제로 해결하게 되기도 합니다.',
-    '이 사이트는 이런 CSS 충돌을 감으로 해결하는 대신, specificity의 우선순위를 직접 경험하며 익히도록 만들었습니다.'
+    '이 사이트는 이런 CSS 충돌을 감으로 해결하는 대신, 선택자와 캐스케이드를 눈으로 보고 → 손으로 치고 → 직접 고치며 익히도록 만들었습니다.'
 ];
 
-const HOWTO_STEPS = [
-    {
-        no: '1',
-        title: '눈으로 비교하고',
-        text: 'CSS 규칙이 충돌했을 때 어떤 스타일이 적용되는지 직접 결과를 비교하면서 CSS 우선순위의 차이를 자연스럽게 이해합니다.'
-    },
-    {
-        no: '2',
-        title: '손으로 직접 입력하고',
-        text: '정답을 보는 것에서 끝나지 않습니다. 직접 CSS를 타이핑하고 적용해보며 specificity 규칙을 반복해서 익힙니다.'
-    },
-    {
-        no: '3',
-        title: '실전에서 진단하기',
-        text: '마지막에는 실제 CSS처럼 충돌하는 스타일의 원인을 직접 찾아봅니다. 어떤 선택자가 더 높은 우선순위를 가지는지 판단하면서, CSS를 수정하는 감각을 기릅니다.'
-    }
-];
+const TRUST = ['무료', '회원가입 없음', '설치 없음', '기록은 이 브라우저에만 저장', '5분이면 첫 판', '최신 Chrome · Edge 권장'];
 
 const ICONS = {
     question: '<path d="M8.5 8.5a3.5 3.5 0 0 1 6.8 1.2c0 2.3-3.3 2.8-3.3 5"/><path d="M12 19h.01"/>',
@@ -74,13 +61,32 @@ function icon(name) {
 }
 
 export function render(container) {
+    const state = getState();
+    const streak = calculateStreak(state.visitLog);
+    const stamps = perfectDays(state.questLog);
+    const quests = dailyQuests();
+    const todayDone = new Set(state.questLog[todayKey()] || []);
+
     container.innerHTML = `
         <section class="landing-hero">
             <p class="landing-hero-coin">◆ INSERT COIN ◆</p>
             <h2 class="landing-hero-logo">CSS<br>BATTLE</h2>
             <p class="landing-hero-tagline">분명 스타일 줬는데, 왜 안 먹지?</p>
-            <p class="landing-hero-sub">CSS 특이도를 대결·타이핑·실전 진단으로 몸에 익히는 학습 도구</p>
-            <a href="#battle" class="landing-hero-start">▶ PRESS START</a>
+            <p class="landing-hero-sub">CSS 선택자와 캐스케이드를 타이핑·진단·재현으로 몸에 익히는 학습 도구</p>
+            <span class="landing-hero-cta">
+                <a href="#typing" class="landing-hero-start">▶ 처음이라면 타자연습</a>
+                <a href="#battle" class="landing-hero-start landing-hero-start-alt">바로 배틀</a>
+            </span>
+        </section>
+
+        <section class="landing-retention">
+            <span class="landing-retention-item">🔥 <b>${streak.current}일</b> 연속 접속</span>
+            <span class="landing-retention-item">★ 스탬프 <b>${stamps}</b>개</span>
+            <span class="landing-retention-quests">
+                오늘의 퀘스트
+                ${quests.map((q) => `<span class="${todayDone.has(q.id) ? 'is-done' : ''}">${q.label}</span>`).join('')}
+            </span>
+            <a href="#quest" class="landing-retention-go">퀘스트 보기 ▶</a>
         </section>
 
         <section class="landing-modes">
@@ -91,28 +97,13 @@ export function render(container) {
                         <a href="${m.href}" class="landing-mode">
                             <span class="landing-mode-stage">${m.stage}</span>
                             <span class="landing-mode-title">${m.title}</span>
+                            <span class="landing-mode-demo">${m.demo}</span>
                             <span class="landing-mode-desc">${m.desc}</span>
                             <span class="landing-mode-go">SELECT ▶</span>
                         </a>
                     </li>
                 `).join('')}
             </ol>
-        </section>
-
-        <section class="landing-players">
-            <h3 class="landing-heading"><span>YOU</span> PLAYER SELECT</h3>
-            <ul class="landing-players-list">
-                ${PLAYERS.map((p) => `
-                    <li class="landing-players-row">
-                        <span class="landing-players-tag">${p.tag}</span>
-                        <span class="landing-players-badge">${icon(p.icon)}</span>
-                        <span class="landing-players-body">
-                            <span class="landing-players-title">${p.title}</span>
-                            <span class="landing-players-desc">${p.desc}</span>
-                        </span>
-                    </li>
-                `).join('')}
-            </ul>
         </section>
 
         <section class="landing-howto">
@@ -123,14 +114,17 @@ export function render(container) {
                 ${HOWTO_INTRO.map((p) => `<p>${p}</p>`).join('')}
             </div>
 
+            <p class="landing-howto-coursehead">막막하면 이 순서로 하세요</p>
             <ol class="landing-howto-list">
-                ${HOWTO_STEPS.map((s) => `
+                ${COURSE.map((s) => `
                     <li class="landing-howto-step">
-                        <span class="landing-howto-no">${s.no}</span>
-                        <span class="landing-howto-body">
-                            <span class="landing-howto-step-title">${s.title}</span>
-                            <span class="landing-howto-text">${s.text}</span>
-                        </span>
+                        <a href="${s.href}" class="landing-howto-steplink">
+                            <span class="landing-howto-no">${s.no}</span>
+                            <span class="landing-howto-body">
+                                <span class="landing-howto-step-title">${s.title}</span>
+                                <span class="landing-howto-text">${s.text}</span>
+                            </span>
+                        </a>
                     </li>
                 `).join('')}
             </ol>
@@ -144,11 +138,31 @@ export function render(container) {
                     <span>어떤 규칙이 우선순위가 높지?</span>
                 </p>
                 <p>스스로 원인을 찾아낼 수 있게 됩니다.</p>
-                <p class="landing-howto-closing">눈으로 보고 → 직접 입력하고 → 문제를 진단하는 과정을 반복하며, CSS specificity와 Cascade를 머리가 아니라 손에 익히는 것.</p>
-                <p class="landing-howto-closing">이것이 이 사이트가 만들어진 이유입니다.</p>
             </div>
+        </section>
 
-            <a href="#battle" class="landing-hero-start landing-howto-start">▶ PRESS START</a>
+        <section class="landing-players">
+            <h3 class="landing-heading"><span>YOU</span> PLAYER SELECT</h3>
+            <ul class="landing-players-list">
+                ${PLAYERS.map((p) => `
+                    <li class="landing-players-row">
+                        <span class="landing-players-tag">${p.tag}</span>
+                        <span class="landing-players-badge">${icon(p.icon)}</span>
+                        <span class="landing-players-body">
+                            <span class="landing-players-title">${p.title}</span>
+                            <span class="landing-players-desc">${p.desc}</span>
+                        </span>
+                        <a href="${p.href}" class="landing-players-cta">${p.cta} ▶</a>
+                    </li>
+                `).join('')}
+            </ul>
+        </section>
+
+        <section class="landing-trust">
+            <ul class="landing-trust-list">
+                ${TRUST.map((t) => `<li>${t}</li>`).join('')}
+            </ul>
+            <a href="#typing" class="landing-hero-start landing-howto-start">▶ PRESS START</a>
         </section>
     `;
 }

@@ -8,6 +8,11 @@
 .typing-page .typing-char.is-ok { color: var(--hp-green); }
 .typing-page .typing-char.is-bad { color: var(--hp-red); background: rgba(255, 71, 87, 0.2); }
 
+.typing-page .typing-tip { margin: 0 0 var(--sp16); padding: var(--sp08) var(--sp16); border-left: 3px solid var(--p1); background: var(--panel); border-radius: var(--sp04); font-size: var(--ft14); color: var(--ink-dim); }
+
+.typing-page .typing-input.is-shake { animation: typing-shake 0.3s ease; border-color: var(--hp-red); }
+@keyframes typing-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
 .typing-page .typing-row { display: flex; gap: var(--sp08); align-items: stretch; }
 .typing-page .typing-input { min-height: 0; flex: 1; font-size: var(--ft20); }
 .typing-page .typing-enter { flex-shrink: 0; }

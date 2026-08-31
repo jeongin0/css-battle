@@ -116,6 +116,16 @@
 .diagnose-page .dgc-spec-note { margin-top: var(--sp08); font-size: var(--ft12); color: var(--ink); font-weight: 600; }
 .diagnose-page .dgc-spec-note b { color: var(--hp-green); }
 
+/* 직접 고쳐보기 (선택) */
+.diagnose-page .dgc-freefix { margin-top: var(--sp16); border: 1px solid var(--panel-light); border-radius: var(--sp08); padding: var(--sp12); }
+.diagnose-page .dgc-freefix summary { cursor: pointer; font-size: var(--ft14); color: var(--p1); }
+.diagnose-page .dgc-freefix textarea { min-height: 90px; margin-top: var(--sp08); }
+.diagnose-page .dgc-freefix-row { display: flex; align-items: center; gap: var(--sp12); margin-top: var(--sp08); flex-wrap: wrap; }
+.diagnose-page .dgc-freefix-row .btn { padding: var(--sp04) var(--sp12); font-size: var(--ft12); }
+.diagnose-page .dgc-freefix-out { font-size: var(--ft12); color: var(--ink-dim); }
+.diagnose-page .dgc-freefix-out.is-ok { color: var(--hp-green); }
+.diagnose-page .dgc-freefix-out.is-bad { color: var(--hp-red); }
+
 @media (max-width: 1024px) {
     .diagnose-page .dgc-stage { grid-template-columns: 1fr; }
     .diagnose-page .dgc-teach-grid { grid-template-columns: 1fr; }

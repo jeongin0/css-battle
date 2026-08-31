@@ -1,6 +1,6 @@
 import { nextChallenge, buildCss, applyFix, REASONS } from '../core/diagnoseChallenges.js';
 import { diagnoseCascade, COL_KR, tupleArr, decidingIndex } from '../core/cascadeReplay.js';
-import { markQuestDone, addDiagnoseRecord } from '../store.js';
+import { addDiagnoseSolved } from '../store.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -39,6 +39,16 @@ function verifyFix(doc, ch) {
     }
 
     const v = ch.verify;
+
+    if (v.kind === 'computedEquals') {
+        const probe = doc.createElement('span');
+        probe.style.setProperty(v.prop, v.probe);
+        doc.body.appendChild(probe);
+        const want = win.getComputedStyle(probe).getPropertyValue(v.prop);
+        probe.remove();
+        return win.getComputedStyle(target).getPropertyValue(v.prop) === want;
+    }
+
     const r = target.getBoundingClientRect();
 
     if (v.kind === 'onTop') {
@@ -91,7 +101,6 @@ export function render(container) {
     let correctDiag = 0;
     let combo = 0;
     let bestCombo = 0;
-    let questMarked = false;
 
     const SET_SIZE = 3;
     let setPos = 0;
@@ -204,8 +213,38 @@ export function render(container) {
                 <h3>2단계 · 처방</h3>
                 <p class="dgc-q">가장 <b>올바른 수정</b>은? (효과가 나야 하고, 부작용·!important 가 없어야 함)</p>
                 ${fixList}
+                <details class="dgc-freefix">
+                    <summary>직접 고쳐보기 (선택)</summary>
+                    <p class="dgc-q">규칙을 추가하거나 덮어쓸 CSS를 직접 쓰고 검증하세요. 이걸 쓰면 위 보기 대신 이 코드로 채점합니다.</p>
+                    <textarea class="css-editor" data-role="freefix" spellcheck="false" placeholder=".modal { position: relative; }"></textarea>
+                    <div class="dgc-freefix-row">
+                        <button type="button" class="btn btn-ghost" data-role="freefix-verify">적용해서 검증</button>
+                        <span class="dgc-freefix-out" data-role="freefix-out"></span>
+                    </div>
+                </details>
             </div>
             <button type="button" class="btn" data-role="submit" disabled>제출</button>`;
+    }
+
+    function freeFixText() {
+        const t = container.querySelector('[data-role="freefix"]');
+        return t ? t.value.trim() : '';
+    }
+
+    function simulateFreeFix(text) {
+        return new Promise((resolve) => {
+            const css = `${buildCss(challenge.rules)}\n${text}`;
+            el.frameSim.addEventListener('load', function once() {
+                el.frameSim.removeEventListener('load', once);
+                resolve(verifyFix(el.frameSim.contentDocument, challenge));
+            });
+            el.frameSim.srcdoc = previewSrc(challenge.html, css);
+        });
+    }
+
+    function freeFixKind(works, text) {
+        if (!works) return 'nope';
+        return /!\s*important/i.test(text) ? 'works' : 'best';
     }
 
     function loadChallenge() {
@@ -233,8 +272,13 @@ export function render(container) {
     }
 
     function pickComplete() {
-        if (challenge.type === 'behavior') return pick.cause !== null && pick.fix !== null;
-        return pick.winner !== null && pick.reason !== null && pick.fix !== null;
+        const fixReady = pick.fix !== null || freeFixText() !== '';
+        if (challenge.type === 'behavior') return pick.cause !== null && fixReady;
+        return pick.winner !== null && pick.reason !== null && fixReady;
+    }
+
+    function refreshSubmit() {
+        if (submitBtn()) submitBtn().disabled = !pickComplete();
     }
 
     listen(container, 'change', (e) => {
@@ -244,10 +288,27 @@ export function render(container) {
         if (input.name === 'reason') pick.reason = input.value;
         if (input.name === 'cause') pick.cause = Number(input.value);
         if (input.name === 'fix') pick.fix = Number(input.value);
-        if (submitBtn()) submitBtn().disabled = !pickComplete();
+        refreshSubmit();
     });
 
-    listen(container, 'click', (e) => {
+    listen(container, 'input', (e) => {
+        if (e.target.dataset.role === 'freefix' && phase === 'answering') refreshSubmit();
+    });
+
+    listen(container, 'click', async (e) => {
+        if (e.target.closest('[data-role="freefix-verify"]')) {
+            const out = container.querySelector('[data-role="freefix-out"]');
+            const text = freeFixText();
+            if (!text) { out.textContent = 'CSS를 먼저 입력하세요.'; return; }
+            out.textContent = '검증 중…';
+            const works = await simulateFreeFix(text);
+            const imp = /!\s*important/i.test(text);
+            out.textContent = works
+                ? (imp ? '효과는 나지만 !important 를 썼습니다 (감점 대상)' : '통과 — 효과가 정상적으로 납니다')
+                : '아직 효과가 안 납니다';
+            out.className = `dgc-freefix-out ${works && !imp ? 'is-ok' : 'is-bad'}`;
+            return;
+        }
         if (!e.target.closest('[data-role="submit"]')) return;
         if (phase === 'revealed') { loadChallenge(); return; }
         if (phase === 'answering' && pickComplete()) reveal();
@@ -281,9 +342,22 @@ export function render(container) {
         attempts += 1;
         const isBehavior = challenge.type === 'behavior';
 
-        const chosenFix = challenge.fixes[pick.fix];
+        const freeText = freeFixText();
         const bestFix = challenge.fixes.find((f) => f.kind === 'best');
-        const fixWorks = await simulateFix(chosenFix.op);
+        let chosenFix;
+        let fixWorks;
+        let afterCss;
+        if (freeText) {
+            fixWorks = await simulateFreeFix(freeText);
+            chosenFix = { label: '직접 작성한 수정', kind: freeFixKind(fixWorks, freeText), op: null };
+            afterCss = fixWorks
+                ? `${buildCss(challenge.rules)}\n${freeText}`
+                : buildCss(applyFix(challenge.rules, bestFix.op));
+        } else {
+            chosenFix = challenge.fixes[pick.fix];
+            fixWorks = await simulateFix(chosenFix.op);
+            afterCss = buildCss(applyFix(challenge.rules, (fixWorks ? chosenFix : bestFix).op));
+        }
 
         const diagOk = isBehavior
             ? !!(challenge.causes[pick.cause] && challenge.causes[pick.cause].correct)
@@ -299,8 +373,7 @@ export function render(container) {
         solved += 1;
         setPos += 1;
         setDone = setPos >= SET_SIZE;
-        addDiagnoseRecord();
-        if (!questMarked) { markQuestDone('diagnose_use'); questMarked = true; }
+        addDiagnoseSolved();
 
         // 퀴즈 채점 표시
         if (isBehavior) {
@@ -325,9 +398,8 @@ export function render(container) {
             });
         }
 
-        const showFix = fixWorks ? chosenFix : bestFix;
         el.afterCap.textContent = fixWorks ? '수정 후 (내 처방)' : '수정 후 (정답 처방)';
-        el.frameAfter.srcdoc = previewSrc(challenge.html, buildCss(applyFix(challenge.rules, showFix.op)));
+        el.frameAfter.srcdoc = previewSrc(challenge.html, afterCss);
         el.afterWrap.hidden = false;
 
         let dx = null;
@@ -460,8 +532,27 @@ const REF_OBJECTFIT = `
         <dd><code>img { width: 100%; height: 100%; object-fit: cover }</code> + 부모(<code>figure</code> 등)에 원하는 크기.</dd>
     </dl>`;
 
+const REF_INHERIT = `
+    <h3>상속 (inheritance)</h3>
+    <p class="dgc-ref-intro">일부 속성은 부모에서 자식으로 <b>자동으로 흘러내립니다</b> — 하지만 자식에 <b>이미 값이 정해져 있으면</b> 상속되지 않습니다.</p>
+    <dl class="dgc-ref-list">
+        <dt>상속되는 속성</dt>
+        <dd><code>color</code> · <code>font-*</code> · <code>line-height</code> · <code>letter-spacing</code> · <code>text-align</code> · <code>visibility</code> · <code>cursor</code> · <code>list-style</code> — 주로 텍스트 관련. <code>margin</code>·<code>padding</code>·<code>border</code>·<code>background</code>·<code>display</code> 는 상속 안 됨.</dd>
+        <dt>왜 안 내려오나</dt>
+        <dd><code>a</code> · <code>button</code> · <code>input</code> · <code>select</code> · <code>textarea</code> · <code>table</code> 는 브라우저 기본 스타일이 <code>color</code>/<code>font</code> 를 직접 지정합니다. 자기 값이 있으니 부모 값이 상속될 자리가 없습니다(상속은 "값이 없을 때"만).</dd>
+        <dt>고칠 때</dt>
+        <dd>물려받게 하려면 그 속성에 <code>inherit</code> 을 명시합니다 — <code>.card a { color: inherit; }</code> · <code>button { font: inherit; }</code>. <code>!important</code> 가 아니라 <code>inherit</code> 이 정답입니다.</dd>
+    </dl>
+    <div class="dgc-ref-example">
+        <pre>.card { color: #334155; }
+.card a { /* 규칙 없음 → 상속? */ }
+/* → a 는 브라우저 기본 파란색. 상속이 아니라 기본값이 이김 */
+.card a { color: inherit; }  /* ← 부모 색을 명시적으로 물려받음 */</pre>
+    </div>`;
+
 const REFERENCE = {
     specificity: REF_SPECIFICITY,
+    inherit: REF_INHERIT,
     'stacking-context': REF_STACKING,
     'containing-block': REF_CONTAINING,
     'overflow-clip': REF_OVERFLOW,
