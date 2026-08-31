@@ -1,4 +1,5 @@
 import { initRouter, registerRoute } from './router.js';
+import { markVisit } from './store.js';
 import { render as renderLanding } from './pages/landing.js';
 import { render as renderBattle } from './pages/battle.js';
 import { render as renderTyping } from './pages/typing.js';
@@ -14,4 +15,5 @@ registerRoute('diagnose', renderDiagnose);
 registerRoute('quest', renderQuest);
 // registerRoute('report', renderReport);
 
+markVisit();
 initRouter(document.getElementById('app'));

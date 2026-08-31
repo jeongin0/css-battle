@@ -1,6 +1,6 @@
 import { nextChallenge, buildCss, applyFix, REASONS } from '../core/diagnoseChallenges.js';
 import { diagnoseCascade, COL_KR, tupleArr, decidingIndex } from '../core/cascadeReplay.js';
-import { markQuestDone } from '../store.js';
+import { markQuestDone, addDiagnoseRecord } from '../store.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -299,6 +299,7 @@ export function render(container) {
         solved += 1;
         setPos += 1;
         setDone = setPos >= SET_SIZE;
+        addDiagnoseRecord();
         if (!questMarked) { markQuestDone('diagnose_use'); questMarked = true; }
 
         // 퀴즈 채점 표시

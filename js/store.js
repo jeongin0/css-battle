@@ -3,7 +3,9 @@ const STORAGE_KEY = 'cssBattleData';
 const DEFAULT_STATE = {
     battleRecords: [],
     typingRecords: [],
+    diagnoseRecords: [],
     questLog: {},
+    visitLog: {},
     streak: { current: 0, longest: 0 },
     settings: { difficulty: 'low' }
 };
@@ -55,6 +57,12 @@ export function addTypingRecord(record) {
     return full;
 }
 
+export function addDiagnoseRecord(record = {}) {
+    const full = { date: todayKey(), ...record };
+    setState({ diagnoseRecords: [...(state.diagnoseRecords || []), full] });
+    return full;
+}
+
 export function setDifficulty(difficulty) {
     setState({ settings: { ...state.settings, difficulty } });
 }
@@ -63,6 +71,11 @@ export function markQuestDone(questId, dateKey = todayKey()) {
     const done = new Set(state.questLog[dateKey] || []);
     done.add(questId);
     setState({ questLog: { ...state.questLog, [dateKey]: [...done] } });
+}
+
+export function markVisit(dateKey = todayKey()) {
+    if (state.visitLog[dateKey]) return;
+    setState({ visitLog: { ...state.visitLog, [dateKey]: true } });
 }
 
 export function setStreak(streak) {
