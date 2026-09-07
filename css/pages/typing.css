@@ -29,6 +29,8 @@
 @keyframes typing-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
 @media (prefers-reduced-motion: reduce) {
+    .typing-page .typing-topbar { flex-direction: column; align-items: flex-start; }
+    .typing-page .typing-stats div { flex: 1; }
     .typing-page .typing-fighter.is-swing .fighter-idle { opacity: 1; }
     .typing-page .typing-fighter.is-swing .fighter-swing { opacity: 0; }
     .typing-page .typing-fighter.is-swing,
