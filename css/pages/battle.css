@@ -55,7 +55,6 @@
 
 .battle-page .battle-checklist { list-style: none; display: grid; gap: var(--sp08); margin: var(--sp08) 0; }
 .battle-page .battle-checklist li { display: flex; gap: var(--sp08); align-items: baseline; background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--sp08); padding: var(--sp08) var(--sp12); font-size: var(--ft14); }
-.battle-page .battle-checklist li.is-ok { border-color: var(--hp-green); }
 .battle-page .battle-checklist li.is-warn { border-color: var(--gold); }
 .battle-page .battle-checklist .battle-check-mark { font-family: var(--font-point); font-size: 10px; flex-shrink: 0; }
 .battle-page .battle-checklist li.is-ok .battle-check-mark { color: var(--hp-green); }

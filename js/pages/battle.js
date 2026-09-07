@@ -270,13 +270,13 @@ export function render(container) {
         `);
 
         if (hygiene.empty) {
-            parts.push(`<h3 class="battle-result-head">셀렉터 위생</h3><p class="hint-text">CSS를 작성하지 않았습니다.</p>`);
+            parts.push(`<h3 class="battle-result-head">체크리스트</h3><p class="hint-text">CSS를 작성하지 않았습니다.</p>`);
         } else {
             const items = hygiene.checks.map((c) =>
                 `<li class="${c.ok ? 'is-ok' : 'is-warn'}"><span class="battle-check-mark">${c.ok ? '✓' : '주의'}</span>
                     <span>${escapeHtml(c.label)}${c.detail ? ` <em>(${escapeHtml(c.detail)})</em>` : ''}</span></li>`).join('');
             parts.push(`
-                <h3 class="battle-result-head">셀렉터 위생 (점수 아님 · 체크리스트)</h3>
+                <h3 class="battle-result-head">체크리스트 (점수 아님 · 셀렉터 습관 점검)</h3>
                 <ul class="battle-checklist">${items}</ul>
                 <div class="table-scroll">
                     <table class="specificity-table">

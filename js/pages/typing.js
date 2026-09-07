@@ -1,6 +1,22 @@
 import { nextDrill } from '../core/typingDrills.js';
 import { reportTypingAccuracy } from '../store.js';
 
+// 타이핑할 때마다 칼을 휘두르는 8bit 검사
+const FIGHTER_SVG = `
+    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="typing-fighter-slash" d="M30 4 A22 22 0 0 1 46 32" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="16" y="36" width="6" height="9" rx="1" fill="var(--p2)"/>
+        <rect x="26" y="36" width="6" height="9" rx="1" fill="var(--p2)"/>
+        <rect x="14" y="19" width="20" height="18" rx="2" fill="var(--p1)"/>
+        <rect x="17" y="7" width="14" height="13" rx="2" fill="var(--ink)"/>
+        <rect x="18" y="12" width="12" height="3" fill="var(--p1)"/>
+        <g class="typing-fighter-sword">
+            <rect x="30" y="0" width="4" height="21" rx="2" fill="var(--gold)"/>
+            <rect x="25" y="20" width="14" height="3" rx="1" fill="var(--ink-dim)"/>
+            <rect x="31" y="23" width="2" height="6" fill="var(--ink-dim)"/>
+        </g>
+    </svg>`;
+
 function escapeHtml(s) {
     return String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 }
@@ -29,17 +45,22 @@ export function render(container) {
     let bestCombo = 0;
     let completed = 0;
     let hadErrorThisDrill = false;
+    let lastLen = 0;
+    let swingFlip = false;
 
     container.innerHTML = `
         <section class="container typing-page">
             <h2 class="page-title">타자연습 모드</h2>
             <p class="page-desc">화면의 CSS 선택자를 똑같이, 빠르고 정확하게 타이핑하고 Enter로 넘기세요. 아래 설명으로 그 선택자가 무엇을 고르는지도 같이 익힙니다.</p>
 
-            <dl class="typing-stats">
-                <div><dt>타 / 분</dt><dd data-role="wpm">0</dd></div>
-                <div><dt>정확도 %</dt><dd data-role="acc">100</dd></div>
-                <div><dt>콤보</dt><dd data-role="combo">0</dd></div>
-            </dl>
+            <div class="typing-topbar">
+                <dl class="typing-stats">
+                    <div><dt>타 / 분</dt><dd data-role="wpm">0</dd></div>
+                    <div><dt>정확도 %</dt><dd data-role="acc">100</dd></div>
+                    <div><dt>콤보</dt><dd data-role="combo">0</dd></div>
+                </dl>
+                <div class="typing-fighter" data-role="fighter" aria-hidden="true">${FIGHTER_SVG}</div>
+            </div>
 
             <pre class="typing-answer" data-role="target"></pre>
             <p class="typing-tip" data-role="tip"></p>
@@ -65,7 +86,8 @@ export function render(container) {
         acc: container.querySelector('[data-role="acc"]'),
         combo: container.querySelector('[data-role="combo"]'),
         enter: container.querySelector('[data-role="enter"]'),
-        skip: container.querySelector('[data-role="skip"]')
+        skip: container.querySelector('[data-role="skip"]'),
+        fighter: container.querySelector('[data-role="fighter"]')
     };
 
     function renderStats() {
@@ -74,11 +96,25 @@ export function render(container) {
         el.wpm.textContent = minutes > 0 ? Math.round(liveChars / minutes) : 0;
         el.acc.textContent = keystrokes > 0 ? Math.round((correctKeystrokes / keystrokes) * 100) : 100;
         el.combo.textContent = combo;
+        el.fighter.classList.toggle('is-hot', combo >= 5);
+    }
+
+    // 글자를 새로 칠 때마다 칼 휘두르기 (틀리면 움찔)
+    function swing(hit) {
+        el.fighter.classList.remove('is-swing-a', 'is-swing-b', 'is-miss');
+        void el.fighter.offsetWidth;
+        if (!hit) {
+            el.fighter.classList.add('is-miss');
+            return;
+        }
+        el.fighter.classList.add(swingFlip ? 'is-swing-a' : 'is-swing-b');
+        swingFlip = !swingFlip;
     }
 
     function loadDrill(resetCombo) {
         if (resetCombo) combo = 0;
         hadErrorThisDrill = false;
+        lastLen = 0;
         drill = nextDrill();
         target = drill.text;
         el.input.value = '';
@@ -119,8 +155,11 @@ export function render(container) {
         const typed = el.input.value;
         keystrokes += 1;
         const pos = typed.length - 1;
-        if (pos >= 0 && typed[pos] === target[pos]) correctKeystrokes += 1;
+        const hit = pos >= 0 && typed[pos] === target[pos];
+        if (hit) correctKeystrokes += 1;
         else if (pos >= 0) hadErrorThisDrill = true;
+        if (typed.length > lastLen) swing(hit);
+        lastLen = typed.length;
         el.target.innerHTML = renderTarget(target, typed);
         renderStats();
     }
