@@ -1,21 +1,10 @@
 import { nextDrill } from '../core/typingDrills.js';
 import { reportTypingAccuracy } from '../store.js';
 
-// 타이핑할 때마다 칼을 휘두르는 8bit 검사
-const FIGHTER_SVG = `
-    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path class="typing-fighter-slash" d="M30 4 A22 22 0 0 1 46 32" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
-        <rect x="16" y="36" width="6" height="9" rx="1" fill="var(--p2)"/>
-        <rect x="26" y="36" width="6" height="9" rx="1" fill="var(--p2)"/>
-        <rect x="14" y="19" width="20" height="18" rx="2" fill="var(--p1)"/>
-        <rect x="17" y="7" width="14" height="13" rx="2" fill="var(--ink)"/>
-        <rect x="18" y="12" width="12" height="3" fill="var(--p1)"/>
-        <g class="typing-fighter-sword">
-            <rect x="30" y="0" width="4" height="21" rx="2" fill="var(--gold)"/>
-            <rect x="25" y="20" width="14" height="3" rx="1" fill="var(--ink-dim)"/>
-            <rect x="31" y="23" width="2" height="6" fill="var(--ink-dim)"/>
-        </g>
-    </svg>`;
+// 타이핑할 때마다 칼을 휘두르는 검사 (평소 / 베는 중 두 컷 스왑)
+const FIGHTER_HTML = `
+    <img class="fighter-idle" src="img/fighter-idle.png" alt="">
+    <img class="fighter-swing" src="img/fighter-swing.png" alt="">`;
 
 function escapeHtml(s) {
     return String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -46,7 +35,7 @@ export function render(container) {
     let completed = 0;
     let hadErrorThisDrill = false;
     let lastLen = 0;
-    let swingFlip = false;
+    let swingTimer = null;
 
     container.innerHTML = `
         <section class="container typing-page">
@@ -59,7 +48,7 @@ export function render(container) {
                     <div><dt>정확도 %</dt><dd data-role="acc">100</dd></div>
                     <div><dt>콤보</dt><dd data-role="combo">0</dd></div>
                 </dl>
-                <div class="typing-fighter" data-role="fighter" aria-hidden="true">${FIGHTER_SVG}</div>
+                <div class="typing-fighter" data-role="fighter" aria-hidden="true">${FIGHTER_HTML}</div>
             </div>
 
             <pre class="typing-answer" data-role="target"></pre>
@@ -101,14 +90,15 @@ export function render(container) {
 
     // 글자를 새로 칠 때마다 칼 휘두르기 (틀리면 움찔)
     function swing(hit) {
-        el.fighter.classList.remove('is-swing-a', 'is-swing-b', 'is-miss');
-        void el.fighter.offsetWidth;
         if (!hit) {
+            el.fighter.classList.remove('is-miss');
+            void el.fighter.offsetWidth;
             el.fighter.classList.add('is-miss');
             return;
         }
-        el.fighter.classList.add(swingFlip ? 'is-swing-a' : 'is-swing-b');
-        swingFlip = !swingFlip;
+        el.fighter.classList.add('is-swing');
+        clearTimeout(swingTimer);
+        swingTimer = setTimeout(() => el.fighter.classList.remove('is-swing'), 170);
     }
 
     function loadDrill(resetCombo) {
