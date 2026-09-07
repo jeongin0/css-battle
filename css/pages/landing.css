@@ -9,7 +9,7 @@
 .landing-hero .landing-hero-tagline { font-family: var(--font-main); font-weight: 800; font-size: var(--ft24); color: var(--ink); margin-bottom: var(--sp08); }
 .landing-hero .landing-hero-sub { color: var(--ink-dim); margin-bottom: var(--sp40); }
 
-.landing-hero-start { display: inline-block; font-family: var(--font-point); font-size: var(--ft14); color: var(--bg); background: var(--p1); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: var(--sp16) var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
+.landing-hero-start { display: inline-block; font-family: var(--font-main); font-size: var(--ft14); color: var(--bg); background: var(--p1); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: var(--sp16) var(--sp24); transition: transform 0.1s ease, box-shadow 0.1s ease; }
 .landing-hero-start:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
 
 /* Hero(상단) 버튼: hover 시 왼쪽→오른쪽 체력바 차오르듯 채워짐 */
@@ -50,7 +50,7 @@
 
 .landing-howto .landing-howto-intro { display: grid; gap: var(--sp16); max-width: 760px; margin-bottom: var(--sp60); color: var(--ink); font-size: var(--ft14); line-height: 1.9; word-break: keep-all; text-align: center; }
 
-.landing-howto .landing-howto-coursehead { text-align: center; font-family: var(--font-point); font-size: var(--ft12); color: var(--p1); margin-bottom: var(--sp24); }
+.landing-howto .landing-howto-coursehead { text-align: center; font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); margin-bottom: var(--sp24); }
 .landing-howto .landing-howto-list { grid-auto-flow: column; display: grid; gap: var(--sp24); margin-bottom: var(--sp60); border-bottom: 2px solid var(--panel-light); padding-bottom: var(--sp40); }
 .landing-howto .landing-howto-step { display: flex; }
 .landing-howto .landing-howto-steplink { display: flex; gap: var(--sp16); border: 2px solid var(--panel-light); padding: var(--sp16); width: 100%; }
@@ -76,11 +76,11 @@
 /* 리텐션 스트립 */
 .landing-retention { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp16); background: var(--panel); border: 2px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16) var(--sp24); margin-bottom: var(--sp60); font-size: var(--ft14); }
 .landing-retention .landing-retention-item { color: var(--ink-dim); }
-.landing-retention .landing-retention-item b { color: var(--gold); font-family: var(--font-point); font-size: var(--ft12); }
+.landing-retention .landing-retention-item b { color: var(--gold); font-family: var(--font-point); font-size: var(--ft14); }
 .landing-retention .landing-retention-quests { display: flex; align-items: center; gap: var(--sp08); flex-wrap: wrap; color: var(--ink-dim); }
 .landing-retention .landing-retention-quests span { background: var(--panel-light); border-radius: var(--sp04); padding: 2px var(--sp08); font-size: var(--ft12); }
 .landing-retention .landing-retention-quests span.is-done { color: var(--hp-green); border: 1px solid var(--hp-green); }
-.landing-retention .landing-retention-go { margin-left: auto; font-family: var(--font-point); font-size: 10px; color: var(--p1); }
+.landing-retention .landing-retention-go { margin-left: auto; font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); }
 
 /* 모드 카드 데모 */
 .landing-modes .landing-mode-demo { display: flex; align-items: center; gap: var(--sp08); min-height: 46px; background: var(--bg); border: 1px solid var(--panel-light); border-radius: var(--sp04); padding: var(--sp08) var(--sp12); margin: var(--sp04) 0 var(--sp08); overflow: hidden; }
@@ -97,10 +97,6 @@
 .landing-demo-card-dot { width: 12px; height: 12px; border-radius: 999px; background: #4f46e5; flex-shrink: 0; }
 .landing-demo-card-bar { height: 5px; border-radius: 2px; background: #111827; flex: 1; }
 .landing-demo-card-bar.short { flex: 0 0 20px; background: #9ca3af; }
-
-/* PLAYER CTA */
-.landing-players .landing-players-cta { flex-shrink: 0; font-family: var(--font-point); font-size: 10px; color: var(--p1); border: 2px solid var(--panel-light); padding: var(--sp08) var(--sp12); }
-.landing-players .landing-players-cta:hover { border-color: var(--gold); }
 
 /* 안심 요소 */
 .landing-trust { text-align: center; margin-bottom: var(--sp80); }

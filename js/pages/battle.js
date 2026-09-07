@@ -16,7 +16,7 @@ export function render(container) {
 
     container.innerHTML = `
         <section class="container battle-page">
-            <h1 class="page-title">배틀 모드</h1>
+            <h2 class="page-title">배틀 모드</h2>
             <p class="page-desc">목표 시안과 똑같이 보이도록 CSS를 0부터 작성하는 <strong>모작 연습</strong>입니다. 정답은 하나가 아니라서 점수는 매기지 않아요 — 겹쳐보기와 예시 정답으로 직접 확인하세요.</p>
 
             <div class="battle-bar">
@@ -46,7 +46,7 @@ export function render(container) {
 
                     <h3 class="battle-panel-title">목표 시안 <span data-role="problem-name"></span></h3>
                     <div class="battle-shielded">
-                        <iframe class="preview-frame preview-frame-lg" data-role="shown-frame" sandbox="allow-same-origin" scrolling="no" title="목표 시안"></iframe>
+                        <iframe class="preview-frame preview-frame-lg" data-role="shown-frame" sandbox="allow-same-origin" title="목표 시안"></iframe>
                         <div class="battle-shield" data-role="shield"></div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@ export function render(container) {
                     <h3 class="battle-panel-title">현재 렌더링 (실시간)</h3>
                     <div class="battle-overlay-wrap">
                         <iframe class="preview-frame preview-frame-lg" data-role="live-frame" sandbox="allow-same-origin" title="현재 렌더링"></iframe>
-                        <iframe class="preview-frame preview-frame-lg battle-overlay-frame" data-role="overlay-frame" sandbox="allow-same-origin" scrolling="no" title="시안 겹쳐보기" hidden></iframe>
+                        <iframe class="preview-frame preview-frame-lg battle-overlay-frame" data-role="overlay-frame" sandbox="allow-same-origin" title="시안 겹쳐보기" hidden></iframe>
                     </div>
                     <div class="battle-overlay-ctl">
                         <label><input type="checkbox" data-role="overlay-toggle"> 시안 겹쳐보기</label>

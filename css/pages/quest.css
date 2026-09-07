@@ -21,7 +21,6 @@
 .stamp-calendar .stamp-calendar-cell.is-visit { border-color: var(--gold); color: var(--gold); }
 .stamp-calendar .stamp-calendar-cell.is-partial { border-color: var(--hp-green); color: var(--hp-green); }
 .stamp-calendar .stamp-calendar-cell.is-perfect { background: var(--hp-green); color: var(--bg); border-color: var(--hp-green); font-size: var(--ft14); }
-.stamp-calendar .stamp-calendar-cell.is-future { color: var(--ink-dim); opacity: 0.5; }
 .stamp-calendar .stamp-calendar-cell.is-outside { background: transparent; color: var(--ink-dim); opacity: 0.4; }
 
 /* 범례 — 그리드 아래 한 줄 */

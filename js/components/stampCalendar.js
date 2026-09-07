@@ -30,8 +30,9 @@ export function stampCalendarHtml(questLog = {}, visitLog = {}) {
         const perfect = count >= 3;
         const partial = count >= 1 && count < 3;
         const visitOnly = count === 0 && !!visitLog[key];
-        const isFuture = date > today;
         const isOutside = date.getMonth() !== month;
+        // 이번 달 칸에는 is-future를 붙이지 않는다. 옆달 미리보기 중 미래 날짜만 흐리게.
+        const isFuture = isOutside && date > today;
         const cls = [
             'stamp-calendar-cell',
             perfect ? 'is-perfect' : '',

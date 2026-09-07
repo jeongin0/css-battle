@@ -32,13 +32,13 @@ const COURSE = [
 ];
 
 const PLAYERS = [
-    { tag: '1P', icon: 'question', href: '#typing', cta: '타자연습부터',
+    { tag: '1P', icon: 'question',
         title: 'CSS만 만나면 멈추는 입문·주니어',
         desc: '선택자 우선순위가 감으로만 잡혀서, 스타일이 왜 안 먹히는지 설명하지 못하는 분' },
-    { tag: '2P', icon: 'clock', href: '#diagnose', cta: 'CSS 디버그로',
+    { tag: '2P', icon: 'clock',
         title: '실무에서 스타일 충돌에 시간 쓰는 현직자',
         desc: '어떤 규칙이 이기는지 찾느라 개발자도구를 한참 뒤지는 분' },
-    { tag: '3P', icon: 'robot', href: '#diagnose', cta: 'CSS 디버그로',
+    { tag: '3P', icon: 'robot',
         title: '막히면 바로 AI에 붙여넣는 분',
         desc: '되긴 하는데 원리는 여전히 모르는 채로 넘어가서, 다음에 또 똑같이 막히는 분' }
 ];
@@ -79,7 +79,7 @@ export function render(container) {
             </span>
         </section>
 
-        <section class="landing-retention">
+        <div class="landing-retention">
             <span class="landing-retention-item">🔥 <b>${streak.current}일</b> 연속 접속</span>
             <span class="landing-retention-item">★ 스탬프 <b>${stamps}</b>개</span>
             <span class="landing-retention-quests">
@@ -87,10 +87,10 @@ export function render(container) {
                 ${quests.map((q) => `<span class="${todayDone.has(q.id) ? 'is-done' : ''}">${q.label}</span>`).join('')}
             </span>
             <a href="#quest" class="landing-retention-go">퀘스트 보기 ▶</a>
-        </section>
+        </div>
 
         <section class="landing-modes">
-            <h3 class="landing-heading"><span>MODE</span> STAGE SELECT</h3>
+            <h2 class="landing-heading"><span>MODE</span> STAGE SELECT</h2>
             <ol class="landing-modes-list">
                 ${MODES.map((m) => `
                     <li>
@@ -107,7 +107,7 @@ export function render(container) {
         </section>
 
         <section class="landing-howto">
-            <h3 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h3>
+            <h2 class="landing-heading"><span>MANUAL</span> HOW TO PLAY</h2>
             <p class="landing-howto-tagline">CSS가 왜 안 먹히는지, 직접 부딪혀보세요.</p>
 
             <div class="landing-howto-intro">
@@ -130,7 +130,7 @@ export function render(container) {
             </ol>
 
             <div class="landing-howto-outcome">
-                <h4 class="landing-howto-outcome-title">그래서 무엇이 달라질까요?</h4>
+                <h3 class="landing-howto-outcome-title">그래서 무엇이 달라질까요?</h3>
                 <p>CSS가 적용되지 않을 때 무작정 코드를 수정하거나 !important를 사용하는 대신,</p>
                 <p class="landing-howto-flow">
                     <span>왜 이 스타일이 적용되지 않았지?</span>
@@ -142,7 +142,7 @@ export function render(container) {
         </section>
 
         <section class="landing-players">
-            <h3 class="landing-heading"><span>YOU</span> PLAYER SELECT</h3>
+            <h2 class="landing-heading"><span>YOU</span> PLAYER SELECT</h2>
             <ul class="landing-players-list">
                 ${PLAYERS.map((p) => `
                     <li class="landing-players-row">
@@ -152,17 +152,15 @@ export function render(container) {
                             <span class="landing-players-title">${p.title}</span>
                             <span class="landing-players-desc">${p.desc}</span>
                         </span>
-                        <a href="${p.href}" class="landing-players-cta">${p.cta} ▶</a>
                     </li>
                 `).join('')}
             </ul>
         </section>
 
-        <section class="landing-trust">
+        <div class="landing-trust">
             <ul class="landing-trust-list">
                 ${TRUST.map((t) => `<li>${t}</li>`).join('')}
             </ul>
-            <a href="#typing" class="landing-hero-start landing-howto-start">▶ PRESS START</a>
-        </section>
+        </div>
     `;
 }
