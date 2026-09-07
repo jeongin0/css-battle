@@ -9,9 +9,11 @@
 .typing-page .typing-fighter .fighter-swing { opacity: 0; }
 .typing-page .typing-fighter.is-swing .fighter-idle { opacity: 0; }
 .typing-page .typing-fighter.is-swing .fighter-swing { opacity: 1; }
+.typing-page .typing-fighter.is-swing { animation: typing-chop 0.16s ease-out; }
 .typing-page .typing-fighter.is-hot { filter: drop-shadow(0 0 7px var(--gold)); }
 .typing-page .typing-fighter.is-miss { animation: typing-fighter-flinch 0.24s ease; }
 
+@keyframes typing-chop { 0% { transform: translateY(-3px); } 55% { transform: translateY(4px); } 100% { transform: translateY(0); } }
 @keyframes typing-fighter-flinch { 0%, 100% { transform: translateX(0); } 45% { transform: translateX(6px) rotate(3deg); } }
 .typing-page .typing-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp16); text-align: center; min-width: 96px; }
 .typing-page .typing-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
@@ -29,6 +31,7 @@
 @media (prefers-reduced-motion: reduce) {
     .typing-page .typing-fighter.is-swing .fighter-idle { opacity: 1; }
     .typing-page .typing-fighter.is-swing .fighter-swing { opacity: 0; }
+    .typing-page .typing-fighter.is-swing,
     .typing-page .typing-fighter.is-miss,
     .typing-page .typing-input.is-shake { animation: none; }
 }

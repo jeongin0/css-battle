@@ -36,6 +36,8 @@ export function render(container) {
     let hadErrorThisDrill = false;
     let lastLen = 0;
     let swingTimer = null;
+    let swingOn = false;
+    let lastSwingAt = 0;
 
     container.innerHTML = `
         <section class="container typing-page">
@@ -88,23 +90,33 @@ export function render(container) {
         el.fighter.classList.toggle('is-hot', combo >= 5);
     }
 
-    // 글자를 새로 칠 때마다 칼 휘두르기 (틀리면 움찔)
+    // 글자를 새로 칠 때마다 두 컷을 번갈아 → 계속 치면 위아래로 베는 모션. 틀리면 움찔.
     function swing(hit) {
         if (!hit) {
-            el.fighter.classList.remove('is-miss');
+            swingOn = false;
+            el.fighter.classList.remove('is-swing', 'is-miss');
             void el.fighter.offsetWidth;
             el.fighter.classList.add('is-miss');
             return;
         }
-        el.fighter.classList.add('is-swing');
+        const now = performance.now();
+        if (now - lastSwingAt < 55) return; // 너무 빠른 연타는 깜빡임 방지 (칼 든 컷 유지)
+        lastSwingAt = now;
+        swingOn = !swingOn;
+        el.fighter.classList.toggle('is-swing', swingOn);
         clearTimeout(swingTimer);
-        swingTimer = setTimeout(() => el.fighter.classList.remove('is-swing'), 170);
+        swingTimer = setTimeout(() => {
+            swingOn = false;
+            el.fighter.classList.remove('is-swing');
+        }, 220);
     }
 
     function loadDrill(resetCombo) {
         if (resetCombo) combo = 0;
         hadErrorThisDrill = false;
         lastLen = 0;
+        swingOn = false;
+        el.fighter.classList.remove('is-swing', 'is-miss');
         drill = nextDrill();
         target = drill.text;
         el.input.value = '';
