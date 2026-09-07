@@ -164,10 +164,19 @@ export function render(container) {
     `;
 
     const intro = showIntro();
-    return () => intro.remove();
+    return () => intro?.remove();
+}
+
+function introSeen() {
+    try { return sessionStorage.getItem('landing-intro-seen') === '1'; } catch { return false; }
+}
+
+function markIntroSeen() {
+    try { sessionStorage.setItem('landing-intro-seen', '1'); } catch { /* noop */ }
 }
 
 function showIntro() {
+    if (introSeen()) return null;
     document.getElementById('landing-intro')?.remove();
 
     const overlay = document.createElement('div');
@@ -196,7 +205,7 @@ function showIntro() {
     `;
 
     overlay.querySelector('.landing-intro-close')
-        .addEventListener('click', () => overlay.remove());
+        .addEventListener('click', () => { markIntroSeen(); overlay.remove(); });
 
     document.body.appendChild(overlay);
     return overlay;

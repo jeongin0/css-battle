@@ -28,6 +28,7 @@ async function handleRouteChange() {
     container.innerHTML = '';
     cleanupCurrent = render(container) || null;
     updateActiveNav(path);
+    window.scrollTo(0, 0);
 }
 
 export function initRouter(appContainer) {

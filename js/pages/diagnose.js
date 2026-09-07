@@ -385,7 +385,9 @@ export function render(container) {
         }
         markOpts(q('[data-role="q-fix"]'), (i) => challenge.fixes[i].kind === 'best', pick.fix);
         q('[data-role="q-fix"]').querySelectorAll('li').forEach((li, i) => {
-            if (challenge.fixes[i].kind === 'nope') li.classList.add('is-wrong');
+            if (challenge.fixes[i].kind === 'nope' && !li.classList.contains('is-chosen')) {
+                li.classList.add('is-nope');
+            }
         });
 
         // CSS 리스트 강조

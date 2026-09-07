@@ -57,6 +57,10 @@
 .diagnose-page .dgc-opts li.is-correct { border-color: var(--hp-green); background: rgba(74, 222, 128, 0.12); }
 .diagnose-page .dgc-opts li.is-wrong { border-color: var(--hp-red); background: rgba(255, 71, 87, 0.1); }
 .diagnose-page .dgc-opts li.is-chosen label { font-weight: 600; }
+.diagnose-page .dgc-opts li.is-correct:has(input:checked) { border-color: var(--hp-green); }
+.diagnose-page .dgc-opts li.is-wrong:has(input:checked) { border-color: var(--hp-red); }
+.diagnose-page .dgc-opts li.is-nope { opacity: 0.5; }
+.diagnose-page .dgc-opts li.is-nope label { text-decoration: line-through; text-decoration-color: var(--ink-dim); }
 .diagnose-page .dgc-opts li.is-correct::after { content: "정답"; margin-left: var(--sp08); align-self: center; font-size: var(--ft12); color: var(--hp-green); }
 .diagnose-page .dgc-opts li.is-wrong.is-chosen::after { content: "내 선택"; margin-left: var(--sp08); align-self: center; font-size: var(--ft12); color: var(--hp-red); }
 .diagnose-page .dgc-quiz .btn { align-self: flex-start; }
