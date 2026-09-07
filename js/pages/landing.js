@@ -162,4 +162,42 @@ export function render(container) {
             </ul>
         </div>
     `;
+
+    const intro = showIntro();
+    return () => intro.remove();
+}
+
+function showIntro() {
+    document.getElementById('landing-intro')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'landing-intro';
+    overlay.className = 'landing-intro';
+    overlay.innerHTML = `
+        <div class="landing-intro-box" role="dialog" aria-modal="true" aria-label="사이트 소개">
+            <div class="landing-intro-bar">
+                <span class="landing-intro-tag">ABOUT</span>
+                <button type="button" class="landing-intro-close" aria-label="닫기">✕</button>
+            </div>
+            <div class="landing-intro-body">
+                <p class="landing-intro-wordmark" aria-hidden="true">CSS<br>BATTLE</p>
+                <div class="landing-intro-text">
+                    <p>CSS 선택자와 캐스케이드를 타이핑·디버그·재현으로 익히는 학습용 웹입니다.</p>
+                    <p>프레임워크 없이 SPA로 구현했고, 반응형·접근성을 고려했습니다.</p>
+                    <p>AI를 활용해 약 14시간(2공수)에 기획부터 구현까지 완료했습니다.</p>
+                </div>
+                <p class="landing-intro-thanks">감사합니다.</p>
+                <dl class="landing-intro-credit">
+                    <div><dt>NAME</dt><dd>박정인</dd></div>
+                    <div><dt>CONTACT</dt><dd>010-6637-4423</dd></div>
+                </dl>
+            </div>
+        </div>
+    `;
+
+    overlay.querySelector('.landing-intro-close')
+        .addEventListener('click', () => overlay.remove());
+
+    document.body.appendChild(overlay);
+    return overlay;
 }

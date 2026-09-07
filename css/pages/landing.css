@@ -105,6 +105,30 @@
 
 @keyframes landing-blink { 50% { opacity: 0; } }
 
+/* 진입 소개 팝업 — 아케이드 ABOUT / STAFF ROLL 화면 */
+.landing-intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: var(--sp24); background: rgba(10, 6, 18, 0.78); backdrop-filter: blur(3px); animation: landing-intro-fade 0.15s ease-out; }
+.landing-intro-box { max-width: 460px; width: 100%; background: var(--panel); border: 4px solid var(--ink); overflow: hidden; }
+.landing-intro-bar { display: flex; align-items: center; justify-content: space-between; padding: var(--sp08) var(--sp08) var(--sp08) var(--sp16); background: var(--bg); border-bottom: 2px solid var(--ink); }
+.landing-intro-tag { font-family: var(--font-point); font-size: var(--ft12); letter-spacing: 2px; color: var(--p1); }
+.landing-intro-close { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: var(--ft16); color: var(--ink-dim); background: transparent; border: 0; cursor: pointer; }
+.landing-intro-close:hover { color: var(--p2); }
+
+.landing-intro-body { padding: var(--sp40) var(--sp24) var(--sp24); text-align: center; background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.22) 3px 4px), var(--panel); }
+.landing-intro-wordmark { font-family: var(--font-point); font-size: var(--ft24); line-height: 1.7; color: var(--gold); text-shadow: 3px 3px 0 var(--p2), 6px 6px 0 var(--bg); margin-bottom: var(--sp24); }
+.landing-intro-text { display: grid; gap: var(--sp08); font-size: var(--ft16); line-height: 1.75; color: var(--ink); word-break: keep-all; margin-bottom: var(--sp24); }
+.landing-intro-thanks { font-family: var(--font-main); font-weight: 700; font-size: var(--ft16); color: var(--p1); margin-bottom: var(--sp24); }
+
+.landing-intro-credit { display: grid; gap: var(--sp08); border-top: 2px dashed var(--panel-light); padding-top: var(--sp16); }
+.landing-intro-credit > div { display: flex; align-items: baseline; justify-content: center; gap: var(--sp12); }
+.landing-intro-credit dt { font-family: var(--font-point); font-size: var(--ft12); letter-spacing: 1px; color: var(--ink-dim); }
+.landing-intro-credit dd { font-family: var(--font-main); font-size: var(--ft16); color: var(--ink); }
+
+@keyframes landing-intro-fade { from { opacity: 0; transform: translateY(-8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-intro { animation: none; }
+}
+
 @media (max-width: 1024px) {
     .landing-modes .landing-modes-list { grid-template-columns: 1fr; }
     .landing-howto .landing-howto-list { grid-auto-flow: row; }
