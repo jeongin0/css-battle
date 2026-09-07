@@ -4,6 +4,9 @@ body { background: radial-gradient(60% 45% at 15% 0%, rgba(255, 210, 63, 0.14), 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--sp20); }
 code { font-family: var(--font-main); background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); }
 
+/* 텍스트 옆 픽셀 아이콘 — 주변 글자 크기에 맞춰 스케일 */
+.icon-px { height: 1.25em; width: auto; vertical-align: -0.25em; }
+
 /* 모든 콘텐츠 페이지 공통 텍스트 */
 .page-title { font-family: var(--font-main); font-weight: 700; font-size: var(--ft24); color: var(--gold); margin-bottom: var(--sp08); }
 .page-desc { color: var(--ink-dim); }

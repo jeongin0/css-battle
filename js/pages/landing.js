@@ -79,8 +79,8 @@ export function render(container) {
         </section>
 
         <div class="landing-retention">
-            <span class="landing-retention-item">🔥 <b>${streak.current}일</b> 연속 접속</span>
-            <span class="landing-retention-item">★ 스탬프 <b>${stamps}</b>개</span>
+            <span class="landing-retention-item"><img class="icon-px" src="img/icon_fire.png" alt=""> <b>${streak.current}일</b> 연속 접속</span>
+            <span class="landing-retention-item"><img class="icon-px" src="img/icon_star.png" alt=""> 스탬프 <b>${stamps}</b>개</span>
             <span class="landing-retention-quests">
                 오늘의 퀘스트
                 ${quests.map((q) => `<span class="${todayDone.has(q.id) ? 'is-done' : ''}">${q.label}</span>`).join('')}

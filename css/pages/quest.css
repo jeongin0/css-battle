@@ -20,7 +20,8 @@
 .stamp-calendar .stamp-calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--ft12); font-variant-numeric: tabular-nums; background: var(--panel-light); border: 2px solid transparent; border-radius: 6px; color: var(--ink); }
 .stamp-calendar .stamp-calendar-cell.is-visit { border-color: var(--gold); color: var(--gold); }
 .stamp-calendar .stamp-calendar-cell.is-partial { border-color: var(--hp-green); color: var(--hp-green); }
-.stamp-calendar .stamp-calendar-cell.is-perfect { background: var(--hp-green); color: var(--bg); border-color: var(--hp-green); font-size: var(--ft14); }
+.stamp-calendar .stamp-calendar-cell.is-perfect { background: var(--hp-green); border-color: var(--hp-green); }
+.stamp-calendar .stamp-calendar-cell img { width: 62%; height: auto; display: block; }
 .stamp-calendar .stamp-calendar-cell.is-outside { background: transparent; color: var(--ink-dim); opacity: 0.4; }
 
 /* 범례 — 그리드 아래 한 줄 */
@@ -29,4 +30,4 @@
 .stamp-calendar .stamp-calendar-legend .dot { width: 13px; height: 13px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; background: var(--panel-light); border: 2px solid transparent; }
 .stamp-calendar .stamp-calendar-legend .dot-visit { border-color: var(--gold); }
 .stamp-calendar .stamp-calendar-legend .dot-partial { border-color: var(--hp-green); }
-.stamp-calendar .stamp-calendar-legend .dot-perfect { background: var(--hp-green); color: var(--bg); border-color: var(--hp-green); }
+.stamp-calendar .stamp-calendar-legend-star { width: 15px; height: 15px; flex-shrink: 0; }

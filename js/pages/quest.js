@@ -31,12 +31,12 @@ export function render(container) {
         <section class="container quest-page">
             <h2 class="page-title">오늘의 퀘스트 / 스탬프</h2>
             <p class="page-desc">
-                <strong>매일 한 번</strong> 접속하면 연속 일수(🔥)가 이어져요. 하루라도 비면 0부터 다시 시작합니다.
-                그날 퀘스트 3개를 모두 깨면 달력에 스탬프(★)가 찍히고, 스탬프를 모으면 보상을 얻습니다.
+                <strong>매일 한 번</strong> 접속하면 연속 일수(<img class="icon-px" src="img/icon_fire.png" alt="">)가 이어져요. 하루라도 비면 0부터 다시 시작합니다.
+                그날 퀘스트 3개를 모두 깨면 달력에 스탬프(<img class="icon-px" src="img/icon_star.png" alt="">)가 찍히고, 스탬프를 모으면 보상을 얻습니다.
             </p>
 
             <div class="quest-streak">
-                <span class="quest-streak-badge">🔥 ${streak.current}일 연속</span>
+                <span class="quest-streak-badge"><img class="icon-px" src="img/icon_fire.png" alt=""> ${streak.current}일 연속</span>
                 <span class="hint-text">최장 ${streak.longest}일 · 스탬프 ${stamps}개</span>
             </div>
 
@@ -50,14 +50,14 @@ export function render(container) {
                 `).join('')}
             </ul>
 
-            <h3 class="battle-panel-title">스탬프 카드</h3>
+            <h3 class="battle-panel-title"><img class="icon-px" src="img/icon_stamp.png" alt=""> 스탬프 카드</h3>
             ${stampCalendarHtml(fresh.questLog, fresh.visitLog)}
 
-            <h3 class="battle-panel-title">다음 보상</h3>
+            <h3 class="battle-panel-title"><img class="icon-px" src="img/icon_trophy.png" alt=""> 다음 보상</h3>
             <p class="quest-reward">
                 ${reward
                     ? `<strong>${reward.title}</strong> 까지 스탬프 ${reward.remaining}개 남음`
-                    : '모든 칭호를 모았습니다! 🎉'}
+                    : '모든 칭호를 모았습니다! <img class="icon-px" src="img/icon_trophy.png" alt="">'}
             </p>
             <p class="hint-text">칭호 목록과 획득 조건은 <a href="#me">마이페이지</a>에서 볼 수 있어요.</p>
         </section>

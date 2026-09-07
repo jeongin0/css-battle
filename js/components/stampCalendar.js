@@ -41,18 +41,19 @@ export function stampCalendarHtml(questLog = {}, visitLog = {}) {
             isFuture ? 'is-future' : '',
             isOutside ? 'is-outside' : ''
         ].filter(Boolean).join(' ');
-        cells.push(`<li class="${cls}" title="${key} — 퀘스트 ${count}/3">${perfect ? '★' : date.getDate()}</li>`);
+        const mark = perfect ? '<img src="img/icon_star.png" alt="완료">' : date.getDate();
+        cells.push(`<li class="${cls}" title="${key} — 퀘스트 ${count}/3">${mark}</li>`);
     }
 
     return `
         <div class="stamp-calendar">
-            <p class="stamp-calendar-caption">${year}. ${String(month + 1).padStart(2, '0')}</p>
+            <p class="stamp-calendar-caption">${year}.${String(month + 1).padStart(2, '0')}</p>
             <ul class="stamp-calendar-head">${head}</ul>
             <ul class="stamp-calendar-grid">${cells.join('')}</ul>
             <ul class="stamp-calendar-legend">
                 <li><span class="dot dot-visit"></span>접속</li>
                 <li><span class="dot dot-partial"></span>일부 완료</li>
-                <li><span class="dot dot-perfect">★</span>3개 완료</li>
+                <li><img class="stamp-calendar-legend-star" src="img/icon_star.png" alt="">3개 완료</li>
             </ul>
         </div>
     `;

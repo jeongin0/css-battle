@@ -23,17 +23,17 @@ export function render(container) {
             <p class="page-desc">지금까지 모은 스탬프와 칭호, 그리고 각 칭호의 획득 조건입니다.</p>
 
             <div class="me-card">
-                <p class="me-card-label">현재 칭호</p>
+                <p class="me-card-label"><img class="icon-px" src="img/icon_trophy.png" alt=""> 현재 칭호</p>
                 <p class="me-card-title">${title}</p>
                 <dl class="me-figures">
-                    <div><dt>🔥 연속 접속</dt><dd>${streak.current}일</dd></div>
+                    <div><dt><img class="icon-px" src="img/icon_fire.png" alt=""> 연속 접속</dt><dd>${streak.current}일</dd></div>
                     <div><dt>최장 연속</dt><dd>${streak.longest}일</dd></div>
-                    <div><dt>스탬프(퍼펙트 데이)</dt><dd>${stamps}개</dd></div>
+                    <div><dt><img class="icon-px" src="img/icon_stamp.png" alt=""> 스탬프(퍼펙트 데이)</dt><dd>${stamps}개</dd></div>
                     <div><dt>총 접속일</dt><dd>${visits}일</dd></div>
                 </dl>
             </div>
 
-            <h3 class="battle-panel-title">칭호 목록</h3>
+            <h3 class="battle-panel-title"><img class="icon-px" src="img/icon_trophy.png" alt=""> 칭호 목록</h3>
             <p class="me-titles-intro">
                 <strong>퍼펙트 데이</strong> = 하루에 그날 퀘스트 3개(배틀 · 타자연습 · CSS 디버그)를 모두 완료한 날.
                 퍼펙트 데이가 쌓이면 아래 칭호가 자동으로 열립니다. 연속으로 할 필요는 없어요.
@@ -41,7 +41,7 @@ export function render(container) {
             <p class="me-next">
                 ${reward
                     ? `다음 칭호 <strong>${reward.title}</strong> 까지 퍼펙트 데이 ${reward.remaining}일`
-                    : '모든 칭호를 모았습니다! 🎉'}
+                    : '모든 칭호를 모았습니다! <img class="icon-px" src="img/icon_trophy.png" alt="">'}
             </p>
             <ul class="me-titles">
                 <li class="is-unlocked">
