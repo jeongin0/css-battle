@@ -20,7 +20,7 @@ export function render(container) {
     container.innerHTML = `
         <section class="container me-page">
             <h2 class="page-title">마이페이지</h2>
-            <p class="page-desc">지금까지 모은 스탬프와 칭호입니다. 칭호는 헤더 오른쪽에 항상 표시됩니다.</p>
+            <p class="page-desc">지금까지 모은 스탬프와 칭호, 그리고 각 칭호의 획득 조건입니다.</p>
 
             <div class="me-card">
                 <p class="me-card-label">현재 칭호</p>
@@ -34,22 +34,37 @@ export function render(container) {
             </div>
 
             <h3 class="battle-panel-title">칭호 목록</h3>
+            <p class="me-titles-intro">
+                <strong>퍼펙트 데이</strong> = 하루에 그날 퀘스트 3개(배틀 · 타자연습 · CSS 디버그)를 모두 완료한 날.
+                퍼펙트 데이가 쌓이면 아래 칭호가 자동으로 열립니다. 연속으로 할 필요는 없어요.
+            </p>
             <p class="me-next">
                 ${reward
-                    ? `다음 칭호 <strong>${reward.title}</strong> 까지 스탬프 ${reward.remaining}개`
+                    ? `다음 칭호 <strong>${reward.title}</strong> 까지 퍼펙트 데이 ${reward.remaining}일`
                     : '모든 칭호를 모았습니다! 🎉'}
             </p>
             <ul class="me-titles">
+                <li class="is-unlocked">
+                    <span class="me-titles-count">시작</span>
+                    <span class="me-titles-body">
+                        <span class="me-titles-name">신입 도전자</span>
+                        <span class="me-titles-desc">기본 칭호 — 아무 조건 없음</span>
+                    </span>
+                    <span class="me-titles-state">보유</span>
+                </li>
                 ${STAMP_REWARDS.map((r) => `
                     <li class="${stamps >= r.count ? 'is-unlocked' : ''}">
                         <span class="me-titles-count">스탬프 ${r.count}개</span>
-                        <span class="me-titles-name">${r.title}</span>
+                        <span class="me-titles-body">
+                            <span class="me-titles-name">${r.title}</span>
+                            <span class="me-titles-desc">${r.desc}</span>
+                        </span>
                         <span class="me-titles-state">${stamps >= r.count ? '획득' : '잠김'}</span>
                     </li>
                 `).join('')}
             </ul>
 
-            <p class="hint-text">스탬프는 <a href="#quest">퀘스트</a> 페이지에서 그날 퀘스트 3개를 모두 깨면 찍힙니다.</p>
+            <p class="hint-text">퍼펙트 데이 판정은 <a href="#quest">퀘스트</a> 페이지에 들어올 때 갱신됩니다.</p>
         </section>
     `;
 }

@@ -43,10 +43,10 @@ export function dailyQuests(dateKey = todayKey()) {
 }
 
 export const STAMP_REWARDS = [
-    { count: 3, title: '입문 스티커' },
-    { count: 7, title: '캐스케이드 견습' },
-    { count: 14, title: '특이도 장인' },
-    { count: 30, title: 'CSS 챔피언' }
+    { count: 3, title: '입문 스티커', desc: '퍼펙트 데이 3일 달성' },
+    { count: 7, title: '캐스케이드 견습', desc: '퍼펙트 데이 7일 달성' },
+    { count: 14, title: '특이도 장인', desc: '퍼펙트 데이 14일 달성' },
+    { count: 30, title: 'CSS 챔피언', desc: '퍼펙트 데이 30일 달성' }
 ];
 
 function shiftDays(dateKey, delta) {

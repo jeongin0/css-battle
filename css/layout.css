@@ -8,14 +8,11 @@
 .site-header .site-header-nav a.is-active { color: var(--p1); font-weight: 600; }
 
 .site-header .site-header-nav { margin-left: auto; }
-.site-header .site-header-me { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding: var(--sp08) var(--sp12); border: 1px solid var(--panel-light); border-radius: var(--radius); color: var(--ink-dim); }
+.site-header .site-header-me { color: var(--ink-dim); font-size: var(--ft16); }
 .site-header .site-header-me:hover,
-.site-header .site-header-me.is-active { border-color: var(--gold); }
-.site-header .site-header-me-label { font-size: var(--ft12); }
-.site-header .site-header-me-title { font-family: var(--font-point); font-size: 10px; color: var(--gold); }
+.site-header .site-header-me.is-active { color: var(--p1); font-weight: 600; }
 
 @media (max-width: 1024px) {
     .site-header .site-header-nav ul { gap: var(--sp08); }
     .site-header .site-header-nav { margin-left: 0; }
-    .site-header .site-header-me { flex-direction: row; align-items: center; gap: var(--sp08); }
 }

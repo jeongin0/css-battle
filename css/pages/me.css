@@ -6,13 +6,17 @@
 .me-page .me-figures dt { font-size: var(--ft12); color: var(--ink-dim); }
 .me-page .me-figures dd { font-family: var(--font-point); font-size: var(--ft16); color: var(--ink); margin-top: var(--sp04); }
 
+.me-page .me-titles-intro { color: var(--ink-dim); font-size: var(--ft14); line-height: 1.7; word-break: keep-all; margin: var(--sp08) 0 var(--sp16); }
+.me-page .me-titles-intro strong { color: var(--gold); }
 .me-page .me-next { color: var(--gold); margin: var(--sp08) 0 var(--sp16); }
 .me-page .me-titles { list-style: none; display: grid; gap: var(--sp08); }
 .me-page .me-titles li { display: flex; align-items: center; gap: var(--sp16); background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp16); color: var(--ink-dim); }
 .me-page .me-titles li.is-unlocked { border-color: var(--hp-green); color: var(--ink); }
 .me-page .me-titles-count { font-size: var(--ft14); min-width: 90px; }
-.me-page .me-titles-name { font-weight: 600; flex: 1; }
-.me-page .me-titles-state { font-family: var(--font-point); font-size: 10px; }
+.me-page .me-titles-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.me-page .me-titles-name { font-weight: 600; }
+.me-page .me-titles-desc { font-size: var(--ft12); color: var(--ink-dim); }
+.me-page .me-titles-state { font-family: var(--font-main); font-size: var(--ft12); }
 .me-page .me-titles li.is-unlocked .me-titles-state { color: var(--hp-green); }
 
 @media (max-width: 1024px) {

@@ -59,7 +59,7 @@ export function render(container) {
                     ? `<strong>${reward.title}</strong> 까지 스탬프 ${reward.remaining}개 남음`
                     : '모든 칭호를 모았습니다! 🎉'}
             </p>
-            <p class="hint-text">모은 칭호는 <a href="#me">마이페이지</a>와 헤더 오른쪽에서 볼 수 있어요.</p>
+            <p class="hint-text">칭호 목록과 획득 조건은 <a href="#me">마이페이지</a>에서 볼 수 있어요.</p>
         </section>
     `;
 }
