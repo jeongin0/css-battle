@@ -78,7 +78,7 @@
 .landing-retention .landing-retention-item { color: var(--ink-dim); }
 .landing-retention .landing-retention-item b { color: var(--gold); font-family: var(--font-point); font-size: var(--ft14); }
 .landing-retention .landing-retention-quests { display: flex; align-items: center; gap: var(--sp08); flex-wrap: wrap; color: var(--ink-dim); }
-.landing-retention .landing-retention-quests span { background: var(--panel-light); border-radius: var(--sp04); padding: 2px var(--sp08); font-size: var(--ft12); }
+.landing-retention .landing-retention-quests span { background: var(--panel-light); border-radius: var(--sp04); border: 1px solid var(--panel); padding: 2px var(--sp08); font-size: var(--ft12); }
 .landing-retention .landing-retention-quests span.is-done { color: var(--hp-green); border: 1px solid var(--hp-green); }
 .landing-retention .landing-retention-go { margin-left: auto; font-family: var(--font-main); font-size: var(--ft14); color: var(--p1); }
 

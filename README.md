@@ -61,23 +61,6 @@ CSS는 글로 설명하면 추상적입니다. 그래서
 
 ---
 
-## 어떻게 여나
-
-서버가 필요 없는 정적 사이트입니다. `index.html`을 로컬 웹 서버로 띄우면 됩니다.
-
-```bash
-# 예: Python
-python -m http.server 5500
-# 또는 VS Code의 Live Server 확장 등
-```
-
-브라우저에서 `http://localhost:5500` 접속. 최신 Chrome · Edge를 권장합니다(색 추출용 EyeDropper API 등).
-
-라우팅은 해시 기반이라 주소로 각 모드에 바로 갈 수 있습니다:
-`#typing` · `#diagnose` · `#battle` · `#quest` · `#me`
-
----
-
 ## 디자인 톤
 
 8bit 아케이드 격투게임 느낌 — 로고 · STAGE 라벨 · FIGHT 버튼 등 임팩트가 필요한 곳엔 픽셀 폰트(`Press Start 2P`)를, 본문과 코드 영역은 `Pretendard`로 읽기 편하게. 어두운 보라 배경에 시안/마젠타/골드 포인트 컬러.

@@ -75,7 +75,6 @@ export function render(container) {
             <p class="landing-hero-sub">CSS 선택자와 캐스케이드를 타이핑·진단·재현으로 몸에 익히는 학습 도구</p>
             <span class="landing-hero-cta">
                 <a href="#typing" class="landing-hero-start">▶ 처음이라면 타자연습</a>
-                <a href="#battle" class="landing-hero-start landing-hero-start-alt">바로 배틀</a>
             </span>
         </section>
 
