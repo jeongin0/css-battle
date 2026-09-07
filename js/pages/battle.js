@@ -302,7 +302,8 @@ export function render(container) {
 
     el.difficultyTabs.addEventListener('click', (e) => {
         const b = e.target.closest('.tabs-btn');
-        if (!b || b.dataset.value === difficulty) return;
+        if (!b) return;
+        // 같은 난이도를 다시 눌러도 새 문제를 받는다 (직전 문제는 제외)
         difficulty = b.dataset.value;
         setActiveTab(difficulty);
         loadProblem(true);
