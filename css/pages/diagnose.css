@@ -9,10 +9,10 @@
 .diagnose-page .dgc-intro-why { font-size: var(--ft14); color: var(--ink-dim); line-height: 1.7; }
 .diagnose-page .dgc-intro-why code { background: var(--bg); padding: 0 var(--sp04); border-radius: var(--sp04); color: var(--ink); }
 
-.diagnose-page .dgc-stats { display: flex; gap: var(--sp16); margin: var(--sp16) 0 var(--sp24); flex-wrap: wrap; }
-.diagnose-page .dgc-stats div { background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp20); text-align: center; min-width: 110px; }
-.diagnose-page .dgc-stats dt { font-size: var(--ft12); color: var(--ink-dim); }
-.diagnose-page .dgc-stats dd { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); margin-top: var(--sp04); }
+.diagnose-page .dgc-stats { display: flex; gap: var(--sp08); margin: var(--sp16) 0 var(--sp24); }
+.diagnose-page .dgc-stats div { flex: 1; min-width: 0; background: var(--panel); border: 1px solid var(--panel-light); border-radius: var(--radius); padding: var(--sp08) var(--sp12); text-align: center; }
+.diagnose-page .dgc-stats dt { font-size: var(--ft12); color: var(--ink-dim); word-break: keep-all; }
+.diagnose-page .dgc-stats dd { font-family: var(--font-point); font-size: var(--ft16); color: var(--p1); margin-top: var(--sp04); overflow-wrap: anywhere; }
 
 .diagnose-page .dgc-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp24); }
 .diagnose-page .dgc-stage .card { padding: var(--sp16); min-width: 0; }
@@ -49,7 +49,7 @@
 .diagnose-page .dgc-q b { color: var(--gold); font-family: var(--font-main); }
 .diagnose-page .dgc-opts { list-style: none; margin: 0; display: flex; flex-direction: column; gap: var(--sp04); }
 .diagnose-page .dgc-opts li { border: 1px solid var(--panel-light); border-radius: var(--sp08); background: var(--bg); }
-.diagnose-page .dgc-opts label { display: flex; gap: var(--sp08); align-items: baseline; padding: var(--sp08) var(--sp12); font-size: var(--ft14); color: var(--ink); cursor: pointer; }
+.diagnose-page .dgc-opts label { display: flex; gap: var(--sp08); align-items: center; padding: var(--sp08) var(--sp12); font-size: var(--ft14); color: var(--ink); cursor: pointer; }
 .diagnose-page .dgc-opts label span { min-width: 0; overflow-wrap: anywhere; }
 .diagnose-page .dgc-opts input { margin: 0; flex-shrink: 0; }
 .diagnose-page .dgc-opts code { background: inherit; padding: 0 var(--sp04); border-radius: var(--sp04); font-size: 0.95em; word-break: break-all; }
