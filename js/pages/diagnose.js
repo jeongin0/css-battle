@@ -126,7 +126,7 @@ export function render(container) {
             </div>
 
             <dl class="dgc-stats">
-                <div><dt>이번 세트</dt><dd data-role="setpos">1 / 3</dd></div>
+                <div><dt>이번 세트</dt><dd data-role="setpos">1/3</dd></div>
                 <div><dt>해결</dt><dd data-role="solved">0</dd></div>
                 <div><dt>진단 정확도</dt><dd data-role="acc">–</dd></div>
                 <div><dt>콤보</dt><dd data-role="combo">0</dd></div>

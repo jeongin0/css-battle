@@ -1,5 +1,5 @@
 /* ===== 배틀 모드 ===== */
-.battle-page .battle-bar { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; margin-top: var(--sp16); }
+.battle-page .battle-bar { display: flex; gap: var(--sp24); flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: var(--sp16); }
 .battle-page .battle-bar .battle-actions { margin-left: auto; }
 .battle-page .battle-actions { display: flex; gap: var(--sp08); flex-wrap: wrap; }
 .battle-page .battle-actions .btn { padding: var(--sp12) var(--sp20); border-radius: var(--sp08); }

@@ -121,7 +121,7 @@
 /* 직접 고쳐보기 (선택) */
 .diagnose-page .dgc-freefix { margin-top: var(--sp16); border: 1px solid var(--panel-light); border-radius: var(--sp08); padding: var(--sp12); }
 .diagnose-page .dgc-freefix summary { cursor: pointer; font-size: var(--ft14); color: var(--p1); }
-.diagnose-page .dgc-freefix textarea { min-height: 90px; margin-top: var(--sp08); }
+.diagnose-page .dgc-freefix textarea { min-height: 90px; box-sizing: border-box; margin-top: var(--sp08); }
 .diagnose-page .dgc-freefix-row { display: flex; align-items: center; gap: var(--sp12); margin-top: var(--sp08); flex-wrap: wrap; }
 .diagnose-page .dgc-freefix-row .btn { padding: var(--sp04) var(--sp12); font-size: var(--ft12); }
 .diagnose-page .dgc-freefix-out { font-size: var(--ft12); color: var(--ink-dim); }
