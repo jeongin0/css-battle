@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+/* 웹폰트는 index.html <head> 의 <link> 로 미리 로드한다.
+   (@import 는 늦게 발견돼 로딩 중 fallback 폰트가 번쩍이는 원인) */
 
 :root {
     --bg: #150C22;
@@ -13,8 +13,9 @@
     --ink: #F1EEFA;
     --ink-dim: #9084AE;
 
-    --font-main: 'Pretendard', sans-serif;
-    --font-point: 'Press Start 2P', cursive;
+    --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    /* Press Start 2P 로딩 전/한글 글자는 cursive(윈도우=Comic Sans) 대신 Pretendard·monospace 로 대체 */
+    --font-point: 'Press Start 2P', 'Pretendard', monospace;
 
     --ft12: 12px;
     --ft14: 14px;

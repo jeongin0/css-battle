@@ -167,12 +167,16 @@ export function render(container) {
     return () => intro?.remove();
 }
 
+// 한 번 닫으면 이 페이지 세션(모듈 로드) 동안은 다시 뜨지 않고,
+// 새로고침하면 모듈이 다시 로드되며 초기화 → 다시 노출된다.
+let introDismissed = false;
+
 function introSeen() {
-    try { return sessionStorage.getItem('landing-intro-seen') === '1'; } catch { return false; }
+    return introDismissed;
 }
 
 function markIntroSeen() {
-    try { sessionStorage.setItem('landing-intro-seen', '1'); } catch { /* noop */ }
+    introDismissed = true;
 }
 
 function showIntro() {
